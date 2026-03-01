@@ -39,8 +39,6 @@ export const GET = async ({ cookies }) => {
     code_challenge: codeChallenge,
     code_challenge_method: "S256",
   });
-
-  console.log("google url params: ", params);
   
   redirect(302, `https://accounts.google.com/o/oauth2/v2/auth?${params}`);
 };

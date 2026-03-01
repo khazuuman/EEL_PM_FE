@@ -5,8 +5,13 @@ import {
   GOOGLE_CLIENT_SECRET,
 } from "$env/static/private";
 import { PUBLIC_APP_URL } from "$env/static/public";
+import { login } from "$lib/server/auth/index.js";
+import { toast } from "svelte-sonner"
+import type { LoginResponse } from "$lib/types/response/authResponse.js";
 
-export const GET = async ({ url, cookies, fetch }) => {
+export const GET = async (event) => {
+  const { url, cookies, fetch } = event;
+
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
   const savedState = cookies.get("oauth_state");
@@ -34,35 +39,37 @@ export const GET = async ({ url, cookies, fetch }) => {
     }),
   });
 
-  if (!tokenRes.ok) throw error(400, "Failed to get token from Google");
+  if (!tokenRes.ok) {
+    const errText = await tokenRes.text();
+    console.log("Google token error:", errText); // Log lỗi chi tiết nếu fail
+    throw error(400, "Failed to get token from Google");
+  }
 
   const { id_token } = await tokenRes.json();
   console.log("id token google: ", id_token);
 
-  // Gửi id_token lên backend C# để xác thực
-  // const backendRes = await fetch("https://your-csharp-api.com/api/auth/google", {
-  //   method: "POST",
-  //   headers: { "Content-Type": "application/json" },
-  //   body: JSON.stringify({ idToken: id_token }),
-  // });
+  const campus = cookies.get("selectedCampus") ?? "";
+  console.log("selected campus: ", campus);
 
-  // if (!backendRes.ok) throw error(401, "Xác thực thất bại");
-
-  // const { accessToken } = await backendRes.json();
-
-  // 4️⃣ Lưu JWT của hệ thống vào httpOnly cookie
-  // cookies.set("access_token", accessToken, {
-  //   path: "/",
-  //   httpOnly: true,      // ✅ JS không đọc được
-  //   sameSite: "lax",
-  //   maxAge: 60 * 60 * 24,
-  //   secure: process.env.NODE_ENV === "production",
-  // });
+  //Gọi api login
+  const loginResult = await login(event, {
+    idToken: id_token,
+    // campus: campus
+  });
 
   // Dọn cookie tạm
   cookies.delete("oauth_state", { path: "/" });
   cookies.delete("code_verifier", { path: "/" });
+  cookies.delete("selectedCampus", { path: "/" });
 
-  // 5️⃣ Redirect vào dashboard SAU KHI đã xác thực xong
-  redirect(302, "/dashboard");
+  if (loginResult.status === 200) {
+    const msg = encodeURIComponent(loginResult.data.message ?? 'Login successfully!');
+    redirect(302, `/app/dashboard?toast=success&message=${msg}`);
+
+  } else {
+    const msg = encodeURIComponent(loginResult.data.message ?? 'Internal Server Error');
+    redirect(302, `/auth/login?toast=error&message=${msg}`);
+  }
+
+  //Lưu token lấy được từ login response vào cookie
 };

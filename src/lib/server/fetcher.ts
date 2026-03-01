@@ -60,21 +60,35 @@ export const fetcher = async <T>({
 	formData
 }: Fetcher<T>): Promise<Response> => {
 	const { request } = event;
+	// if (!url.includes('/auth')) {
+	// 	const accessToken = event.cookies.get('accessToken');
+	// 	if (!accessToken) {
+	// 		const refreshed = await refreshToken(event);
+	// 		if (!refreshed) {
+	// 			return createErrorResponse(401, 'Session expired');
+	// 		}
+	// 	}
+	// }
+	// check accessToken exist to refresh
 
-	const cookieHeader = request.headers.get('cookie');
 
 	const makeRequest = async (): Promise<Response> => {
+		const accessToken = event.cookies.get('accessToken');
+		const cookieHeader = event.request.headers.get('cookie');
+		console.log("[makeRequest] accessToken: ", accessToken);
+		console.log("[makeRequest] cookie: ", cookieHeader);
 		const fullUrl = endpoint + url;
-
 		// Xây dựng options
 		const options: RequestInit = {
 			method,
 			headers: {
-				...(cookieHeader ? { cookie: cookieHeader } : {})
+				// ...(cookieHeader ? { cookie: cookieHeader } : {})
+				...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+				...(cookieHeader ? { cookie: cookieHeader } : {}),
 			},
 			credentials: 'include'
 		};
-
+		console.log("[makeRequest] headers: ", options.headers);
 		// Xử lý body dựa trên loại data
 		if (formData) {
 			// Với FormData, không set Content-Type (browser tự set với boundary)
@@ -90,10 +104,8 @@ export const fetcher = async <T>({
 
 		try {
 			const res = await event.fetch(fullUrl, options);
-			console.log(`[fetcher] Requested URL: ${fullUrl} | Status: ${res.status} ${res.statusText}`);
 			return res;
 		} catch (err: any) {
-			console.error('[fetcher]', err);
 			if (err?.cause?.code === 'EAI_AGAIN') {
 				return createErrorResponse(503, 'DNS lookup failed');
 			}
@@ -102,10 +114,9 @@ export const fetcher = async <T>({
 	};
 
 	let res = await makeRequest();
-	console.log(`[fetcher] Response for ${url}:`, res);
 
 	// Skip retry logic if this is the refresh endpoint itself
-	const isRefreshRequest = url.includes('/refresh-token');
+	const isRefreshRequest = url.includes('/refresh-token') || url.includes('/logout');
 
 	// If 401 and not a refresh request
 	if (res.status === 401 && !isRefreshRequest) {
@@ -139,5 +150,23 @@ export const fetcher = async <T>({
 		}
 	}
 
-	return res;
+	return logResponse(res, url);
+};
+
+// Log chi tiết response data
+const logResponse = async (response: Response, label: string): Promise<Response> => {
+	const cloned = response.clone();
+	try {
+		const contentType = cloned.headers.get('Content-Type') || '';
+		if (contentType.includes('application/json')) {
+			const json = await cloned.json();
+			console.log(`[fetcher] ${label} - Status: ${response.status}`, JSON.stringify(json, null, 2));
+		} else {
+			const text = await cloned.text();
+			console.log(`[fetcher] ${label} - Status: ${response.status}`, text);
+		}
+	} catch (e) {
+		console.log(`[fetcher] ${label} - Could not parse response body`);
+	}
+	return response;
 };

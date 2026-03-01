@@ -130,7 +130,6 @@
 @theme {
   --color-logo: #f2a20d;
   --font-lexend: 'Lexend', ui-sans-serif, system-ui, sans-serif;
-  --color-background: #FAFAFA;
 }
 
 @layer base {

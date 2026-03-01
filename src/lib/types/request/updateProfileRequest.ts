@@ -1,0 +1,11 @@
+export interface UpdateProfileRequest {
+    phoneNumber?: string | null;
+    gender?: string | null;
+    dateOfBirth?: string | null;
+    //mentor
+    currentCompany?: string | null;
+    currentPosition?: string | null;
+    fieldOfWork?: string | null;
+    biography?: string | null;
+    yearsOfExperience?: number | null;
+}

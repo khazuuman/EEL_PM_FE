@@ -39,7 +39,7 @@
                 >
             </span>
             <Button
-                onclick={() => goto("/login")}
+                onclick={() => goto("/auth/login")}
                 variant="default"
                 class="group w-full bg-white border border-amber-500 text-black font-bold mt-5 h-10 hover:text-white cursor-pointer flex justify-center items-center"
                 ><CircleUserIcon
