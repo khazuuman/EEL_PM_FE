@@ -8,7 +8,7 @@ export const GET = async (event: RequestEvent) => {
     try {
         const logoutResult = await logout(event);
         if (logoutResult.status === 200) {
-            msg = 'Login successfully!';
+            msg = 'Logout successfully!';
             toastType = 'success'
         } else {
             msg = "Internal Server Error";

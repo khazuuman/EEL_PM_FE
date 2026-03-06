@@ -17,7 +17,7 @@
     </header>
 
     <main
-        class="flex-1 flex h-full w-screen justify-center items-center bg-background"
+        class="flex-1 flex h-full w-screen justify-center items-center bg-stone-100"
     >
         {@render children()}
     </main>
