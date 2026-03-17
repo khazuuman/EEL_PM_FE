@@ -1,10 +1,14 @@
-<script>
+<script lang="ts">
     import { goto } from "$app/navigation";
+    import { enhance } from "$app/forms";
+    import { toast } from "svelte-sonner";
     import { Button } from "$lib/components/ui/button";
     import { FieldLabel } from "$lib/components/ui/field";
     import { Input } from "$lib/components/ui/input";
     import { Separator } from "$lib/components/ui/separator";
     import { CircleUserIcon } from "lucide-svelte";
+
+    let loading = $state(false);
 </script>
 
 <div>
@@ -20,20 +24,62 @@
                 Please enter your FEID account information to continue accessing
                 the system.
             </h5>
-            <form>
+
+            <form
+                method="POST"
+                action="?/loginFEID"
+                use:enhance={() => {
+                    loading = true;
+                    return async ({ result, update }) => {
+                        loading = false;
+                        if (result.type === "failure") {
+                            toast.error(
+                                (result.data?.message as string) ??
+                                    "Login failed",
+                            );
+                        } else if (result.type === "error") {
+                            toast.error(
+                                result.error?.message ??
+                                    "Internal Server Error",
+                            );
+                        } else if (result.type === "redirect") {
+                            toast.success("Login successful!");
+                        }
+                        await update();
+                    };
+                }}
+            >
                 <FieldLabel class="mb-2">Username</FieldLabel>
-                <Input class="mb-4" placeholder="Enter username" required />
+                <Input
+                    name="email"
+                    class="mb-4"
+                    type="email"
+                    placeholder="Enter username"
+                    required
+                />
                 <FieldLabel class="mb-2">Password</FieldLabel>
-                <Input placeholder="Enter password" required type="password" />
+                <Input
+                    name="password"
+                    placeholder="Enter password"
+                    required
+                    type="password"
+                />
+
                 <Button
+                    type="submit"
+                    disabled={loading}
                     variant="default"
-                    class="group mb-5 bg-amber-400 text-black font-bold w-full mt-7 h-10 hover:text-white cursor-pointer flex justify-center items-center"
-                    >Login</Button
+                    class="group mb-5 bg-amber-400 text-black font-bold w-full mt-7 h-10 hover:text-white cursor-pointer flex justify-center items-center disabled:opacity-60"
                 >
+                    {loading ? "Logging in..." : "Login"}
+                </Button>
             </form>
 
             <span class="flex gap-3 justify-center items-center relative">
-                <Separator orientation="horizontal" class="h-px! bg-stone-300"/>
+                <Separator
+                    orientation="horizontal"
+                    class="h-px! bg-stone-300"
+                />
                 <span class="absolute bg-white px-4 text-stone-400 text-sm"
                     >OR</span
                 >
@@ -42,10 +88,12 @@
                 onclick={() => goto("/auth/login")}
                 variant="default"
                 class="group w-full bg-white border border-amber-500 text-black font-bold mt-5 h-10 hover:text-white cursor-pointer flex justify-center items-center"
-                ><CircleUserIcon
-                    class="text-black group-hover:text-white h-10 text-center"
-                /> Login with Google</Button
             >
+                <CircleUserIcon
+                    class="text-black group-hover:text-white h-10 text-center"
+                />
+                Login with Google
+            </Button>
         </div>
     </div>
     <p class="text-center w-105 text-[12px] text-stone-500 mb-2">

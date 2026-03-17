@@ -5,7 +5,7 @@ import {
   GOOGLE_CLIENT_SECRET,
 } from "$env/static/private";
 import { PUBLIC_APP_URL } from "$env/static/public";
-import { login } from "$lib/server/auth/index.js";
+import { loginByGoogle } from "$lib/server/auth/index.js";
 
 export const GET = async (event) => {
   const { url, cookies, fetch } = event;
@@ -51,7 +51,7 @@ export const GET = async (event) => {
   console.log("selected campus: ", campus);
 
   //Gọi api login
-  const loginResult = await login(event, {
+  const loginResult = await loginByGoogle(event, {
     idToken: id_token,
     // campus: campus
   });
