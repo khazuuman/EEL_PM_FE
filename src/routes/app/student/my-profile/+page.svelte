@@ -185,7 +185,7 @@
 </AlertDialog.Root>
 
 <div class="w-screen flex justify-center items-center">
-    <div class="w-[70%]">
+    <div class="w-[70%] pt-5">
         <h1
             class="text-3xl font-bold text-black bg-white w-fit px-3 rounded-t-md"
         >

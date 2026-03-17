@@ -5,8 +5,7 @@ import {
   GOOGLE_CLIENT_SECRET,
 } from "$env/static/private";
 import { PUBLIC_APP_URL } from "$env/static/public";
-import { getMe, login } from "$lib/server/auth/index.js";
-import { ROLE } from "$lib/enums/role.js";
+import { login } from "$lib/server/auth/index.js";
 
 export const GET = async (event) => {
   const { url, cookies, fetch } = event;
@@ -64,35 +63,6 @@ export const GET = async (event) => {
 
   if (loginResult?.status === 200) {
     throw redirect(303, redirectTo ? decodeURIComponent(redirectTo) : '/');
-    // const msg = encodeURIComponent(loginResult.data.message ?? 'Login successfully!');
-    // const getMeResult = await getMe(event);
-    // console.log("getMeResult: ", getMeResult);
-    // if (getMeResult.status !== 200) {
-    //   redirect(302, '/auth/login?toast=error&message=Session expired');
-    // }
-    // let url = "/";
-    // switch (getMeResult.data.data.roleName) {
-    //   case ROLE.STUDENT:
-    //     url = "/student/dashboard";
-    //     break;
-    //   case ROLE.LECTURER:
-    //     url = "/lecturer/class";
-    //     break;
-    //   case ROLE.MENTOR:
-    //     url = "/mentor/dashboard";
-    //     break;
-    //   case ROLE.ACADEMICSTAFF:
-    //     url = "/academic-staff/dashboard";
-    //     break;
-    //   case ROLE.ADMIN:
-    //     url = "/admin/dashboard";
-    //     break;
-    //   default:
-    //     url = "/";
-    // }
-    // console.log("role Name:", getMeResult.data.data.roleName)
-    // console.log("role url: ", url);
-    // redirect(302, `/app${url}?toast=success&message=${msg}`);
   }
-  throw error(400, loginResult?.data?.detail || 'Internal Server Error');
+  throw error(500, loginResult?.data?.detail || 'Internal Server Error');
 };

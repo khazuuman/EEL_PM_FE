@@ -1,4 +1,5 @@
 // src/hooks.server.ts
+import { ROLE } from '$lib/enums/role';
 import { getMe } from '$lib/server/auth';
 import { redirect, type Handle } from '@sveltejs/kit';
 
@@ -7,13 +8,11 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 export const handle: Handle = async ({ event, resolve }) => {
   const { locals } = event;
   const userResult = await getMe(event);
-  locals.user = userResult?.data?.data;
 
   const publicRoutes = ['/auth'];
   const isPublicRoute = publicRoutes.some((r) => event.url.pathname.startsWith(r));
 
   if (!isPublicRoute) {
-    const userResult = await getMe(event);
     locals.user = userResult?.data?.data;
 
     if (!locals.user) {
@@ -21,16 +20,10 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
 
     if (event.url.pathname === '/') {
-      let target = "/auth/login";
-      switch (locals.user?.roleName) {
-        case 'Student': target = '/app/student'; break;
-        case 'Lecturer': target = '/app/lecturer/class'; break;
-        case 'AcademicStaff': target = '/app/academic-staff/dashboard'; break;
-        case 'Admin': target = '/app/admin/dashboard'; break;
-        case 'Mentor': target = '/app/mentor/dashboard'; break;
-        default: target = '/auth/login'; break;
+      if (locals.user.roles.includes(ROLE.LECTURER)) {
+        throw redirect(302, "/app/lecturer/class");
       }
-      throw redirect(302, target);
+      throw redirect(302, "/app");
     }
   }
   return resolve(event);

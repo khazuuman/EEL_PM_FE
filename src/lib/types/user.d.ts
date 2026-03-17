@@ -1,3 +1,5 @@
+import type ROLE from "$lib/enums/role";
+
 // ── UserProfile ───────────────────────────────────────────────────
 export interface UserProfileDto {
 	userId: number;
@@ -5,7 +7,7 @@ export interface UserProfileDto {
 	fullName: string;
 	avatarUrl?: string; 
 	phoneNumber?: string;
-	roleName: string;
+	roles: ROLE[];
 	lastLoginAt?: string; // DateTime → ISO string
 
 	// Chỉ 1 trong các field dưới có giá trị tùy theo role

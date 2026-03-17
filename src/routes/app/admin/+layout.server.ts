@@ -5,7 +5,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
     const { user } = locals;
 
 
-    if (!user?.roleName.includes('Admin')) {
+    if (!user?.roles.includes('Admin')) {
         throw error(403, {
             message: 'Access Denied!'
         });

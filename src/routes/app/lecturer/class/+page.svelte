@@ -11,7 +11,6 @@
     } from "lucide-svelte";
     import SemesterDropDown from "./components/SemesterDropDown.svelte";
     import Badge from "$lib/components/ui/badge/badge.svelte";
-    import { CodepenIcon } from "@lucide/svelte";
     import Separator from "$lib/components/ui/separator/separator.svelte";
     import type { PageData } from "./$types";
     import type { ClassDetail } from "$lib/types/class";
@@ -20,17 +19,15 @@
     import { goto } from "$app/navigation";
 
     let { data } = $props<{ data: PageData }>();
-
-    let selectedSemesterId = $state(
-        page.url.searchParams.get("semesterId") ?? null,
-    );
     let searchQuery = $state(page.url.searchParams.get("search") ?? "");
 
     //Dữ liệu từ server
     const semesters = $derived(data.semesters as Semester[]);
     const classes = $derived(data.classes as ClassDetail[]);
-
-    // Debounce để tránh gọi quá nhiều khi gõ
+    let selectedSemesterId = $state(
+        page.url.searchParams.get("semesterId") ??
+            String(data.defaultSemesterId ?? ""),
+    );
     let debounceTimer: ReturnType<typeof setTimeout>;
 
     function updateURL() {
@@ -58,31 +55,6 @@
 </script>
 
 <div class="flex flex-col h-screen">
-    <header
-        class="w-full border-b border-stone-300 p-4 bg-white flex justify-between"
-    >
-        <div class="flex gap-5 items-center">
-            <GraduationCapIcon color="#f2a20d" class="w-8 h-8" />
-            <div class="text-lg font-bold flex justify-center items-center">
-                <h1>EXE</h1>
-                <span class="mx-2 h-0.75 w-2.5 bg-black"></span>
-                <h1>FPT University Portal</h1>
-            </div>
-        </div>
-        <div class="flex items-center gap-3">
-            <div class="flex flex-col items-end">
-                <span class="font-bold text-[15px]">{data.user.fullName}</span>
-                <span class="text-[13px] text-stone-600"
-                    >{data.user.email}</span
-                >
-            </div>
-            <div class="rounded-full p-2 bg-amber-100 border border-amber-500">
-                <!-- <img src="" alt="" /> -->
-                <UserIcon class="w-6 h-6 text-amber-500" />
-            </div>
-        </div>
-    </header>
-
     <main
         class="h-full w-screen justify-center items-center bg-stone-100 py-10 px-20 overflow-x-hidden"
     >
@@ -124,11 +96,11 @@
                                 class="w-5 h-5 text-amber-600"
                             />Class Code: {classCard.classCode}</span
                         >
-                        <span class="flex items-center gap-2 text-stone-600"
+                        <!-- <span class="flex items-center gap-2 text-stone-600"
                             ><CodepenIcon
                                 class="w-5 h-5 text-amber-600"
                             />Number of Students: {classCard.currentStudentCount}</span
-                        >
+                        > -->
                         <span class="flex items-center gap-2 text-stone-600"
                             ><CalendarIcon
                                 class="w-5 h-5 text-amber-600"
@@ -144,7 +116,7 @@
                     <div class="flex justify-end">
                         <a
                             class="text-amber-600 text-[17px] flex items-center gap-2"
-                            href="/app/lecturer/class/{classCard.classId}/student-management"
+                            href="/app/lecturer/class/{classCard.classId}"
                             >Manage Class <ArrowRightIcon
                                 class="text-amber-600"
                             /></a

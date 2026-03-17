@@ -5,3 +5,4 @@ export enum ROLE {
     LECTURER = "Lecturer",
     MENTOR = "Mentor"
 }
+export default ROLE;

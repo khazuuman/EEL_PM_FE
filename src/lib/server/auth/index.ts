@@ -46,3 +46,14 @@ export const getMe = async (event: RequestEvent) => {
 	};
 };
 
+export const getInvitations = async (event: RequestEvent) => {
+	const response = await fetcher({
+		event,
+		url: '/users/me/invitations'
+	});
+	const data = await safeJsonParse(response);
+	return {
+		status: response.status,
+		data: data
+	};
+};
