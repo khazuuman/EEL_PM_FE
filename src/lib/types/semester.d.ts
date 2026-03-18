@@ -17,3 +17,11 @@ export interface CreateSemester {
     startDate: string;
     endDate: string;
 }
+
+export interface UpdateSemester {
+    semesterName: string;
+    year: number;
+    startDate: string;
+    endDate: string;
+    isActive: boolean;
+}

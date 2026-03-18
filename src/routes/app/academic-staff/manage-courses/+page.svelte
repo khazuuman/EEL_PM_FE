@@ -49,6 +49,7 @@
         href="/app"><ArrowLeftIcon />Back to Dashboard</a
     >
     <DataTable
+        showView={false}
         statuses={[]}
         keyId={"courseId"}
         {cacheKeyName}

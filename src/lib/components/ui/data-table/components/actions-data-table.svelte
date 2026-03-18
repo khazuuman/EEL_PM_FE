@@ -18,7 +18,7 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { toast } from 'svelte-sonner';
 	import { invalidateAll } from '$app/navigation';
-	let { id } = $props();
+	let { id, showView } = $props();
 	const dataTableCtx = getDataTableCTX();
 	const { tableName } = $derived(dataTableCtx());
 	let isSubmiting = $state(false);
@@ -40,6 +40,8 @@
 			}
 		};
 	};
+	
+	const actions = showView as string[] ? ['view', 'update', 'delete'] : ['update', 'delete']
 </script>
 
 <DropdownMenu>
@@ -51,7 +53,7 @@
 	<DropdownMenuContent align="end">
 		<DropdownMenuLabel>{'Actions'}</DropdownMenuLabel>
 		<DropdownMenuSeparator />
-		{#each ['view', 'update', 'delete'] as action (action)}
+		{#each actions as action (action)}
 			{@const actionConfig = getAction(action)}
 			{@const Icon = actionConfig?.icon}
 			{#if action === 'delete'}

@@ -39,6 +39,7 @@
 		totalItems?: number;
 		keyId?: string;
 		statuses: Status[];
+		showView: boolean;
 	};
 
 	const {
@@ -53,7 +54,8 @@
 		headerValues,
 		filters,
 		keyId,
-		statuses
+		statuses,
+		showView
 	}: Props = $props();
 
 	setDataTableCtx(() => {
@@ -311,7 +313,7 @@
 									</Table.Cell>
 								{/each}
 								<Table.Cell class="w-12">
-									<ActionsDataTable id={d.id} />
+									<ActionsDataTable id={d.id} {showView}/>
 								</Table.Cell>
 							</Table.Row>
 						{/each}
