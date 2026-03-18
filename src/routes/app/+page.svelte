@@ -167,6 +167,10 @@
                 name: "Manage Courses",
                 url: "/app/academic-staff/manage-courses",
             },
+            {
+                name: "Manage Campuses",
+                url: "/app/academic-staff/manage-campuses",
+            },
         ],
     };
 
