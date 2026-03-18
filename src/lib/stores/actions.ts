@@ -12,6 +12,7 @@ export const actions = writable<Actions>({
 
 export function setActions(d: Actions) {
 	actions.set(d);
+	console.log("trigger setAction");
 }
 export function updateActions(updater: (current: Actions) => Actions) {
 	actions.update(updater);

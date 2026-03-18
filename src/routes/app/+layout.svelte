@@ -35,6 +35,7 @@
         <NavUser user={data.user} />
     </div>
 </header>
-<div class="w-screen h-screen bg-stone-100 pt-15 overflow-x-hidden">
+<div class="w-screen h-screen bg-stone-100">
     {@render children()}
 </div>
+

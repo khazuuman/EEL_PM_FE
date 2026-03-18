@@ -136,10 +136,6 @@
                 name: "Manage Students",
                 url: "/app/academic-staff/manage-students",
             },
-            // {
-            //     name: "Create Students",
-            //     url: "/app/staff/manage-classes",
-            // },
         ],
     };
     const staffLecturerNav: NavigationGroup = {
@@ -149,10 +145,6 @@
                 name: "Manage Lecturers",
                 url: "/app/academic-staff/manage-lecturers",
             },
-            // {
-            //     name: "Create Lecturers",
-            //     url: "/app/staff/manage-classes",
-            // },
         ],
     };
     const staffMentorNav: NavigationGroup = {
@@ -162,10 +154,19 @@
                 name: "Manage Mentors",
                 url: "/app/academic-staff/manage-mentors",
             },
-            // {
-            //     name: "Create Lecturers",
-            //     url: "/app/staff/manage-classes",
-            // },
+        ],
+    };
+    const staffOtherNav: NavigationGroup = {
+        groupLabel: "Others",
+        items: [
+            {
+                name: "Manage Semesters",
+                url: "/app/academic-staff/manage-semester",
+            },
+            {
+                name: "Manage Courses",
+                url: "/app/academic-staff/manage-courses",
+            },
         ],
     };
 
@@ -220,13 +221,12 @@
         finalNavGroups.push(staffStudentNav);
         finalNavGroups.push(staffLecturerNav);
         finalNavGroups.push(staffMentorNav);
+        finalNavGroups.push(staffOtherNav);
     }
 
     if (user.roles.includes("Admin")) {
         finalNavGroups.push(adminSystemNav);
     }
-
-    
 </script>
 
 <h1 class="w-full text-center pt-10 text-3xl font-bold text-amber-900">

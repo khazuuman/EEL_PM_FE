@@ -68,6 +68,7 @@
 								description:
 									'This action cannot be undone. This will permanently delete and remove this student account from our servers.',
 								cb: () => {
+                                    console.log("cb called, deleteFormEl:", deleteFormEl);
 									if (deleteFormEl) {
 										deleteFormEl.requestSubmit();
 									}

@@ -4,6 +4,7 @@
 	import "../app.css";
 	import { navigating } from "$app/state";
 	import { IsMobile } from "$lib/hooks/is-mobile.svelte.js";
+    import ConfirmDialog from "$lib/common/Actions/ConfirmDialog.svelte";
 	let { children } = $props();
 
 	const isMobile = new IsMobile();
@@ -41,5 +42,6 @@
 	{/if}
 	<!-- Your existing app code -->
 	<Toaster position="top-right" richColors duration={3000} closeButton />
+	<ConfirmDialog />
 	{@render children()}
 {/if}

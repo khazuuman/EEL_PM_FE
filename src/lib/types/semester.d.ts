@@ -9,3 +9,11 @@ export interface Semester {
     createdAt: string;
     updatedAt: string;
 }
+
+export interface CreateSemester {
+    semesterCode: string;
+    semesterName: string;
+    year: number;
+    startDate: string;
+    endDate: string;
+}

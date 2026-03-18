@@ -9,11 +9,11 @@ export const createQuery = (
 	const searchParams = new URLSearchParams(window.location.search);
 
 	if (Array.isArray(keys) && Array.isArray(values)) {
-		const hasPageNumberKey = keys.some((k) => k === 'pageNumber');
+		const hasPageNumberKey = keys.some((k) => k === 'page');
 
 		// ✅ Chỉ reset page khi KHÔNG phải đang set pageNumber
 		if (!hasPageNumberKey && hasPage) {
-			searchParams.set('pageNumber', '1');
+			searchParams.set('page', '1');
 		}
 
 		keys.forEach((k, index) => {
@@ -22,21 +22,21 @@ export const createQuery = (
 				searchParams.set(k, value);
 			} else {
 				if (!hasPageNumberKey && hasPage) {
-					searchParams.set('pageNumber', '1');
+					searchParams.set('page', '1');
 				}
 				searchParams.delete(k);
 			}
 		});
 	} else if (typeof keys === 'string' && typeof values === 'string') {
 		if (values && values.trim() !== '') {
-			// ✅ Chỉ reset page khi KHÔNG phải đang set pageNumber
-			if (keys !== 'pageNumber' && hasPage) {
-				searchParams.set('pageNumber', '1');
+			// ✅ Chỉ reset page khi KHÔNG phải đang set page
+			if (keys !== 'page' && hasPage) {
+				searchParams.set('page', '1');
 			}
 			searchParams.set(keys, values);
 		} else {
 			if (hasPage) {
-				searchParams.set('pageNumber', '1');
+				searchParams.set('page', '1');
 			}
 			searchParams.delete(keys);
 		}
