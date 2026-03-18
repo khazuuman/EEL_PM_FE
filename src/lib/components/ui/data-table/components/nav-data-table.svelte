@@ -1,31 +1,61 @@
 <script lang="ts">
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { ChevronDownIcon, Settings2Icon, XIcon } from '@lucide/svelte';
-	import { Input } from '../../input/index.js';
-	import { createQuery, resetQuery } from '$lib/hooks/use-query.svelte.js';
-	import { page } from '$app/state';
-	import { getDataTableCTX } from '../ctx/data-table.ctx.js';
-	import debounce from 'lodash/debounce.js';
-	import { onMount } from 'svelte';
-	import * as Select from '$lib/components/ui/select/index.js';
+	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+	import { Button } from "$lib/components/ui/button/index.js";
+	import { ChevronDownIcon, Settings2Icon, XIcon } from "@lucide/svelte";
+	import { Input } from "../../input/index.js";
+	import { createQuery, resetQuery } from "$lib/hooks/use-query.svelte.js";
+	import { page } from "$app/state";
+	import { getDataTableCTX } from "../ctx/data-table.ctx.js";
+	import debounce from "lodash/debounce.js";
+	import { onMount, type Snippet } from "svelte";
+	import * as Select from "$lib/components/ui/select/index.js";
+    import { UploadIcon } from "lucide-svelte";
 
-	let { activeHeaders, setActiveHeaders } = $props();
-	let searchValue = $state('');
-	onMount(() => (searchValue = page.url.searchParams.get('searchTerm') ?? ''));
+	let {
+		activeHeaders,
+		setActiveHeaders,
+		showAddButton = true,
+		showImport = false,
+		importDialog,
+		importOpen,
+		setImportOpen,
+	}: {
+		activeHeaders: string[];
+		setActiveHeaders: (headers: string[]) => void;
+		showAddButton?: boolean;
+		showImport?: boolean;
+		importDialog?: Snippet<
+			[{ open: boolean; setOpen: (v: boolean) => void }]
+		>;
+		importOpen?: boolean;
+		setImportOpen?: (v: boolean) => void;
+	} = $props();
+
+	let searchValue = $state("");
+	onMount(
+		() => (searchValue = page.url.searchParams.get("searchTerm") ?? ""),
+	);
 	const dataTableCtx = getDataTableCTX();
-	const { filters, headerValues, defaultHeaders, matchSearchColumns, tableName } =
-		$derived(dataTableCtx());
+	const {
+		filters,
+		headerValues,
+		defaultHeaders,
+		matchSearchColumns,
+		tableName,
+	} = $derived(dataTableCtx());
 	let debounceSearch = debounce(
 		(searchValue: unknown) => {
-			createQuery({ keys: 'searchTerm', values: searchValue as unknown as string });
+			createQuery({
+				keys: "searchTerm",
+				values: searchValue as unknown as string,
+			});
 		},
 		500,
 		{
 			leading: false,
 			trailing: true,
-			maxWait: 2000
-		}
+			maxWait: 2000,
+		},
 	);
 	$effect(() => debounceSearch(searchValue));
 	let allParamKeys = $derived.by(() => {
@@ -39,13 +69,13 @@
 			<Input
 				bind:value={searchValue}
 				onkeydown={(e) => {
-					if (e.key === 'Escape') {
+					if (e.key === "Escape") {
 						(e.target as HTMLInputElement).blur();
 					}
 				}}
 				placeholder={`Search by ${matchSearchColumns
 					.map((v) => headerValues[v])
-					.join('/')
+					.join("/")
 					.toLowerCase()}`}
 				class="h-max py-2 xl:max-w-sm"
 			/>
@@ -54,20 +84,25 @@
 			{#each filters as filter}
 				<Select.Root
 					type="single"
+					value={page.url.searchParams.get(filter.key) ?? ""}
 					onValueChange={(v) =>
 						createQuery({
 							keys: filter.key,
-							values: v
+							values: v,
 						})}
 				>
 					{@const titleParam = page.url.searchParams.get(filter.key)}
-					{@const filterData = filter.data.find((d) => d.value === titleParam)}
-					<Select.Trigger class="w-fit capitalize"
-						>{filterData ? filterData.label : filter.title}</Select.Trigger
-					>
+					{@const filterData = filter.data.find(
+						(d) => d.value === titleParam,
+					)}
+					<Select.Trigger class="w-fit capitalize">
+						{filterData ? filterData.label : filter.title}
+					</Select.Trigger>
 					<Select.Content>
 						{#each filter.data as d}
-							<Select.Item class="capitalize" value={d.value}>{d.label}</Select.Item>
+							<Select.Item class="capitalize" value={d.value}
+								>{d.label}</Select.Item
+							>
 						{/each}
 					</Select.Content>
 				</Select.Root>
@@ -76,10 +111,10 @@
 		{#if allParamKeys.length > 1}
 			<Button
 				class="w-full xl:w-auto"
-				variant={'destructive'}
+				variant={"destructive"}
 				onclick={() => {
 					resetQuery();
-					searchValue = '';
+					searchValue = "";
 				}}
 			>
 				<XIcon />
@@ -93,7 +128,7 @@
 				{#snippet child({ props })}
 					<Button {...props} variant="outline">
 						<Settings2Icon />
-						{'Columns'}
+						{"Columns"}
 						<ChevronDownIcon />
 					</Button>
 				{/snippet}
@@ -105,10 +140,12 @@
 							checked={activeHeaders.includes(header)}
 							onCheckedChange={(checked) => {
 								const newActiveHeaders = checked
-									? header === 'id'
+									? header === "id"
 										? [header, ...activeHeaders]
 										: [...activeHeaders, header]
-									: activeHeaders.filter((col: string) => col !== header);
+									: activeHeaders.filter(
+											(col: string) => col !== header,
+										);
 								setActiveHeaders(newActiveHeaders);
 							}}
 						>
@@ -119,11 +156,24 @@
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 
-		<Button
-			class="gap-2"
-			href={`${page.url.pathname}/create?redirectTo=${encodeURIComponent(`${page.url.pathname}?${page.url.searchParams.toString()}`)}`}
-		>
-			<span>+ {`Add ${tableName.toLocaleLowerCase()}`}</span>
-		</Button>
+		{#if showImport && importDialog}
+			<Button class="gap-2" onclick={() => setImportOpen?.(true)}>
+				<UploadIcon />
+				<span>Import {tableName.toLocaleLowerCase()}</span>
+			</Button>
+			{@render importDialog({
+				open: importOpen ?? false,
+				setOpen: setImportOpen ?? (() => {}),
+			})}
+		{/if}
+
+		{#if showAddButton}
+			<Button
+				class="gap-2"
+				href={`${page.url.pathname}/create?redirectTo=${encodeURIComponent(`${page.url.pathname}?${page.url.searchParams.toString()}`)}`}
+			>
+				<span>+ {`Add ${tableName.toLocaleLowerCase()}`}</span>
+			</Button>
+		{/if}
 	</div>
 </div>

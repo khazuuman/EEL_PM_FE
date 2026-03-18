@@ -18,6 +18,20 @@ export const getCampuses = async (
     };
 };
 
+export const getAllCampuses = async (
+    event: RequestEvent,
+) => {
+    const response = await fetcher({
+        event,
+        url: `/Campus?isActive=true&limit=100`
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const getCampuseDetail = async (
     event: RequestEvent, id: any
 ) => {

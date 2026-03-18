@@ -19,3 +19,17 @@ export const getMajors = async (
         data: data
     };
 };
+
+export const getAllMajors = async (
+    event: RequestEvent,
+) => {
+    const response = await fetcher({
+        event,
+        url: `/majors?isActive=true&limit=100`
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};

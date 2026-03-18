@@ -21,3 +21,13 @@ export const getStudentsAvailableByClass = async (event: RequestEvent, classId: 
         data: data
     };
 };
+
+export const getStudents = async (event: RequestEvent) => {
+    const { url } = event;
+    const response = await fetcher({ event, url: `/Students?${url.searchParams.toString()}` });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};

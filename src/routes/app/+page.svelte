@@ -129,30 +129,20 @@
             },
         ],
     };
-    const staffStudentNav: NavigationGroup = {
-        groupLabel: "Students",
+    const staffAcademicDataNav: NavigationGroup = {
+        groupLabel: "Academic Data",
         items: [
             {
-                name: "Manage Students",
+                name: "Manage Academic Data",
+                url: "/app/academic-staff/manage-academic-data",
+            },
+            {
+                name: "Manage Mentor Data",
                 url: "/app/academic-staff/manage-students",
             },
-        ],
-    };
-    const staffLecturerNav: NavigationGroup = {
-        groupLabel: "Lecturers",
-        items: [
             {
                 name: "Manage Lecturers",
                 url: "/app/academic-staff/manage-lecturers",
-            },
-        ],
-    };
-    const staffMentorNav: NavigationGroup = {
-        groupLabel: "Mentors",
-        items: [
-            {
-                name: "Manage Mentors",
-                url: "/app/academic-staff/manage-mentors",
             },
         ],
     };
@@ -226,9 +216,7 @@
         roleLabel.push("Academic Staff");
         finalNavGroups.push(staffClassNav);
         finalNavGroups.push(staffGroupNav);
-        finalNavGroups.push(staffStudentNav);
-        finalNavGroups.push(staffLecturerNav);
-        finalNavGroups.push(staffMentorNav);
+        finalNavGroups.push(staffAcademicDataNav);
         finalNavGroups.push(staffOtherNav);
     }
 
@@ -241,7 +229,7 @@
         roleLabel.length > 1 ? roleLabel.join(" & ") : (roleLabel[0] ?? "");
 </script>
 
-<div class="pt-15 bg-white">
+<div class="pt-15 bg-white z-100">
     <h1 class="w-full text-center pt-10 text-3xl font-bold text-amber-900">
         {displayLabel} Home Page
     </h1>

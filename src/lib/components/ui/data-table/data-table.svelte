@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as Table from '$lib/components/ui/table/index.js';
+	import * as Table from "$lib/components/ui/table/index.js";
 	import {
 		handleDragStart,
 		handleDragOver,
@@ -11,20 +11,23 @@
 		copyToClipboard,
 		type CellPosition,
 		type CellRange,
-		handleRowSelect
-	} from './data-table.helper.js';
-	import PaginateDataTable from './components/paginate-data-table.svelte';
-	import { toast } from 'svelte-sonner';
-	import HeadDataTable from './components/head-data-table.svelte';
-	import NavDataTable from './components/nav-data-table.svelte';
-	import { Checkbox } from '$lib/components/ui/checkbox/index.js';
-	import { setLocalStorageItem } from '$lib/utils.js';
-	import { Button } from '../button/index.js';
-	import { setDataTableCtx, type DataTableCtx } from './ctx/data-table.ctx.js';
-	import RenderValueDataTable from './components/render-value-data-table.svelte';
-	import { page } from '$app/state';
-	import LoadingDataTable from './components/loading-data-table.svelte';
-	import ActionsDataTable from './components/actions-data-table.svelte';
+		handleRowSelect,
+	} from "./data-table.helper.js";
+	import PaginateDataTable from "./components/paginate-data-table.svelte";
+	import { toast } from "svelte-sonner";
+	import HeadDataTable from "./components/head-data-table.svelte";
+	import NavDataTable from "./components/nav-data-table.svelte";
+	import { Checkbox } from "$lib/components/ui/checkbox/index.js";
+	import { setLocalStorageItem } from "$lib/utils.js";
+	import { Button } from "../button/index.js";
+	import {
+		setDataTableCtx,
+		type DataTableCtx,
+	} from "./ctx/data-table.ctx.js";
+	import RenderValueDataTable from "./components/render-value-data-table.svelte";
+	import { page } from "$app/state";
+	import LoadingDataTable from "./components/loading-data-table.svelte";
+	import ActionsDataTable from "./components/actions-data-table.svelte";
 	type Status = {
 		label: string;
 		value: string | number;
@@ -40,6 +43,11 @@
 		keyId?: string;
 		statuses: Status[];
 		showView: boolean;
+		showAddButton?: boolean;
+		showImport?: boolean;
+		importDialog?: import("svelte").Snippet<
+			[{ open: boolean; setOpen: (v: boolean) => void }]
+		>;
 	};
 
 	const {
@@ -55,7 +63,10 @@
 		filters,
 		keyId,
 		statuses,
-		showView
+		showView,
+		showAddButton = true,
+		showImport = false,
+		importDialog,
 	}: Props = $props();
 
 	setDataTableCtx(() => {
@@ -67,12 +78,13 @@
 			matchSearchColumns,
 			tableName,
 			filters: filters ?? [],
-			statuses
+			statuses,
 		};
 	});
 	let initialLoad = $state(false);
 	let activeHeaders = $state<string[]>([]);
 	let deleteForms = $state<Map<string, HTMLFormElement>>(new Map());
+	let importOpen = $state(false);
 	const handleFormBind = (id: string, formEl: HTMLFormElement) => {
 		deleteForms.set(id, formEl);
 	};
@@ -83,7 +95,10 @@
 	});
 
 	const setActiveHeaders = (headers: string[]) => {
-		setLocalStorageItem(`data-table-${cacheKeyName}-headers`, JSON.stringify(headers));
+		setLocalStorageItem(
+			`data-table-${cacheKeyName}-headers`,
+			JSON.stringify(headers),
+		);
 		activeHeaders = headers;
 	};
 
@@ -99,7 +114,7 @@
 				row.id = cls.id ?? cls._id ?? `row-${index}`;
 			}
 			return row;
-		})
+		}),
 	);
 	let draggedColumn = $state<string | null>(null);
 	let dragOverColumn = $state<string | null>(null);
@@ -115,8 +130,12 @@
 	let lastCheckedIndex = $state<number | null>(null);
 
 	// Derived state cho "select all"
-	let isAllSelected = $derived(sortedData.length > 0 && selectedRows.size === sortedData.length);
-	let isIndeterminate = $derived(selectedRows.size > 0 && selectedRows.size < sortedData.length);
+	let isAllSelected = $derived(
+		sortedData.length > 0 && selectedRows.size === sortedData.length,
+	);
+	let isIndeterminate = $derived(
+		selectedRows.size > 0 && selectedRows.size < sortedData.length,
+	);
 
 	// Handler functions for drag and drop
 	function onDragStart(header: string) {
@@ -132,7 +151,11 @@
 		e.preventDefault();
 		if (!draggedColumn) return;
 
-		const newHeaders = handleDropHeader(draggedColumn, targetHeader, activeHeaders);
+		const newHeaders = handleDropHeader(
+			draggedColumn,
+			targetHeader,
+			activeHeaders,
+		);
 		if (newHeaders) {
 			setActiveHeaders(newHeaders);
 		}
@@ -151,11 +174,15 @@
 	}
 
 	// Handler functions for cell selection
-	function handleCellMouseDown(rowIndex: number, colIndex: number, e: MouseEvent) {
+	function handleCellMouseDown(
+		rowIndex: number,
+		colIndex: number,
+		e: MouseEvent,
+	) {
 		if (e.shiftKey && lastClickedCell) {
 			selectionRange = {
 				start: lastClickedCell,
-				end: { rowIndex, colIndex }
+				end: { rowIndex, colIndex },
 			};
 			return;
 		}
@@ -165,16 +192,20 @@
 		lastClickedCell = { rowIndex, colIndex };
 		selectionRange = {
 			start: { rowIndex, colIndex },
-			end: { rowIndex, colIndex }
+			end: { rowIndex, colIndex },
 		};
 	}
 
-	function handleCellClick(rowIndex: number, colIndex: number, e: MouseEvent) {
+	function handleCellClick(
+		rowIndex: number,
+		colIndex: number,
+		e: MouseEvent,
+	) {
 		if (!e.shiftKey && !isSelecting) {
 			lastClickedCell = { rowIndex, colIndex };
 			selectionRange = {
 				start: { rowIndex, colIndex },
-				end: { rowIndex, colIndex }
+				end: { rowIndex, colIndex },
 			};
 		}
 	}
@@ -183,7 +214,7 @@
 		if (isSelecting && selectionStart) {
 			selectionRange = {
 				start: selectionStart,
-				end: { rowIndex, colIndex }
+				end: { rowIndex, colIndex },
 			};
 		}
 	}
@@ -206,29 +237,40 @@
 	}
 
 	function rowSelect(rowId: string, rowIndex: number, e: MouseEvent) {
-		const result = handleRowSelect(sortedData, selectedRows, lastCheckedIndex, rowId, rowIndex, e);
+		const result = handleRowSelect(
+			sortedData,
+			selectedRows,
+			lastCheckedIndex,
+			rowId,
+			rowIndex,
+			e,
+		);
 		selectedRows = result.selectedRows;
 		lastCheckedIndex = result.lastCheckedIndex;
 	}
 
 	async function handleKeyDown(e: KeyboardEvent) {
 		// Ctrl+C or Cmd+C to copy
-		if ((e.ctrlKey || e.metaKey) && e.key === 'c' && selectionRange) {
+		if ((e.ctrlKey || e.metaKey) && e.key === "c" && selectionRange) {
 			e.preventDefault();
-			const data = getSelectedCellsData(sortedData, activeHeaders, selectionRange);
+			const data = getSelectedCellsData(
+				sortedData,
+				activeHeaders,
+				selectionRange,
+			);
 			copyToClipboard(data).then((success) => {
 				console.log(success);
 
 				if (success) {
-					toast.success('Coppied data to clipboard!');
+					toast.success("Coppied data to clipboard!");
 				} else {
-					toast.error('Coppy failed! Please try again.');
+					toast.error("Coppy failed! Please try again.");
 				}
 			});
 		}
 
 		// Escape to clear selection
-		if (e.key === 'Escape') {
+		if (e.key === "Escape") {
 			selectionRange = null;
 			selectionStart = null;
 			lastClickedCell = null;
@@ -237,7 +279,7 @@
 
 	function handleClickOutside(e: MouseEvent) {
 		const target = e.target as HTMLElement;
-		if (!target.closest('table')) {
+		if (!target.closest("table")) {
 			selectionRange = null;
 			selectionStart = null;
 			lastClickedCell = null;
@@ -245,10 +287,23 @@
 	}
 </script>
 
-<svelte:window onkeydown={handleKeyDown} onmouseup={handleMouseUp} onclick={handleClickOutside} />
+<svelte:window
+	onkeydown={handleKeyDown}
+	onmouseup={handleMouseUp}
+	onclick={handleClickOutside}
+/>
 
 <div class="flex h-full flex-1 flex-col gap-6">
-	<NavDataTable {activeHeaders} {setActiveHeaders} />
+	<NavDataTable
+		{activeHeaders}
+		{setActiveHeaders}
+		{showAddButton}
+		{showImport}
+		{importDialog}
+		{importOpen}
+		setImportOpen={(v) => (importOpen = v)}
+	/>
+
 	{#if initialLoad}
 		{#if sortedData.length > 0}
 			<div class="relative rounded-md border">
@@ -267,10 +322,14 @@
 							{#each activeHeaders as header (header)}
 								<Table.Head
 									class={[
-										'cursor-move px-0! py-0! text-center font-semibold transition-colors select-none',
-										dragOverColumn === header ? 'bg-primary/10' : '',
-										draggedColumn === header ? 'opacity-50' : ''
-									].join(' ')}
+										"cursor-move px-0! py-0! text-center font-semibold transition-colors select-none",
+										dragOverColumn === header
+											? "bg-primary/10"
+											: "",
+										draggedColumn === header
+											? "opacity-50"
+											: "",
+									].join(" ")}
 									draggable="true"
 									ondragstart={() => onDragStart(header)}
 									ondragover={(e) => onDragOver(e, header)}
@@ -278,7 +337,11 @@
 									ondragend={onDragEnd}
 									ondragleave={onDragLeave}
 								>
-									<HeadDataTable {header} {activeHeaders} {setActiveHeaders} />
+									<HeadDataTable
+										{header}
+										{activeHeaders}
+										{setActiveHeaders}
+									/>
 								</Table.Head>
 							{/each}
 							<Table.Head class="w-12"></Table.Head>
@@ -301,19 +364,42 @@
 								{#each activeHeaders as header, colIndex (header)}
 									<Table.Cell
 										class={[
-											'w-32 cursor-cell p-0 px-4 text-center',
-											isCellSelected(rowIndex, colIndex, selectionRange) ? 'bg-primary/20' : ''
-										].join(' ')}
+											"w-32 cursor-cell p-0 px-4 text-center",
+											isCellSelected(
+												rowIndex,
+												colIndex,
+												selectionRange,
+											)
+												? "bg-primary/20"
+												: "",
+										].join(" ")}
 										tabindex={-1}
-										onmousedown={(e) => handleCellMouseDown(rowIndex, colIndex, e)}
-										onclick={(e) => handleCellClick(rowIndex, colIndex, e)}
-										onmouseenter={() => handleCellMouseEnter(rowIndex, colIndex)}
+										onmousedown={(e) =>
+											handleCellMouseDown(
+												rowIndex,
+												colIndex,
+												e,
+											)}
+										onclick={(e) =>
+											handleCellClick(
+												rowIndex,
+												colIndex,
+												e,
+											)}
+										onmouseenter={() =>
+											handleCellMouseEnter(
+												rowIndex,
+												colIndex,
+											)}
 									>
-										<RenderValueDataTable {header} value={d[header]} />
+										<RenderValueDataTable
+											{header}
+											value={d[header]}
+										/>
 									</Table.Cell>
 								{/each}
 								<Table.Cell class="w-12">
-									<ActionsDataTable id={d.id} {showView}/>
+									<ActionsDataTable id={d.id} {showView} />
 								</Table.Cell>
 							</Table.Row>
 						{/each}
@@ -321,13 +407,27 @@
 				</Table.Root>
 			</div>
 		{:else}
-			<div class="flex h-full flex-1 flex-col items-center justify-center gap-6">
+			<div
+				class="flex h-full flex-1 flex-col items-center justify-center gap-6"
+			>
 				<p class="text-5xl font-bold">No records available!</p>
-				<Button
-					size="lg"
-					href={`${page.url.pathname}/create?redirectTo=${encodeURIComponent(`${page.url.pathname}?${page.url.searchParams.toString()}`)}`}
-					>+ Add new {tableName.toLocaleLowerCase()}</Button
-				>
+
+				{#if showImport && importDialog}
+					<Button size="lg" onclick={() => (importOpen = true)}>
+						Import {tableName.toLocaleLowerCase()}
+					</Button>
+					{@render importDialog({
+						open: importOpen,
+						setOpen: (v) => (importOpen = v),
+					})}
+				{:else if showAddButton}
+					<Button
+						size="lg"
+						href={`${page.url.pathname}/create?redirectTo=${encodeURIComponent(`${page.url.pathname}?${page.url.searchParams.toString()}`)}`}
+					>
+						+ Add new {tableName.toLocaleLowerCase()}
+					</Button>
+				{/if}
 			</div>
 		{/if}
 
@@ -348,7 +448,11 @@
 			{/if}
 		</div>
 	{:else}
-		{@const pageSize = Number(page.url.searchParams.get('pageSize')) || '10'}
-		<LoadingDataTable rows={defaultHeaders.length} columns={Number(pageSize)} />
+		{@const pageSize =
+			Number(page.url.searchParams.get("pageSize")) || "10"}
+		<LoadingDataTable
+			rows={defaultHeaders.length}
+			columns={Number(pageSize)}
+		/>
 	{/if}
 </div>

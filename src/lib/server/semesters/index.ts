@@ -19,6 +19,20 @@ export const getSemesters = async (
     };
 };
 
+export const getAllSemesters = async (
+    event: RequestEvent,
+) => {
+    const response = await fetcher({
+        event,
+        url: `/semesters?isActive=true&limit=100`
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const getSemesterDetail = async (
     event: RequestEvent, id: any
 ) => {

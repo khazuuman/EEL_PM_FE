@@ -8,7 +8,7 @@
 </script>
 
 <header
-    class="px-5 py-2 flex flex-row w-full justify-between items-center gap-10 bg-white border border-amber-600 fixed"
+    class="px-5 py-2 flex flex-row w-full justify-between items-center gap-10 bg-white border border-amber-600 fixed z-100"
 >
     <div class="w-full bg-white">
         <div class="flex gap-5">
@@ -35,7 +35,7 @@
         <NavUser user={data.user} />
     </div>
 </header>
-<div class="w-screen h-screen bg-stone-100">
+<div class="w-full min-h-screen bg-stone-100 overflow-x-hidden">
     {@render children()}
 </div>
 
