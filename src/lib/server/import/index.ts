@@ -17,3 +17,19 @@ export const importAcademicData = async (
         data: data
     };
 };
+
+export const importMentorData = async (
+    event: RequestEvent, formData: FormData
+) => {
+    const response = await fetcher({
+        event: event,
+        url: `/v1/import/mentors`,
+        method: 'POST',
+        formData
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};

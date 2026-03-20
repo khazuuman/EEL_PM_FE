@@ -8,14 +8,15 @@
     import { toast } from "svelte-sonner";
 
     const { data } = $props();
+    console.log("campuses: ", data.campuses);
 
     let isSubmitting = $state(false);
 
-    // Select binding states — khởi tạo từ data.student
-    let selectedGender = $state(data.student?.gender ?? "");
-    let selectedCampusId = $state(String(data.student?.campusId ?? ""));
-    let selectedMajorId = $state(String(data.student?.majorId ?? ""));
-    let selectedClassId = $state(String(data.student?.classId ?? ""));
+    // Select binding states
+    let selectedGender = $state("");
+    let selectedCampusId = $state("");
+    let selectedMajorId = $state("");
+    let selectedClassId = $state("");
 
     const handleSubmit: import("@sveltejs/kit").SubmitFunction = () => {
         isSubmitting = true;
@@ -23,10 +24,10 @@
             isSubmitting = false;
             if (result.type === "failure") {
                 toast.error(
-                    (result.data as any)?.message ?? "Failed to update student",
+                    (result.data as any)?.message ?? "Failed to create student",
                 );
             } else if (result.type === "success") {
-                toast.success("Student updated successfully!");
+                toast.success("Student created successfully!");
                 await goto("/app/academic-staff/manage-academic-data");
             }
             await update();
@@ -37,9 +38,8 @@
 <div
     class="flex h-screen w-screen flex-col items-center justify-center bg-stone-100 pt-12"
 >
-    <form method="POST" action="/app/academic-staff/manage-academic-data/${data?.student?.studentId}?/updateStudent" use:enhance={handleSubmit}>
-        <!-- Hidden inputs for Select values -->
-        <input type="hidden" name="studentId" value={data?.student?.studentId} />
+    <form method="POST" action="?/createStudent" use:enhance={handleSubmit}>
+        <!-- Hidden inputs for Select values (shadcn Select không tự submit qua form) -->
         <input type="hidden" name="gender" value={selectedGender} />
         <input type="hidden" name="campusId" value={selectedCampusId} />
         <input type="hidden" name="majorId" value={selectedMajorId} />
@@ -52,12 +52,12 @@
             <!-- Title -->
             <div class="flex w-full items-center gap-3">
                 <span class="whitespace-nowrap font-semibold text-stone-800">
-                    Update Student
+                    Create New Student
                 </span>
                 <span class="block h-px flex-1 bg-stone-300"></span>
             </div>
 
-            <!-- Row 1: Student Code + Full Name + Email -->
+            <!-- Row 1: Student Code + Full Name -->
             <div class="mt-8 flex gap-5">
                 <Field.Field class="flex-1">
                     <Field.Label for="studentCode">
@@ -66,9 +66,9 @@
                     <Input
                         name="studentCode"
                         id="studentCode"
-                        value={data.student?.studentCode}
-                        class="font-mono bg-stone-50 text-stone-400 cursor-not-allowed"
-                        disabled
+                        placeholder="e.g. SE123456"
+                        class="font-mono"
+                        required
                     />
                 </Field.Field>
 
@@ -79,7 +79,6 @@
                     <Input
                         name="fullName"
                         id="fullName"
-                        value={data.student?.fullName}
                         placeholder="e.g. Nguyen Van A"
                         required
                     />
@@ -93,9 +92,8 @@
                         type="email"
                         name="email"
                         id="email"
-                        value={data.student?.email}
-                        class="bg-stone-50 text-stone-400 cursor-not-allowed"
-                        disabled
+                        placeholder="e.g. nguyenvana@example.com"
+                        required
                     />
                 </Field.Field>
             </div>
@@ -132,12 +130,11 @@
                         name="dateOfBirth"
                         id="dateOfBirth"
                         required
-                        value={data.student?.dateOfBirth?.slice(0, 10)}
                         class="border-input w-full rounded-md border bg-white px-3 py-2 text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none
-                               [&::-webkit-calendar-picker-indicator]:invert-[0.4]
-                               [&::-webkit-calendar-picker-indicator]:sepia
-                               [&::-webkit-calendar-picker-indicator]:saturate-[3]
-                               [&::-webkit-calendar-picker-indicator]:hue-rotate-[330deg]"
+                                [&::-webkit-calendar-picker-indicator]:invert-[0.4]
+                                [&::-webkit-calendar-picker-indicator]:sepia
+                                [&::-webkit-calendar-picker-indicator]:saturate-[3]
+                                [&::-webkit-calendar-picker-indicator]:hue-rotate-[330deg]"
                     />
                 </Field.Field>
             </div>
@@ -149,7 +146,6 @@
                     <Input
                         name="phoneNumber"
                         id="phoneNumber"
-                        value={data.student?.phoneNumber}
                         placeholder="e.g. 0912345678"
                     />
                 </Field.Field>
@@ -249,7 +245,6 @@
                         type="number"
                         name="enrollmentYear"
                         id="enrollmentYear"
-                        value={data.student?.enrollmentYear}
                         placeholder="e.g. 2024"
                         min="2000"
                         max="2100"
@@ -264,7 +259,6 @@
                         type="number"
                         name="currentSemester"
                         id="currentSemester"
-                        value={data.student?.currentSemester}
                         placeholder="e.g. 1"
                         min="1"
                     />
@@ -298,9 +292,9 @@
                         <span
                             class="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"
                         ></span>
-                        Updating...
+                        Creating...
                     {:else}
-                        Update Student
+                        Create Student
                     {/if}
                 </Button>
             </div>

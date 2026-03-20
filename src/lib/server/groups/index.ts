@@ -159,3 +159,17 @@ export const leaveGroup = async (event: RequestEvent, groupId: any) => {
         data: data
     };
 }
+
+export const joinRequest = async (event: RequestEvent, groupId: any, body: any) => {
+    const response = await fetcher({
+        event,
+        url: `/groups/${groupId}/join-requests`,
+        method: 'POST',
+        data: body
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+}

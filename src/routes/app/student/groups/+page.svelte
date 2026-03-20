@@ -7,8 +7,6 @@
         ArrowLeftIcon,
         EyeIcon,
         Layers2Icon,
-        LockKeyholeIcon,
-        PlusIcon,
         SearchIcon,
         SettingsIcon,
         UsersIcon,
@@ -20,11 +18,48 @@
     import { enhance } from "$app/forms";
     import GroupDetail from "./components/GroupDetail.svelte";
     import type { SubmitFunction } from "@sveltejs/kit";
+    import * as Dialog from "$lib/components/ui/dialog/index";
+    import Label from "$lib/components/ui/label/label.svelte";
+    import Textarea from "$lib/components/ui/textarea/textarea.svelte";
+    import { toast } from "svelte-sonner";
 
     let { data } = $props<{ data: PageData }>();
+    const user = data.user;
+    console.log("user in gorup page: ", user);
     const groups = $derived(data.groups as any[]);
     const totalItems = $derived(data.totalItems as any);
     let searchQuery = $state(page.url.searchParams.get("search") ?? "");
+    // Thêm vào phần script
+    let joinDialogOpen = $state(false);
+    let selectedJoinGroup = $state<any>(null);
+    let joinMessage = $state("");
+    let joinLoading = $state(false);
+
+    const handleJoinEnhance: SubmitFunction = () => {
+        joinLoading = true;
+        return async ({ result, update }) => {
+            joinLoading = false;
+            if (result.type === "success") {
+                joinDialogOpen = false;
+                joinMessage = "";
+                selectedJoinGroup = null;
+                toast.success("Join request sent successfully!");
+            } else if (result.type === "failure") {
+                toast.error(
+                    result.data?.message ?? "Failed to send join request.",
+                );
+            } else {
+                toast.error("Something went wrong. Please try again.");
+            }
+            await update();
+        };
+    };
+
+    function openJoinDialog(group: any) {
+        selectedJoinGroup = group;
+        joinMessage = "";
+        joinDialogOpen = true;
+    }
 
     const overviewData = $derived([
         {
@@ -107,90 +142,156 @@
         </span>
     </div>
 {/snippet}
-<a
-    class="flex gap-2 items-center w-fit text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mt-10 mx-10"
-    href="/app"><ArrowLeftIcon />Back to Dashboard</a
->
-<div class="p-10 bg-stone-100 w-full h-full">
-    <h1 class="text-3xl font-extrabold mb-2">Groups</h1>
-    <div class="flex flex-col lg:flex-row justify-between items-center">
-        <p class="text-[16px] text-stone-500">View all groups in this class</p>
-        <div class="flex flex-col lg:flex-row gap-4">
-            <div class="relative w-70">
-                <Input
-                    id="search"
-                    placeholder="Search group name..."
-                    class="ps-8"
-                    bind:value={searchQuery}
-                />
-                <SearchIcon
-                    class="pointer-events-none absolute start-2 top-1/2 size-4 -translate-y-1/2 opacity-50 select-none"
-                />
+<div class="pt-15">
+    <a
+        class="flex gap-2 items-center w-fit text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mt-10 mx-10"
+        href="/app"><ArrowLeftIcon />Back to Dashboard</a
+    >
+    <div class="p-10 bg-stone-100 w-full h-full">
+        <h1 class="text-3xl font-extrabold mb-2">Groups</h1>
+        <div class="flex flex-col lg:flex-row justify-between items-center">
+            <p class="text-[16px] text-stone-500">
+                View all groups in this class
+            </p>
+            <div class="flex flex-col lg:flex-row gap-4">
+                <div class="relative w-70">
+                    <Input
+                        id="search"
+                        placeholder="Search group name..."
+                        class="ps-8"
+                        bind:value={searchQuery}
+                    />
+                    <SearchIcon
+                        class="pointer-events-none absolute start-2 top-1/2 size-4 -translate-y-1/2 opacity-50 select-none"
+                    />
+                </div>
             </div>
         </div>
-    </div>
-    <div class="flex flex-wrap gap-5 mt-10">
-        {#each overviewData as cardInfo}
-            {@render overviewCard(cardInfo)}
-        {/each}
-    </div>
+        <div class="flex flex-wrap gap-5 mt-10">
+            {#each overviewData as cardInfo}
+                {@render overviewCard(cardInfo)}
+            {/each}
+        </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">
-        {#each groups as group}
-            <div class="card rounded-md p-4 bg-white">
-                <span
-                    class="w-full flex justify-between font-bold text-xl items-center mb-3"
-                    >{group.name}
-                    <Badge
-                        class={statusClass[group.status] ??
-                            "bg-stone-200 text-stone-600"}
-                    >
-                        {group.status}
-                    </Badge></span
-                >
-                <span
-                    class="flex gap-2 text-stone-600 text-[16px] items-center mb-1 font-bold"
-                    ><UserStarIcon
-                        class="w-5 h-5 text-amber-700"
-                    />{group.leaderName}
-                    <span class="text-red-700 font-bold text-[14px]"
-                        >(Leader)</span
-                    ></span
-                >
-                <span class="flex gap-2 text-stone-600 text-[16px] items-center"
-                    ><UsersIcon
-                        class="w-5 h-5"
-                    />{group.memberCount}/{group.maxMember} Members</span
-                >
-                <Progress
-                    value={group.memberCount}
-                    max={group.maxMember}
-                    class="w-full my-5 [&>div]:bg-amber-600"
-                />
-                <form
-                    method="POST"
-                    action="?/getGroupDetail"
-                    use:enhance={handleEnhance}
-                >
-                    <input type="hidden" name="groupId" value={group.id} />
-                    <div class="flex gap-2">
-                        <Button
-                            type="submit"
-                            class="flex-1 bg-amber-600 cursor-pointer"
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">
+            {#each groups as group}
+                <div class="card rounded-md p-4 bg-white">
+                    <span
+                        class="w-full flex justify-between font-bold text-xl items-center mb-3"
+                        >{group.name}
+                        <Badge
+                            class={statusClass[group.status] ??
+                                "bg-stone-200 text-stone-600"}
                         >
-                            <EyeIcon />View Detail
-                        </Button>
-                        <Button variant="default" class="cursor-pointer">
-                            <SettingsIcon />
-                        </Button>
-                    </div>
-                </form>
-            </div>
-        {/each}
+                            {group.status}
+                        </Badge></span
+                    >
+                    <span
+                        class="flex gap-2 text-stone-600 text-[16px] items-center mb-1 font-bold"
+                        ><UserStarIcon
+                            class="w-5 h-5 text-amber-700"
+                        />{group.leaderName}
+                        <span class="text-red-700 font-bold text-[14px]"
+                            >(Leader)</span
+                        ></span
+                    >
+                    <span
+                        class="flex gap-2 text-stone-600 text-[16px] items-center"
+                        ><UsersIcon
+                            class="w-5 h-5"
+                        />{group.memberCount}/{group.maxMember} Members</span
+                    >
+                    <Progress
+                        value={group.memberCount}
+                        max={group.maxMember}
+                        class="w-full my-5 [&>div]:bg-amber-600"
+                    />
+                    <form
+                        method="POST"
+                        action="?/getGroupDetail"
+                        use:enhance={handleEnhance}
+                    >
+                        <input type="hidden" name="groupId" value={group.id} />
+                        <div class="flex gap-2">
+                            <Button
+                                type="submit"
+                                class="flex-1 bg-amber-600 cursor-pointer"
+                            >
+                                <EyeIcon />View Detail
+                            </Button>
+                            {#if !user?.student?.group && (group.status === "Rejected" || group.status === "Draft")}
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    class="flex-1 cursor-pointer border-amber-600 text-amber-600 hover:bg-amber-50"
+                                    onclick={() => openJoinDialog(group)}
+                                >
+                                    <UsersIcon class="w-4 h-4" />Join
+                                </Button>
+                            {/if}
+                        </div>
+                    </form>
+                </div>
+            {/each}
+        </div>
     </div>
+    <GroupDetail
+        open={detailOpen}
+        onOpenChange={(v) => (detailOpen = v)}
+        group={selectedGroup}
+    />
 </div>
-<GroupDetail
-    open={detailOpen}
-    onOpenChange={(v) => (detailOpen = v)}
-    group={selectedGroup}
-/>
+<Dialog.Root bind:open={joinDialogOpen}>
+    <Dialog.Content class="max-w-md">
+        <Dialog.Header>
+            <Dialog.Title>Join Group</Dialog.Title>
+            <Dialog.Description>
+                Send a join request to
+                <span class="font-semibold text-black"
+                    >{selectedJoinGroup?.name}</span
+                >
+            </Dialog.Description>
+        </Dialog.Header>
+
+        <form
+            method="POST"
+            action="?/joinRequest"
+            use:enhance={handleJoinEnhance}
+        >
+            <input type="hidden" name="groupId" value={selectedJoinGroup?.id} />
+
+            <div class="flex flex-col gap-2 my-4">
+                <Label for="join-message">
+                    Message <span class="text-red-500">*</span>
+                </Label>
+                <Textarea
+                    id="join-message"
+                    name="message"
+                    bind:value={joinMessage}
+                    rows={4}
+                    placeholder="Nhập lý do bạn muốn tham gia nhóm này..."
+                    required
+                />
+            </div>
+
+            <Dialog.Footer>
+                <Button
+                    type="button"
+                    variant="outline"
+                    class="cursor-pointer"
+                    onclick={() => (joinDialogOpen = false)}
+                    disabled={joinLoading}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    type="submit"
+                    class="bg-amber-600 cursor-pointer"
+                    disabled={joinLoading || !joinMessage.trim()}
+                >
+                    {joinLoading ? "Sending..." : "Send Request"}
+                </Button>
+            </Dialog.Footer>
+        </form>
+    </Dialog.Content>
+</Dialog.Root>

@@ -179,263 +179,269 @@
     </div>
 {/snippet}
 
-<a
-    class="flex gap-2 items-center w-fit text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mt-10 mx-10"
-    href="/app"><ArrowLeftIcon />Back to Dashboard</a
->
-<div class="px-20 pt-10 bg-stone-100">
-    <div class="px-25">
-        {#if data?.group}
-            <div
-                class="bg-white rounded-xl px-5 py-3 flex justify-between mb-5"
-            >
-                <span
-                    class="text-2xl flex flex-1 items-center font-bold gap-3 text-wrap mr-10"
-                >
-                    {data?.group.groupName}
-                    <Badge
-                        class="{statusClass[data?.group?.status] ??
-                            'bg-stone-200 text-stone-600'} text-[14px] leading-none py-1 px-2.5 self-center"
-                    >
-                        {data?.group?.status}
-                    </Badge>
-                    {#if data?.group?.status === GroupStatusEnum.DRAFT || data?.group?.status === GroupStatusEnum.REJECTED}
-                        {#if currentUser?.student?.group?.isLeader === true}
-                            <form
-                                method="POST"
-                                action="?/submitGroup"
-                                use:enhance={() => {
-                                    return async ({ result, update }) => {
-                                        if (result.type === "success") {
-                                            toast.success(
-                                                "Approval request sent successfully!",
-                                            );
-                                        } else if (result.type === "failure") {
-                                            toast.error(
-                                                String(
-                                                    result.data?.message ??
-                                                        "Failed to send approval request",
-                                                ),
-                                            );
-                                        }
-                                        await update();
-                                    };
-                                }}
-                            >
-                                <input
-                                    type="hidden"
-                                    name="groupId"
-                                    value={data?.group?.groupId}
-                                />
-                                <Button
-                                    type="submit"
-                                    class="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2"
-                                >
-                                    Request Approval
-                                </Button>
-                            </form>
-                        {/if}
-                        {#if currentUser?.student?.group?.isLeader === false}
-                            <form
-                                id="leave-form"
-                                method="POST"
-                                action="?/leaveGroup"
-                                use:enhance={() => {
-                                    return async ({ result }) => {
-                                        if (result.type === "success") {
-                                            toast.success(
-                                                "You have left the group.",
-                                            );
-                                            pendingLeave = false;
-                                            await invalidateAll();
-                                        } else if (result.type === "failure") {
-                                            toast.error(
-                                                String(
-                                                    result.data?.message ??
-                                                        "Failed to leave group",
-                                                ),
-                                            );
-                                            pendingLeave = false;
-                                        }
-                                    };
-                                }}
-                            >
-                                <input
-                                    type="hidden"
-                                    name="groupId"
-                                    value={data?.group?.groupId}
-                                />
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    class="cursor-pointer border-red-500 text-red-500 hover:bg-red-50"
-                                    onclick={() => (pendingLeave = true)}
-                                >
-                                    Leave Group
-                                </Button>
-                            </form>
-                        {/if}
-                    {/if}
-                </span>
-                <div class="flex gap-3">
-                    <div
-                        class="flex flex-col justify-center gap-1 items-start bg-stone-100 rounded-2xl px-4 py-2"
-                    >
-                        <span class="text-stone-500">MEMBERS</span>
-                        <span class="text-stone-900 text-xl font-bold"
-                            >{memberCount}</span
-                        >
-                    </div>
-                    <div
-                        class="flex flex-col gap-1 justify-center items-start bg-stone-100 rounded-2xl px-4 py-2"
-                    >
-                        <span class="text-stone-500">DEPARTMENT</span>
-                        <span class="text-stone-900 text-xl font-bold"
-                            >SE - Software Engineering</span
-                        >
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-xl px-5 py-3 mb-5 flex flex-col">
-                <span class="text-2xl font-bold gap-5">Description</span>
-                <p>{data?.group?.groupDescription}</p>
-            </div>
-            <h2 class="text-xl font-bold text-black mb-3">Group Members</h2>
-            <div class="rounded-xl py-3 mb-5 flex flex-col gap-3">
-                {#each groupMembers as cardInfo}
-                    {@render memberInforCard(cardInfo)}
-                {/each}
-            </div>
-        {:else}
-            <div
-                class="flex flex-col items-center justify-center bg-white rounded-xl py-20 gap-5"
-            >
+<div class="pt-15">
+    <a
+        class="flex gap-2 items-center w-fit text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mt-10 mx-10"
+        href="/app"><ArrowLeftIcon />Back to Dashboard</a
+    >
+    <div class="px-20 pt-10 bg-stone-100">
+        <div class="px-25">
+            {#if data?.group}
                 <div
-                    class="w-20 h-20 rounded-full bg-stone-100 flex items-center justify-center"
+                    class="bg-white rounded-xl px-5 py-3 flex justify-between mb-5"
                 >
-                    <UsersIcon class="w-10 h-10 text-stone-400" />
-                </div>
-                <div class="flex flex-col items-center gap-1 text-center">
-                    <span class="text-xl font-bold text-stone-700"
-                        >You are not in any group yet</span
+                    <span
+                        class="text-2xl flex flex-1 items-center font-bold gap-3 text-wrap mr-10"
                     >
-                    <span class="text-stone-400 text-sm"
-                        >Join or register a group to get started</span
-                    >
+                        {data?.group.groupName}
+                        <Badge
+                            class="{statusClass[data?.group?.status] ??
+                                'bg-stone-200 text-stone-600'} text-[14px] leading-none py-1 px-2.5 self-center"
+                        >
+                            {data?.group?.status}
+                        </Badge>
+                        {#if data?.group?.status === GroupStatusEnum.DRAFT || data?.group?.status === GroupStatusEnum.REJECTED}
+                            {#if currentUser?.student?.group?.isLeader === true}
+                                <form
+                                    method="POST"
+                                    action="?/submitGroup"
+                                    use:enhance={() => {
+                                        return async ({ result, update }) => {
+                                            if (result.type === "success") {
+                                                toast.success(
+                                                    "Approval request sent successfully!",
+                                                );
+                                            } else if (
+                                                result.type === "failure"
+                                            ) {
+                                                toast.error(
+                                                    String(
+                                                        result.data?.message ??
+                                                            "Failed to send approval request",
+                                                    ),
+                                                );
+                                            }
+                                            await update();
+                                        };
+                                    }}
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="groupId"
+                                        value={data?.group?.groupId}
+                                    />
+                                    <Button
+                                        type="submit"
+                                        class="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2"
+                                    >
+                                        Request Approval
+                                    </Button>
+                                </form>
+                            {/if}
+                            {#if currentUser?.student?.group?.isLeader === false}
+                                <form
+                                    id="leave-form"
+                                    method="POST"
+                                    action="?/leaveGroup"
+                                    use:enhance={() => {
+                                        return async ({ result }) => {
+                                            if (result.type === "success") {
+                                                toast.success(
+                                                    "You have left the group.",
+                                                );
+                                                pendingLeave = false;
+                                                await invalidateAll();
+                                            } else if (
+                                                result.type === "failure"
+                                            ) {
+                                                toast.error(
+                                                    String(
+                                                        result.data?.message ??
+                                                            "Failed to leave group",
+                                                    ),
+                                                );
+                                                pendingLeave = false;
+                                            }
+                                        };
+                                    }}
+                                >
+                                    <input
+                                        type="hidden"
+                                        name="groupId"
+                                        value={data?.group?.groupId}
+                                    />
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        class="cursor-pointer border-red-500 text-red-500 hover:bg-red-50"
+                                        onclick={() => (pendingLeave = true)}
+                                    >
+                                        Leave Group
+                                    </Button>
+                                </form>
+                            {/if}
+                        {/if}
+                    </span>
+                    <div class="flex gap-3">
+                        <div
+                            class="flex flex-col justify-center gap-1 items-start bg-stone-100 rounded-2xl px-4 py-2"
+                        >
+                            <span class="text-stone-500">MEMBERS</span>
+                            <span class="text-stone-900 text-xl font-bold"
+                                >{memberCount}</span
+                            >
+                        </div>
+                        <div
+                            class="flex flex-col gap-1 justify-center items-start bg-stone-100 rounded-2xl px-4 py-2"
+                        >
+                            <span class="text-stone-500">DEPARTMENT</span>
+                            <span class="text-stone-900 text-xl font-bold"
+                                >SE - Software Engineering</span
+                            >
+                        </div>
+                    </div>
                 </div>
-                <a
-                    href="/app/student/groups"
-                    class="bg-amber-400 hover:bg-amber-500 text-white font-semibold px-6 py-2.5 rounded-xl transition-all duration-200"
+                <div class="bg-white rounded-xl px-5 py-3 mb-5 flex flex-col">
+                    <span class="text-2xl font-bold gap-5">Description</span>
+                    <p>{data?.group?.groupDescription}</p>
+                </div>
+                <h2 class="text-xl font-bold text-black mb-3">Group Members</h2>
+                <div class="rounded-xl py-3 mb-5 flex flex-col gap-3">
+                    {#each groupMembers as cardInfo}
+                        {@render memberInforCard(cardInfo)}
+                    {/each}
+                </div>
+            {:else}
+                <div
+                    class="flex flex-col items-center justify-center bg-white rounded-xl py-20 gap-5"
                 >
-                    Register Group
-                </a>
-            </div>
-        {/if}
+                    <div
+                        class="w-20 h-20 rounded-full bg-stone-100 flex items-center justify-center"
+                    >
+                        <UsersIcon class="w-10 h-10 text-stone-400" />
+                    </div>
+                    <div class="flex flex-col items-center gap-1 text-center">
+                        <span class="text-xl font-bold text-stone-700"
+                            >You are not in any group yet</span
+                        >
+                        <span class="text-stone-400 text-sm"
+                            >Join or register a group to get started</span
+                        >
+                    </div>
+                    <a
+                        href="/app/student/groups"
+                        class="bg-amber-400 hover:bg-amber-500 text-white font-semibold px-6 py-2.5 rounded-xl transition-all duration-200"
+                    >
+                        Register Group
+                    </a>
+                </div>
+            {/if}
+        </div>
     </div>
+
+    <AlertDialog.Root
+        open={!!pendingRemove}
+        onOpenChange={(v) => {
+            if (!v) pendingRemove = null;
+        }}
+    >
+        <AlertDialog.Content>
+            <AlertDialog.Header>
+                <AlertDialog.Title>Remove Member</AlertDialog.Title>
+                <AlertDialog.Description>
+                    Are you sure you want to remove
+                    <span class="font-semibold text-black"
+                        >{pendingRemove?.fullName}</span
+                    >
+                    from the group? This action cannot be undone.
+                </AlertDialog.Description>
+            </AlertDialog.Header>
+            <AlertDialog.Footer>
+                <AlertDialog.Cancel onclick={() => (pendingRemove = null)}>
+                    Cancel
+                </AlertDialog.Cancel>
+                <AlertDialog.Action
+                    class="bg-red-500 hover:bg-red-600 text-white"
+                    onclick={() => {
+                        const form = document.getElementById(
+                            `remove-form-${pendingRemove?.studentId}`,
+                        ) as HTMLFormElement;
+                        form?.requestSubmit();
+                    }}
+                >
+                    Remove
+                </AlertDialog.Action>
+            </AlertDialog.Footer>
+        </AlertDialog.Content>
+    </AlertDialog.Root>
+
+    <AlertDialog.Root
+        open={!!pendingPromote}
+        onOpenChange={(v) => {
+            if (!v) pendingPromote = null;
+        }}
+    >
+        <AlertDialog.Content>
+            <AlertDialog.Header>
+                <AlertDialog.Title>Promote to Leader</AlertDialog.Title>
+                <AlertDialog.Description>
+                    Are you sure you want to promote
+                    <span class="font-semibold text-black"
+                        >{pendingPromote?.fullName}</span
+                    >
+                    to group Leader? They will have full admin rights.
+                </AlertDialog.Description>
+            </AlertDialog.Header>
+            <AlertDialog.Footer>
+                <AlertDialog.Cancel onclick={() => (pendingPromote = null)}>
+                    Cancel
+                </AlertDialog.Cancel>
+                <AlertDialog.Action
+                    class="bg-amber-500 hover:bg-amber-600 text-white"
+                    onclick={() => {
+                        const form = document.getElementById(
+                            `promote-form-${pendingPromote?.studentId}`,
+                        ) as HTMLFormElement;
+                        form?.requestSubmit();
+                    }}
+                >
+                    Promote Leader
+                </AlertDialog.Action>
+            </AlertDialog.Footer>
+        </AlertDialog.Content>
+    </AlertDialog.Root>
+    <AlertDialog.Root
+        open={pendingLeave}
+        onOpenChange={(v) => {
+            if (!v) pendingLeave = false;
+        }}
+    >
+        <AlertDialog.Content>
+            <AlertDialog.Header>
+                <AlertDialog.Title>Leave Group</AlertDialog.Title>
+                <AlertDialog.Description>
+                    Are you sure you want to leave
+                    <span class="font-semibold text-black"
+                        >{data?.group?.groupName}</span
+                    >? You will need to be invited again to rejoin.
+                </AlertDialog.Description>
+            </AlertDialog.Header>
+            <AlertDialog.Footer>
+                <AlertDialog.Cancel onclick={() => (pendingLeave = false)}>
+                    Cancel
+                </AlertDialog.Cancel>
+                <AlertDialog.Action
+                    class="bg-red-500 hover:bg-red-600 text-white"
+                    onclick={() => {
+                        const form = document.getElementById(
+                            "leave-form",
+                        ) as HTMLFormElement;
+                        form?.requestSubmit();
+                    }}
+                >
+                    Leave
+                </AlertDialog.Action>
+            </AlertDialog.Footer>
+        </AlertDialog.Content>
+    </AlertDialog.Root>
 </div>
-
-<AlertDialog.Root
-    open={!!pendingRemove}
-    onOpenChange={(v) => {
-        if (!v) pendingRemove = null;
-    }}
->
-    <AlertDialog.Content>
-        <AlertDialog.Header>
-            <AlertDialog.Title>Remove Member</AlertDialog.Title>
-            <AlertDialog.Description>
-                Are you sure you want to remove
-                <span class="font-semibold text-black"
-                    >{pendingRemove?.fullName}</span
-                >
-                from the group? This action cannot be undone.
-            </AlertDialog.Description>
-        </AlertDialog.Header>
-        <AlertDialog.Footer>
-            <AlertDialog.Cancel onclick={() => (pendingRemove = null)}>
-                Cancel
-            </AlertDialog.Cancel>
-            <AlertDialog.Action
-                class="bg-red-500 hover:bg-red-600 text-white"
-                onclick={() => {
-                    const form = document.getElementById(
-                        `remove-form-${pendingRemove?.studentId}`,
-                    ) as HTMLFormElement;
-                    form?.requestSubmit();
-                }}
-            >
-                Remove
-            </AlertDialog.Action>
-        </AlertDialog.Footer>
-    </AlertDialog.Content>
-</AlertDialog.Root>
-
-<AlertDialog.Root
-    open={!!pendingPromote}
-    onOpenChange={(v) => {
-        if (!v) pendingPromote = null;
-    }}
->
-    <AlertDialog.Content>
-        <AlertDialog.Header>
-            <AlertDialog.Title>Promote to Leader</AlertDialog.Title>
-            <AlertDialog.Description>
-                Are you sure you want to promote
-                <span class="font-semibold text-black"
-                    >{pendingPromote?.fullName}</span
-                >
-                to group Leader? They will have full admin rights.
-            </AlertDialog.Description>
-        </AlertDialog.Header>
-        <AlertDialog.Footer>
-            <AlertDialog.Cancel onclick={() => (pendingPromote = null)}>
-                Cancel
-            </AlertDialog.Cancel>
-            <AlertDialog.Action
-                class="bg-amber-500 hover:bg-amber-600 text-white"
-                onclick={() => {
-                    const form = document.getElementById(
-                        `promote-form-${pendingPromote?.studentId}`,
-                    ) as HTMLFormElement;
-                    form?.requestSubmit();
-                }}
-            >
-                Promote Leader
-            </AlertDialog.Action>
-        </AlertDialog.Footer>
-    </AlertDialog.Content>
-</AlertDialog.Root>
-<AlertDialog.Root
-    open={pendingLeave}
-    onOpenChange={(v) => {
-        if (!v) pendingLeave = false;
-    }}
->
-    <AlertDialog.Content>
-        <AlertDialog.Header>
-            <AlertDialog.Title>Leave Group</AlertDialog.Title>
-            <AlertDialog.Description>
-                Are you sure you want to leave
-                <span class="font-semibold text-black"
-                    >{data?.group?.groupName}</span
-                >? You will need to be invited again to rejoin.
-            </AlertDialog.Description>
-        </AlertDialog.Header>
-        <AlertDialog.Footer>
-            <AlertDialog.Cancel onclick={() => (pendingLeave = false)}>
-                Cancel
-            </AlertDialog.Cancel>
-            <AlertDialog.Action
-                class="bg-red-500 hover:bg-red-600 text-white"
-                onclick={() => {
-                    const form = document.getElementById(
-                        "leave-form",
-                    ) as HTMLFormElement;
-                    form?.requestSubmit();
-                }}
-            >
-                Leave
-            </AlertDialog.Action>
-        </AlertDialog.Footer>
-    </AlertDialog.Content>
-</AlertDialog.Root>

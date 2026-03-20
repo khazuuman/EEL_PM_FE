@@ -1,18 +1,29 @@
 import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
-import { getCampuseDetail } from '$lib/server/campuses';
+import { getStudentDetail } from '$lib/server/students';
+import { getAllMajors } from '$lib/server/majors';
+import { getAllCampuses } from '$lib/server/campuses';
+import { getAllClasses } from '$lib/server/classes';
 
 export const load: LayoutServerLoad = async (event) => {
 	const { params } = event;
 	const { id } = params;
-	const campusResult = await getCampuseDetail(event, id);
-	console.log("course detail: ", campusResult.data.data);
-	if (campusResult.status !== 200) {
+	const [majorsRes, campusesRes, classesRes, studentRes] = await Promise.all([
+		getAllMajors(event),
+		getAllCampuses(event),
+		getAllClasses(event),
+		getStudentDetail(event, id)
+	]);
+	console.log("student detail: ", studentRes.data.data);
+	if (studentRes.status !== 200) {
 		throw error(404, {
-			message: 'Not found campus!'
+			message: 'Not found student!'
 		});
 	}
 	return {
-		campusDetails: campusResult.data.data
+		majors: majorsRes?.data?.data?.data ?? [],
+		campuses: campusesRes?.data?.data?.data ?? [],
+		classes: classesRes?.data?.data?.data ?? [],
+		student: studentRes.data.data
 	};
 };

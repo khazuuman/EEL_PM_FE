@@ -57,7 +57,6 @@
         href="/app"><ArrowLeftIcon />Back to Dashboard</a
     >
     <DataTable
-        showAddButton={false}
         showImport={true}
         showView={false}
         statuses={[]}
@@ -73,11 +72,6 @@
         matchSearchColumns={["studentName", "studentCode"]}
         {filters}
     >
-        <script lang="ts">
-            import { invalidateAll } from "$app/navigation"; // ← thêm import
-            // ...
-        </script>
-
         {#snippet importDialog({ open, setOpen })}
             <ImportStudentDialog
                 {open}

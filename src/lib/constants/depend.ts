@@ -6,5 +6,5 @@ export const APP_STAFF_MANAGE_SEMESTER = 'app:staff-semester-management';
 export const APP_STAFF_MANAGE_COURSE = 'app:staff-course-management';
 export const APP_STAFF_MANAGE_CAMPUS = 'app:staff-campus-management';
 export const APP_STAFF_MANAGE_STUDENT = 'app:staff-student-management';
-
+export const APP_STAFF_MANAGE_MENTOR = 'app:staff-mentor-management';
 

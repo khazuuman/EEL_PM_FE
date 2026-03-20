@@ -1,4 +1,4 @@
-import { getGroupDetail, getGroupsByClass } from "$lib/server/groups";
+import { getGroupDetail, getGroupsByClass, joinRequest } from "$lib/server/groups";
 import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 
@@ -38,6 +38,27 @@ export const actions: Actions = {
         return {
             success: true,
             group: groupDetailRes?.data?.data ?? null,
+        };
+    },
+    joinRequest: async (event) => {
+        const formData = await event.request.formData();
+        const groupId = formData.get("groupId") as string;
+        const message = formData.get("message") as string;
+
+        if (!groupId) {
+            return fail(400, { message: "Group ID is required" });
+        }
+
+        const joinRequestRes = await joinRequest(event, groupId, {message});
+        console.log("joinRequestRes:", joinRequestRes.data?.data);
+
+        if (!joinRequestRes || joinRequestRes.status !== 200) {
+            return fail(400, { message: joinRequestRes?.data?.detail ?? "Failed to create join request" });
+        }
+
+        return {
+            success: true,
+            group: joinRequestRes?.data?.data ?? null,
         };
     },
 };

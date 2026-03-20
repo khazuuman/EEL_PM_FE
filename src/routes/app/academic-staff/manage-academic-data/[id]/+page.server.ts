@@ -1,58 +1,60 @@
-import { deleteCampus, updateCampus } from "$lib/server/campuses";
-import { deleteCourse, updateCourse } from "$lib/server/course";
-import type { CreateCampus } from "$lib/types/campus";
-import type { UpdateCourse } from "$lib/types/course";
+import { deleteCampus } from "$lib/server/campuses";
+import { deleteStudent, updateStudent } from "$lib/server/students";
+import type { UpdateStudent } from "$lib/types/student";
 import type { Actions } from "@sveltejs/kit";
 import { fail, redirect } from "@sveltejs/kit";
 
 export const actions: Actions = {
-    updateCampus: async (event) => {
-        const { params } = event;
+    updateStudent: async (event) => {
         const formData = await event.request.formData();
-        const campusCode = formData.get("campusCode") as string;
-        const campusName = formData.get("campusName") as string;
-        const city = formData.get("city") as string;
-        const address = formData.get("address") as string;
-        const isActive = formData.get("isActive") === "true";
+        const dateOfBirthRaw = formData.get("dateOfBirth") as string;
+        const id = formData.get("studentId");
+        // Build typed payload trực tiếp
+        const payload: UpdateStudent = {
+            fullName: formData.get("fullName") as string,
+            gender: formData.get("gender") as string,
+            phoneNumber: formData.get("phoneNumber") as string || null,
+            dateOfBirth: dateOfBirthRaw
+                ? new Date(dateOfBirthRaw).toISOString()
+                : null,
+            campusId: Number(formData.get("campusId")),
+            majorId: Number(formData.get("majorId")),
+            classId: Number(formData.get("classId")),
+            enrollmentYear: formData.get("enrollmentYear")
+                ? Number(formData.get("enrollmentYear"))
+                : null,
+            currentSemester: formData.get("currentSemester")
+                ? Number(formData.get("currentSemester"))
+                : null,
+        };
 
-        const body: CreateCampus = {
-            campusCode,
-            campusName,
-            city,
-            address,
-            isActive
-        }
+        console.log("payload: ", payload);
 
-        console.log("update campus body: ", body);
+        const res = await updateStudent(event, payload, id);
+        console.log("updateStudentRes:", res);
 
-        const updateCampusRes = await updateCampus(event, body, params.id as string);
-        console.log("update campus:", updateCampusRes);
-
-        if (!updateCampusRes || updateCampusRes.status !== 200) {
+        if (!res || res.status !== 200) {
             return fail(400, {
-                message: updateCampusRes?.data?.message ?? "Failed to update campus",
+                message: res?.data?.message ?? "Failed to update student",
             });
         }
 
-        return {
-            success: true,
-            group: updateCampusRes?.data?.message ?? null,
-        };
+        return { success: true };
     },
     delete: async (event) => {
         const { url, params } = event;
         const redirectTo = url.searchParams.get('redirectTo');
 
-        const deleteCampusRes = await deleteCampus(event, params.id as string);
-        if (deleteCampusRes?.status === 200) {
+        const deleteStudentRes = await deleteStudent(event, params.id);
+        if (deleteStudentRes?.status === 200) {
             throw redirect(
                 303,
-                redirectTo ? decodeURIComponent(redirectTo) : '/app/academic-staff/manage-campuses'
+                redirectTo ? decodeURIComponent(redirectTo) : '/app/academic-staff/manage-academic-data'
             );
         }
         return fail(400, {
-            message: deleteCampusRes?.data?.detail,
-            errors: deleteCampusRes?.data?.errors
+            message: deleteStudentRes?.data?.detail,
+            errors: deleteStudentRes?.data?.errors
         });
     },
 };
