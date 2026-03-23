@@ -1,5 +1,6 @@
 <script lang="ts">
 	import DataTable from "$lib/components/ui/data-table/data-table.svelte";
+    import { ArrowLeftIcon } from "lucide-svelte";
 
 	const { data } = $props();
 	console.log("data client: ", data);
@@ -33,8 +34,14 @@
 	});
 </script>
 
-<div class="bg-white p-5 rounded-md">
+<div class="bg-white px-5 pt-30 rounded-md min-h-screen">
+<a
+        class="flex gap-2 w-fit items-center text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mb-5"
+        href="/app/lecturer/class/{data.classId}"><ArrowLeftIcon />Back to Dashboard</a
+    >
 	<DataTable
+		showView={false}
+		showAddButton={false}
 		statuses={[]}
 		keyId={"studentId"}
 		{cacheKeyName}

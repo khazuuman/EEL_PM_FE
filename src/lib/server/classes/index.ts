@@ -30,3 +30,17 @@ export const getAllClasses = async (event: RequestEvent) => {
         data: data
     };
 };
+
+export const allocateGroup = async (event: RequestEvent, body: any, classId: any) => {
+    const response = await fetcher({
+        event,
+        url: `/classes/${classId}/groups/auto-allocate`,
+        data: body,
+        method: "POST"
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data,
+    };
+};

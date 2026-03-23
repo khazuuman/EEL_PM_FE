@@ -8,7 +8,7 @@
     const { data } = $props();
     let mentors = $derived(data?.mentors || []);
     let totalCount = $derived(data?.totalCount || 0);
-    const cacheKeyName = "staff-student-management";
+    const cacheKeyName = "staff-mentor-management";
 
     let filters = $derived([
         // {
@@ -48,7 +48,7 @@
 </script>
 
 <div
-    class="bg-white w-full px-10 rounded-md pt-30 h-fit overflow-x-hidden pb-10 z-10"
+    class="bg-white w-full px-10 rounded-md pt-30 h-fit overflow-x-hidden pb-10 z-10 select-none"
 >
     <a
         class="flex gap-2 w-fit items-center text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mb-5"

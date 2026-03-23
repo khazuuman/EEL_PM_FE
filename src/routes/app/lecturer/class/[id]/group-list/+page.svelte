@@ -4,6 +4,7 @@
     import Input from "$lib/components/ui/input/input.svelte";
     import Progress from "$lib/components/ui/progress/progress.svelte";
     import {
+        ArrowLeftIcon,
         EyeIcon,
         Layers2Icon,
         LockKeyholeIcon,
@@ -16,6 +17,9 @@
     import type { PageData } from "./$types";
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
+    import type { SubmitFunction } from "@sveltejs/kit";
+    import { enhance } from "$app/forms";
+    import GroupDetail from "../../../../student/groups/components/GroupDetail.svelte";
 
     let { data } = $props<{ data: PageData }>();
     const groups = $derived(data.groups as any[]);
@@ -61,6 +65,19 @@
         searchQuery;
         updateURL();
     });
+
+    // ── View Detail ──
+    let detailOpen = $state(false);
+    let selectedGroup = $state<any>(null);
+
+    const handleEnhance: SubmitFunction = () => {
+        return async ({ result }) => {
+            if (result.type === "success" && result.data?.group) {
+                selectedGroup = result.data.group;
+                detailOpen = true;
+            }
+        };
+    };
 </script>
 
 {#snippet overviewCard(o: (typeof overviewData)[number])}
@@ -81,7 +98,12 @@
         </span>
     </div>
 {/snippet}
-<div class="p-5">
+<div class="px-5 pt-20">
+    <a
+        class="flex gap-2 w-fit items-center text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mb-5"
+        href="/app/lecturer/class/{data.classId}"
+        ><ArrowLeftIcon />Back to Dashboard</a
+    >
     <h1 class="text-3xl font-extrabold mb-2">Groups</h1>
     <div class="flex flex-col lg:flex-row justify-between items-center">
         <p class="text-[16px] text-stone-500">
@@ -137,15 +159,27 @@
                     max={group.maxMember}
                     class="w-full my-5 [&>div]:bg-amber-600"
                 />
-                <div class="flex gap-2">
-                    <Button class="flex-1 bg-amber-600 cursor-pointer"
-                        ><EyeIcon />View Detail</Button
+                <!-- Thay div bằng form -->
+                <form
+                    method="POST"
+                    action="?/getGroupDetail"
+                    use:enhance={handleEnhance}
+                >
+                    <input type="hidden" name="groupId" value={group.id} />
+                    <Button
+                        type="submit"
+                        class="w-full bg-amber-600 cursor-pointer"
                     >
-                    <Button variant="default" class="cursor-pointer"
-                        ><SettingsIcon /></Button
-                    >
-                </div>
+                        <EyeIcon />View Detail
+                    </Button>
+                </form>
             </div>
         {/each}
     </div>
 </div>
+
+<GroupDetail
+    open={detailOpen}
+    onOpenChange={(v) => (detailOpen = v)}
+    group={selectedGroup}
+/>

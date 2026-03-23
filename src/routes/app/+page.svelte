@@ -115,8 +115,8 @@
         groupLabel: "Class",
         items: [
             {
-                name: "Manage Classes",
-                url: "/app/academic-staff/manage-classes",
+                name: "Class Grouping",
+                url: "/app/academic-staff/auto-allocate-groups",
             },
         ],
     };

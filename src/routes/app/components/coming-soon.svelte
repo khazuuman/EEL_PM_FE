@@ -13,7 +13,7 @@
 </script>
 
 <div
-    class="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center px-4"
+    class="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center px-4 pt-30"
 >
     <!-- Icon -->
     <div

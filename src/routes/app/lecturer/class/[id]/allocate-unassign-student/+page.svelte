@@ -8,4 +8,7 @@
     const classId = data.classId;
 </script>
 
-<ComingSoon title="Allocate Unassign Student" backPath={`/app/lecturer/class/${classId}`} />
+<ComingSoon
+    title="Allocate Unassign Student"
+    backPath={`/app/lecturer/class/${classId}`}
+/>

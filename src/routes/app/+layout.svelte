@@ -8,9 +8,9 @@
 </script>
 
 <header
-    class="px-5 py-2 flex flex-row w-full justify-between items-center gap-10 bg-white border border-amber-600 fixed z-100"
+    class="px-5 py-2 flex flex-row w-full justify-between items-center gap-10 bg-white border border-amber-600 fixed z-50"
 >
-    <div class="w-full bg-white">
+    <div class="w-full bg-white z-100">
         <div class="flex gap-5">
             <GraduationCapIcon
                 color="#f2a20d"

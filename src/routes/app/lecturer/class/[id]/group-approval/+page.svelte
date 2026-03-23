@@ -144,117 +144,131 @@
         </span>
     </div>
 {/snippet}
-<a
-    class="flex gap-2 items-center w-fit text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mt-10 mx-10"
-    href={`/app/lecturer/class/${data.classId}`}
-    ><ArrowLeftIcon />Back to Dashboard</a
->
-<div class="p-10 bg-stone-100 w-full h-full">
-    <h1 class="text-3xl font-extrabold mb-2">Groups</h1>
-    <div class="flex flex-col lg:flex-row justify-between items-center">
-        <p class="text-[16px] text-stone-500">View all groups in this class</p>
-        <div class="flex flex-col lg:flex-row gap-4">
-            <div class="relative w-70">
-                <Input
-                    id="search"
-                    placeholder="Search group name..."
-                    class="ps-8"
-                    bind:value={searchQuery}
-                />
-                <SearchIcon
-                    class="pointer-events-none absolute start-2 top-1/2 size-4 -translate-y-1/2 opacity-50 select-none"
-                />
+<div class="px-5 pt-20">
+    <a
+        class="flex gap-2 items-center w-fit text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mt-10 mx-10"
+        href={`/app/lecturer/class/${data.classId}`}
+        ><ArrowLeftIcon />Back to Dashboard</a
+    >
+    <div class="p-10 bg-stone-100 w-full h-full">
+        <h1 class="text-3xl font-extrabold mb-2">Groups</h1>
+        <div class="flex flex-col lg:flex-row justify-between items-center">
+            <p class="text-[16px] text-stone-500">
+                View all groups in this class
+            </p>
+            <div class="flex flex-col lg:flex-row gap-4">
+                <div class="relative w-70">
+                    <Input
+                        id="search"
+                        placeholder="Search group name..."
+                        class="ps-8"
+                        bind:value={searchQuery}
+                    />
+                    <SearchIcon
+                        class="pointer-events-none absolute start-2 top-1/2 size-4 -translate-y-1/2 opacity-50 select-none"
+                    />
+                </div>
             </div>
         </div>
-    </div>
-    <div class="flex flex-wrap gap-5 mt-10">
-        {#each overviewData as cardInfo}
-            {@render overviewCard(cardInfo)}
-        {/each}
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">
-        {#if groups.length === 0}
-            <div
-                class="col-span-full flex flex-col items-center justify-center py-20 text-stone-400 gap-3"
-            >
-                <UsersIcon class="w-16 h-16 text-stone-300" />
-                <p class="text-xl font-semibold">No groups found</p>
-                <p class="text-sm">
-                    There are no pending groups in this class yet.
-                </p>
-            </div>
-        {:else}
-            {#each groups as group}
-                <div class="card rounded-md p-4 bg-white">
-                    <span
-                        class="w-full flex justify-between font-bold text-xl items-center mb-3"
-                        >{group.name}
-                        <Badge
-                            class={statusClass[group.status] ??
-                                "bg-stone-200 text-stone-600"}
-                        >
-                            {group.status}
-                        </Badge></span
-                    >
-                    <span
-                        class="flex gap-2 text-stone-600 text-[16px] items-center mb-1 font-bold"
-                        ><UserStarIcon
-                            class="w-5 h-5 text-amber-700"
-                        />{group.leaderName}
-                        <span class="text-red-700 font-bold text-[14px]"
-                            >(Leader)</span
-                        ></span
-                    >
-                    <span
-                        class="flex gap-2 text-stone-600 text-[16px] items-center"
-                        ><UsersIcon
-                            class="w-5 h-5"
-                        />{group.memberCount}/{group.maxMember} Members</span
-                    >
-                    <Progress
-                        value={group.memberCount}
-                        max={group.maxMember}
-                        class="w-full my-5 [&>div]:bg-amber-600"
-                    />
-                    <form
-                        method="POST"
-                        action="?/getGroupDetail"
-                        use:enhance={handleEnhance}
-                    >
-                        <input type="hidden" name="groupId" value={group.id} />
-                        <div class="flex gap-2">
-                            <Button
-                                type="submit"
-                                class="flex-1 bg-amber-600 cursor-pointer"
-                            >
-                                <EyeIcon />View Detail
-                            </Button>
-                            {#if group.status === "Pending"}
-                                <Button
-                                    type="button"
-                                    variant="default"
-                                    class="cursor-pointer bg-green-600 hover:bg-green-700"
-                                    onclick={() =>
-                                        openApprovalDialog(group.id, "approve")}
-                                >
-                                    <CheckIcon />Approve
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="default"
-                                    class="cursor-pointer bg-red-600 hover:bg-red-700"
-                                    onclick={() =>
-                                        openApprovalDialog(group.id, "reject")}
-                                >
-                                    <XIcon />Reject
-                                </Button>
-                            {/if}
-                        </div>
-                    </form>
-                </div>
+        <div class="flex flex-wrap gap-5 mt-10">
+            {#each overviewData as cardInfo}
+                {@render overviewCard(cardInfo)}
             {/each}
-        {/if}
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-10">
+            {#if groups.length === 0}
+                <div
+                    class="col-span-full flex flex-col items-center justify-center py-20 text-stone-400 gap-3"
+                >
+                    <UsersIcon class="w-16 h-16 text-stone-300" />
+                    <p class="text-xl font-semibold">No groups found</p>
+                    <p class="text-sm">
+                        There are no pending groups in this class yet.
+                    </p>
+                </div>
+            {:else}
+                {#each groups as group}
+                    <div class="card rounded-md p-4 bg-white">
+                        <span
+                            class="w-full flex justify-between font-bold text-xl items-center mb-3"
+                            >{group.name}
+                            <Badge
+                                class={statusClass[group.status] ??
+                                    "bg-stone-200 text-stone-600"}
+                            >
+                                {group.status}
+                            </Badge></span
+                        >
+                        <span
+                            class="flex gap-2 text-stone-600 text-[16px] items-center mb-1 font-bold"
+                            ><UserStarIcon
+                                class="w-5 h-5 text-amber-700"
+                            />{group.leaderName}
+                            <span class="text-red-700 font-bold text-[14px]"
+                                >(Leader)</span
+                            ></span
+                        >
+                        <span
+                            class="flex gap-2 text-stone-600 text-[16px] items-center"
+                            ><UsersIcon
+                                class="w-5 h-5"
+                            />{group.memberCount}/{group.maxMember} Members</span
+                        >
+                        <Progress
+                            value={group.memberCount}
+                            max={group.maxMember}
+                            class="w-full my-5 [&>div]:bg-amber-600"
+                        />
+                        <form
+                            method="POST"
+                            action="?/getGroupDetail"
+                            use:enhance={handleEnhance}
+                        >
+                            <input
+                                type="hidden"
+                                name="groupId"
+                                value={group.id}
+                            />
+                            <div class="flex gap-2">
+                                <Button
+                                    type="submit"
+                                    class="flex-1 bg-amber-600 cursor-pointer"
+                                >
+                                    <EyeIcon />View Detail
+                                </Button>
+                                {#if group.status === "Pending"}
+                                    <Button
+                                        type="button"
+                                        variant="default"
+                                        class="cursor-pointer bg-green-600 hover:bg-green-700"
+                                        onclick={() =>
+                                            openApprovalDialog(
+                                                group.id,
+                                                "approve",
+                                            )}
+                                    >
+                                        <CheckIcon />Approve
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant="default"
+                                        class="cursor-pointer bg-red-600 hover:bg-red-700"
+                                        onclick={() =>
+                                            openApprovalDialog(
+                                                group.id,
+                                                "reject",
+                                            )}
+                                    >
+                                        <XIcon />Reject
+                                    </Button>
+                                {/if}
+                            </div>
+                        </form>
+                    </div>
+                {/each}
+            {/if}
+        </div>
     </div>
 </div>
 <GroupDetail
