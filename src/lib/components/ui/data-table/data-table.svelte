@@ -44,8 +44,13 @@
 		statuses: Status[];
 		showView: boolean;
 		showAddButton?: boolean;
+		showAction?: boolean;
 		showImport?: boolean;
 		importDialog?: import("svelte").Snippet<
+			[{ open: boolean; setOpen: (v: boolean) => void }]
+		>;
+		showAutoGroup?: boolean;
+		autoGroupDialog?: import("svelte").Snippet<
 			[{ open: boolean; setOpen: (v: boolean) => void }]
 		>;
 	};
@@ -65,8 +70,11 @@
 		statuses,
 		showView,
 		showAddButton = true,
+		showAction = false,
 		showImport = false,
 		importDialog,
+		showAutoGroup = false,
+		autoGroupDialog,
 	}: Props = $props();
 
 	setDataTableCtx(() => {
@@ -85,6 +93,7 @@
 	let activeHeaders = $state<string[]>([]);
 	let deleteForms = $state<Map<string, HTMLFormElement>>(new Map());
 	let importOpen = $state(false);
+	let autoGroupOpen = $state(false);
 	const handleFormBind = (id: string, formEl: HTMLFormElement) => {
 		deleteForms.set(id, formEl);
 	};
@@ -302,6 +311,10 @@
 		{importDialog}
 		{importOpen}
 		setImportOpen={(v) => (importOpen = v)}
+		{showAutoGroup}
+		{autoGroupDialog}
+		{autoGroupOpen}
+		setAutoGroupOpen={(v) => (autoGroupOpen = v)}
 	/>
 
 	{#if initialLoad}
@@ -398,9 +411,14 @@
 										/>
 									</Table.Cell>
 								{/each}
-								<Table.Cell class="w-12">
-									<ActionsDataTable id={d.id} {showView} />
-								</Table.Cell>
+								{#if showAction}
+									<Table.Cell class="w-12">
+										<ActionsDataTable
+											id={d.id}
+											{showView}
+										/>
+									</Table.Cell>
+								{/if}
 							</Table.Row>
 						{/each}
 					</Table.Body>

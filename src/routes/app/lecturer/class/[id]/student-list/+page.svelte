@@ -8,7 +8,7 @@
 	let totalCount = $derived(data?.totalCount || 0);
 	let majors = $derived(data?.majors || []);
 	console.log("majors client: ", majors);
-	const cacheKeyName = "student-management";
+	const cacheKeyName = "lecturer-student-management";
 	let filters = $derived([
 		{
 			title: "Majors",
@@ -17,7 +17,7 @@
 		},
 	]);
 	let defaultHeaders = $state([
-		"avatarUrl",
+		// "avatarUrl",
 		"studentCode",
 		"fullName",
 		"email",
@@ -25,7 +25,7 @@
 		"majorName",
 	]);
 	let headerValues = $state({
-		avatarUrl: "Avatar",
+		// avatarUrl: "Avatar",
 		studentCode: "Student Code",
 		fullName: "Full Name",
 		email: "Email",
@@ -34,7 +34,7 @@
 	});
 </script>
 
-<div class="bg-white px-5 pt-30 rounded-md min-h-screen">
+<div class="bg-white px-5 pt-30 pb-10 rounded-md min-h-screen">
 <a
         class="flex gap-2 w-fit items-center text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mb-5"
         href="/app/lecturer/class/{data.classId}"><ArrowLeftIcon />Back to Dashboard</a

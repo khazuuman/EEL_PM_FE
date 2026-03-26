@@ -214,10 +214,10 @@
 
     if (user.roles.includes("AcademicStaff")) {
         roleLabel.push("Academic Staff");
-        finalNavGroups.push(staffClassNav);
+        // finalNavGroups.push(staffClassNav);
         finalNavGroups.push(staffGroupNav);
         finalNavGroups.push(staffAcademicDataNav);
-        finalNavGroups.push(staffOtherNav);
+        // finalNavGroups.push(staffOtherNav);
     }
 
     if (user.roles.includes("Admin")) {

@@ -12,6 +12,8 @@ export const actions: Actions = {
         const startDate = formData.get("startDate") as string;
         const endDate = formData.get("endDate") as string;
 
+        console.log("start date: ", startDate);
+        console.log("endDate: ", endDate);
         const createSemesterRes = await createSemester(event, {
             semesterCode,
             semesterName,

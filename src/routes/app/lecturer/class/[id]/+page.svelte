@@ -3,14 +3,14 @@
     import type { PageData } from "../$types";
     import type { NavigationGroup } from "../../../+page.svelte";
     let { data } = $props<{ data: PageData }>();
-    const classId = data.classId;
+    const classId = data.classDetails?.classId;
 
     const lecturerGroupManage: NavigationGroup = {
         groupLabel: "Student Group",
         items: [
             {
-                name: "View Group List",
-                url: `/app/lecturer/class/${classId}/group-list`,
+                name: "Manage Group",
+                url: `/app/lecturer/class/${classId}/manage-groups`,
             },
             {
                 name: "Group Approval",
@@ -28,10 +28,6 @@
             {
                 name: "View Student List",
                 url: `/app/lecturer/class/${classId}/student-list`,
-            },
-            {
-                name: "Allocate Unassign Student",
-                url: `/app/lecturer/class/${classId}/allocate-unassign-student`,
             },
         ],
     };

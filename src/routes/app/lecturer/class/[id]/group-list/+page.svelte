@@ -25,6 +25,12 @@
     const groups = $derived(data.groups as any[]);
     const totalItems = $derived(data.totalItems as any);
     let searchQuery = $state(page.url.searchParams.get("search") ?? "");
+    const totalMembers = $derived(
+        (data.groups as any[]).reduce(
+            (sum: number, g: any) => sum + (g.memberCount ?? 0),
+            0,
+        ),
+    );
 
     const overviewData = $derived([
         {
@@ -34,7 +40,7 @@
         },
         {
             label: "TOTAL MEMBERS",
-            value: "58/60",
+            value: totalMembers,
             icon: Layers2Icon,
         },
         {
@@ -121,11 +127,11 @@
                     class="pointer-events-none absolute start-2 top-1/2 size-4 -translate-y-1/2 opacity-50 select-none"
                 />
             </div>
-            <Button
+            <!-- <Button
                 onclick={() => goto("./group-management/create")}
                 class="bg-amber-600 cursor-pointer"
                 ><PlusIcon class="w-5 h-5" />Create Group</Button
-            >
+            > -->
         </div>
     </div>
     <div class="flex flex-wrap gap-5 mt-10">

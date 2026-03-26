@@ -55,6 +55,7 @@
         href="/app"><ArrowLeftIcon />Back to Dashboard</a
     >
     <DataTable
+        showAction={true}
         showAddButton={true}
         showImport={true}
         showView={false}

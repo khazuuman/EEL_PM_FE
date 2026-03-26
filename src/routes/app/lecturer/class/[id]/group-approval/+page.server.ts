@@ -4,17 +4,17 @@ import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {
     const { parent, url } = event;
-    const { classId } = await parent();
+    const { classDetails } = await parent();
     //url default
     url.searchParams.set("Status", "Pending");
     if (!url.searchParams.has("page")) url.searchParams.set("page", "1");
     if (!url.searchParams.has("limit")) url.searchParams.set("limit", "10");
     //class ID
-    const groupRes = await getGroupsByClass(event, classId);
+    const groupRes = await getGroupsByClass(event, classDetails.classId);
     console.log("group Res:", groupRes);
 
     return {
-        classId: classId,
+        classId: classDetails.classId,
         groups: groupRes?.data?.data?.data ?? [],
         totalItems: groupRes?.data?.data?.paging?.totalItems ?? 0,
     };

@@ -22,8 +22,26 @@ export const getClasses = async (event: RequestEvent) => {
     };
 };
 
+export const getClassesByCampus = async (event: RequestEvent, campusId: any) => {
+    const response = await fetcher({ event, url: `/classes?campusId=${campusId}&limit=100` });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const getAllClasses = async (event: RequestEvent) => {
     const response = await fetcher({ event, url: `/classes?limit=100` });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+export const getClassDetails = async (event: RequestEvent, classId: any) => {
+    const response = await fetcher({ event, url: `/classes/${classId}` });
     const data = await safeJsonParse(response);
     return {
         status: response.status,

@@ -1,6 +1,7 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { fetcher } from "../fetcher";
 import { safeJsonParse } from "$lib/utils";
+import type { CreateGroup, UpdateGroup } from "$lib/types/group";
 
 export const getGroups = async (event: RequestEvent) => {
     const { url } = event;
@@ -22,11 +23,25 @@ export const getGroupsByClass = async (event: RequestEvent, classId: any) => {
     };
 };
 
-export const createGroup = async (event: RequestEvent, body: any) => {
+export const createGroup = async (event: RequestEvent, body: CreateGroup) => {
     const response = await fetcher({
         event,
         url: '/groups',
         method: 'POST',
+        data: body
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+}
+
+export const updateGroup = async (event: RequestEvent, groupId: any, body: UpdateGroup) => {
+    const response = await fetcher({
+        event,
+        url: `/groups/${groupId}/members`,
+        method: 'PUT',
         data: body
     });
     const data = await safeJsonParse(response);
@@ -48,6 +63,20 @@ export const getMyGroup = async (event: RequestEvent, studentId: any) => {
         data: data
     };
 }
+
+export const deleteGroup = async (event: RequestEvent, groupId: any) => {
+    const response = await fetcher({
+        event,
+        url: `/groups/${groupId}`,
+        method: 'DELETE',
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+}
+
 
 export const getGroupDetail = async (event: RequestEvent, groupId: any) => {
     const response = await fetcher({
@@ -175,6 +204,20 @@ export const joinRequest = async (event: RequestEvent, groupId: any, body: any) 
         event,
         url: `/groups/${groupId}/join-requests`,
         method: 'POST',
+        data: body
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+}
+
+export const reviewJoinRequest = async (event: RequestEvent, groupId: any, requestId: any, body: any) => {
+    const response = await fetcher({
+        event,
+        url: `/groups/${groupId}/requests/${requestId}`,
+        method: 'PUT',
         data: body
     });
     const data = await safeJsonParse(response);

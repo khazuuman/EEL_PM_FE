@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
     import { goto } from "$app/navigation";
     import { page } from "$app/state";
     import { Badge } from "$lib/components/ui/badge";
@@ -94,9 +94,9 @@
         memberCount = "";
         dialogOpen = true;
     }
-</script>
+</script> -->
 
-<div class="space-y-5 p-6 pt-25">
+<!-- <div class="space-y-5 p-6 pt-25">
     <a
         class="flex gap-2 w-fit items-center text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mb-5"
         href="/app"><ArrowLeftIcon />Back to Dashboard</a
@@ -453,4 +453,4 @@
             </Dialog.Footer>
         </form>
     </Dialog.Content>
-</Dialog.Root>
+</Dialog.Root> -->

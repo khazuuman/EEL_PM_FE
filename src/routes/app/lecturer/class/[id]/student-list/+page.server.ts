@@ -10,9 +10,9 @@ export const load: PageServerLoad = async (event) => {
     if (!url.searchParams.has("page")) url.searchParams.set("page", "1");
     if (!url.searchParams.has("limit")) url.searchParams.set("limit", "10");
     //class ID
-    const { classId } = await parent();
+    const { classDetails } = await parent();
     const [studentsRes, majorsRes] = await Promise.all([
-        getStudentsByClass(event, classId),
+        getStudentsByClass(event, classDetails.classId),
         getMajors(event),
     ]);
     //majors
@@ -22,7 +22,7 @@ export const load: PageServerLoad = async (event) => {
         variant: 'primary'
     }));
     return {
-        classId: classId,
+        classId: classDetails.classId,
         majors: majors ?? [],
         students: studentsRes?.data?.data?.data ?? [],
         pageSize: studentsRes?.data?.data?.pagination?.limit ?? 0,

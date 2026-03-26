@@ -37,16 +37,16 @@
             value: totalItems,
             icon: Layers2Icon,
         },
-        {
-            label: "TOTAL MEMBERS",
-            value: "58/60",
-            icon: Layers2Icon,
-        },
-        {
-            label: "FULL GROUPS",
-            value: "8",
-            icon: Layers2Icon,
-        },
+        // {
+        //     label: "TOTAL MEMBERS",
+        //     value: "58/60",
+        //     icon: Layers2Icon,
+        // },
+        // {
+        //     label: "FULL GROUPS",
+        //     value: "8",
+        //     icon: Layers2Icon,
+        // },
     ]);
 
     const statusClass: Record<string, string> = {

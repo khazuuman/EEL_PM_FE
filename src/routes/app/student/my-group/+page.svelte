@@ -19,6 +19,7 @@
         null,
     );
     let pendingLeave = $state(false);
+    let pendingSubmit = $state(false);
 
     const currentUser = $derived(data?.currentUser);
     const groupMembers = $derived(
@@ -203,6 +204,7 @@
                         {#if data?.group?.status === GroupStatusEnum.DRAFT || data?.group?.status === GroupStatusEnum.REJECTED}
                             {#if currentUser?.student?.group?.isLeader === true}
                                 <form
+                                    id="submit-form"
                                     method="POST"
                                     action="?/submitGroup"
                                     use:enhance={() => {
@@ -211,6 +213,7 @@
                                                 toast.success(
                                                     "Approval request sent successfully!",
                                                 );
+                                                pendingSubmit = false;
                                             } else if (
                                                 result.type === "failure"
                                             ) {
@@ -220,6 +223,7 @@
                                                             "Failed to send approval request",
                                                     ),
                                                 );
+                                                pendingSubmit = false;
                                             }
                                             await update();
                                         };
@@ -231,13 +235,15 @@
                                         value={data?.group?.groupId}
                                     />
                                     <Button
-                                        type="submit"
+                                        type="button"
                                         class="cursor-pointer bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold px-4 py-2"
+                                        onclick={() => (pendingSubmit = true)}
                                     >
                                         Request Approval
                                     </Button>
                                 </form>
                             {/if}
+
                             {#if currentUser?.student?.group?.isLeader === false}
                                 <form
                                     id="leave-form"
@@ -440,6 +446,42 @@
                     }}
                 >
                     Leave
+                </AlertDialog.Action>
+            </AlertDialog.Footer>
+        </AlertDialog.Content>
+    </AlertDialog.Root>
+    <AlertDialog.Root
+        open={pendingSubmit}
+        onOpenChange={(v) => {
+            if (!v) pendingSubmit = false;
+        }}
+    >
+        <AlertDialog.Content>
+            <AlertDialog.Header>
+                <AlertDialog.Title>Request Approval</AlertDialog.Title>
+                <AlertDialog.Description>
+                    Are you sure you want to submit
+                    <span class="font-semibold text-black"
+                        >{data?.group?.groupName}</span
+                    >
+                    for approval? Make sure all members and information are correct
+                    before submitting.
+                </AlertDialog.Description>
+            </AlertDialog.Header>
+            <AlertDialog.Footer>
+                <AlertDialog.Cancel onclick={() => (pendingSubmit = false)}>
+                    Cancel
+                </AlertDialog.Cancel>
+                <AlertDialog.Action
+                    class="bg-amber-500 hover:bg-amber-600 text-white"
+                    onclick={() => {
+                        const form = document.getElementById(
+                            "submit-form",
+                        ) as HTMLFormElement;
+                        form?.requestSubmit();
+                    }}
+                >
+                    Submit for Approval
                 </AlertDialog.Action>
             </AlertDialog.Footer>
         </AlertDialog.Content>

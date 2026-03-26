@@ -57,8 +57,6 @@ export const load: PageServerLoad = async (event) => {
         })),
     ];
 
-    console.log('studentRes: ', studentsRes?.data?.data?.data);
-
     return {
         students: studentsRes?.data?.data?.data ?? [],
         majors: majors ?? [],

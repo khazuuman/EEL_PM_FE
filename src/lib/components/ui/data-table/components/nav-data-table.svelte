@@ -9,7 +9,7 @@
 	import debounce from "lodash/debounce.js";
 	import { onMount, type Snippet } from "svelte";
 	import * as Select from "$lib/components/ui/select/index.js";
-    import { UploadIcon } from "lucide-svelte";
+	import { UploadIcon } from "lucide-svelte";
 
 	let {
 		activeHeaders,
@@ -19,6 +19,11 @@
 		importDialog,
 		importOpen,
 		setImportOpen,
+
+		showAutoGroup = false,
+		autoGroupDialog,
+		autoGroupOpen,
+		setAutoGroupOpen,
 	}: {
 		activeHeaders: string[];
 		setActiveHeaders: (headers: string[]) => void;
@@ -29,6 +34,13 @@
 		>;
 		importOpen?: boolean;
 		setImportOpen?: (v: boolean) => void;
+
+		showAutoGroup?: boolean;
+		autoGroupDialog?: Snippet<
+			[{ open: boolean; setOpen: (v: boolean) => void }]
+		>;
+		autoGroupOpen?: boolean;
+		setAutoGroupOpen?: (v: boolean) => void;
 	} = $props();
 
 	let searchValue = $state("");
@@ -164,6 +176,17 @@
 			{@render importDialog({
 				open: importOpen ?? false,
 				setOpen: setImportOpen ?? (() => {}),
+			})}
+		{/if}
+
+		{#if showAutoGroup && autoGroupDialog}
+			<Button class="gap-2" onclick={() => setAutoGroupOpen?.(true)}>
+				<UploadIcon />
+				<span>Active {tableName.toLocaleLowerCase()}</span>
+			</Button>
+			{@render autoGroupDialog({
+				open: autoGroupOpen ?? false,
+				setOpen: setAutoGroupOpen ?? (() => {}),
 			})}
 		{/if}
 

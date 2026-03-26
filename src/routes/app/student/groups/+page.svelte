@@ -8,7 +8,6 @@
         EyeIcon,
         Layers2Icon,
         SearchIcon,
-        SettingsIcon,
         UsersIcon,
         UserStarIcon,
     } from "lucide-svelte";

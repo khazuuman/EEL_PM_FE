@@ -56,6 +56,7 @@ export const createSemester = async (
         method: 'POST',
         data: body
     });
+    console.log("body: ", body);
     const data = await safeJsonParse(response);
     return {
         status: response.status,

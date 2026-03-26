@@ -50,10 +50,9 @@ export const actions: Actions = {
         }
 
         const joinRequestRes = await joinRequest(event, groupId, {message});
-        console.log("joinRequestRes:", joinRequestRes.data?.data);
 
         if (!joinRequestRes || joinRequestRes.status !== 200) {
-            return fail(400, { message: joinRequestRes?.data?.detail ?? "Failed to create join request" });
+            return fail(400, { message: joinRequestRes?.data?.message ?? "Failed to create join request" });
         }
 
         return {
