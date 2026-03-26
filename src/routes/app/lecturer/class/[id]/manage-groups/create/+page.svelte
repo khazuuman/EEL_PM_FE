@@ -5,6 +5,7 @@
     import * as Field from "$lib/components/ui/field/index";
     import * as Popover from "$lib/components/ui/popover/index";
     import * as Command from "$lib/components/ui/command/index";
+    import Input from "$lib/components/ui/input/input.svelte";
     import { toast } from "svelte-sonner";
     import type { PageData } from "./$types";
     import { Check, ChevronsUpDown } from "@lucide/svelte";
@@ -18,6 +19,20 @@
 
     // --- Form state ---
     let isSubmitting = $state(false);
+    let minMembers = $state<number | undefined>(undefined);
+    let maxMembers = $state<number | undefined>(undefined);
+    let memberError = $state<string | null>(null);
+
+    function validateMembers() {
+        if (minMembers !== undefined && maxMembers !== undefined) {
+            if (minMembers > maxMembers) {
+                memberError = "Min members cannot be greater than max members.";
+                return false;
+            }
+        }
+        memberError = null;
+        return true;
+    }
 
     // --- Combobox state ---
     let open = $state(false);
@@ -52,7 +67,11 @@
     }
 
     // --- Submit ---
-    const handleSubmit: import("@sveltejs/kit").SubmitFunction = () => {
+    const handleSubmit: import("@sveltejs/kit").SubmitFunction = (event) => {
+        if (!validateMembers()) {
+            event.cancel();
+            return;
+        }
         isSubmitting = true;
         return async ({ result, update }) => {
             isSubmitting = false;
@@ -71,7 +90,7 @@
 
 <!-- Main Form -->
 <div
-    class="flex h-screen w-screen flex-col items-center justify-center bg-stone-100"
+    class="flex min-h-screen w-screen flex-col items-center justify-center bg-stone-100"
 >
     <form method="POST" action="?/createGroup" use:enhance={handleSubmit}>
         <!-- Hidden fields -->
@@ -117,6 +136,52 @@
                 </div>
             </div>
 
+            <!-- Row: Min & Max Members -->
+            <div class="mt-6 flex gap-5">
+                <Field.Field class="flex-1">
+                    <Field.Label for="minMembers">
+                        Min Members<span class="text-orange-500">*</span>
+                    </Field.Label>
+                    <Input
+                        id="minMembers"
+                        name="minMembers"
+                        type="number"
+                        min="1"
+                        placeholder="e.g. 3"
+                        required
+                        bind:value={minMembers}
+                        oninput={validateMembers}
+                        class={memberError
+                            ? "border-red-400 focus-visible:ring-red-400"
+                            : ""}
+                    />
+                </Field.Field>
+
+                <Field.Field class="flex-1">
+                    <Field.Label for="maxMembers">
+                        Max Members<span class="text-orange-500">*</span>
+                    </Field.Label>
+                    <Input
+                        id="maxMembers"
+                        name="maxMembers"
+                        type="number"
+                        min="1"
+                        placeholder="e.g. 5"
+                        required
+                        bind:value={maxMembers}
+                        oninput={validateMembers}
+                        class={memberError
+                            ? "border-red-400 focus-visible:ring-red-400"
+                            : ""}
+                    />
+                </Field.Field>
+            </div>
+
+            <!-- Validation error -->
+            {#if memberError}
+                <p class="mt-1.5 text-xs text-red-500">{memberError}</p>
+            {/if}
+
             <!-- Students -->
             <div class="mt-6">
                 <Field.Field>
@@ -143,7 +208,7 @@
                         </Popover.Trigger>
 
                         <Popover.Content
-                            class="w-[500px] p-0"
+                            class="w-[500px] p-0 h-[250px]"
                             align="start"
                             side="bottom"
                             avoidCollisions={false}
@@ -219,7 +284,7 @@
             class="flex w-[800px] items-center justify-between rounded-b-md border border-t-0 border-stone-300 bg-stone-50 px-8 py-5"
         >
             <p class="text-xs text-stone-400">
-                Add at least 3 student to create a group.
+                <span class="text-orange-500">*</span> Required fields
             </p>
             <div class="flex gap-3">
                 <Button
@@ -233,7 +298,7 @@
                 </Button>
                 <Button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !!memberError}
                     class="cursor-pointer bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-60"
                 >
                     {#if isSubmitting}

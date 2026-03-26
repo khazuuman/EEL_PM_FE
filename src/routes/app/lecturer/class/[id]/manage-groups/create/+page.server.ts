@@ -10,35 +10,35 @@ export const load: PageServerLoad = async (event) => {
     const { classDetails } = await parent();
 
     const res = await getStudentsAvailableByClass(event, classDetails.classId);
-        console.log("student res: ", res.data?.data);
+    console.log("student res: ", res.data?.data);
 
-        if (!res || res.status !== 200) {
-            return fail(400, {
-                message: res?.data?.message ?? "Failed to load students",
-            });
-        }
+    if (!res || res.status !== 200) {
+        return fail(400, {
+            message: res?.data?.message ?? "Failed to load students",
+        });
+    }
 
-        return {
-            students: (res.data?.data ?? []).map((s: any) => ({
-                id: s.studentId,
-                name: s.name,
-                studentCode: s.studentCode,
-            })),
-            classId: classDetails.classId
-        };
+    return {
+        students: (res.data?.data ?? []).map((s: any) => ({
+            id: s.studentId,
+            name: s.name,
+            studentCode: s.studentCode,
+        })),
+        classId: classDetails.classId
+    };
 };
 
 export const actions: Actions = {
     createGroup: async (event) => {
         const formData = await event.request.formData();
-        // const name = formData.get("name") as string;
         const classId = Number(formData.get("classId"));
-        // const description = formData.get("description") as string | undefined;
+        const minMembers = Number(formData.get("minMembers"));
+        const maxMembers = Number(formData.get("maxMembers"));
         const studentIds = formData.getAll("studentIds").map(Number);
 
         const res = await createGroup(event, {
-            // name,
-            // description,
+            minMembers,
+            maxMembers,
             classId,
             studentIds,
         } as CreateGroup);

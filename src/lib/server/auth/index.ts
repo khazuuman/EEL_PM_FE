@@ -75,3 +75,16 @@ export const getInvitations = async (event: RequestEvent) => {
 		data: data
 	};
 };
+
+export const getMySentInvitations = async (event: RequestEvent, groupId: any) => {
+	const response = await fetcher({
+		event,
+		url: `/groups/${groupId}/invitations/me`
+	});
+	const data = await safeJsonParse(response);
+	return {
+		status: response.status,
+		data: data
+	};
+};
+

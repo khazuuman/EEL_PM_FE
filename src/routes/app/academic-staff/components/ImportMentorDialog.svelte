@@ -1,63 +1,85 @@
 <script lang="ts">
-    import * as Dialog from "$lib/components/ui/dialog/index.js";
-    import { Button } from "$lib/components/ui/button/index.js";
+    import * as Dialog from "$lib/components/ui/dialog/index";
+    import { Button } from "$lib/components/ui/button";
     import { FileSpreadsheetIcon, InfoIcon, UploadIcon } from "@lucide/svelte";
+    import { toast } from "svelte-sonner";
+    import { invalidateAll } from "$app/navigation";
 
     type Props = {
         open: boolean;
         onOpenChange: (v: boolean) => void;
-        onImport?: (data: { file: File }) => Promise<void>;
     };
 
-    const { open, onOpenChange, onImport }: Props = $props();
+    let { open, onOpenChange }: Props = $props();
 
-    let selectedFile = $state<File | null>(null);
+    let file = $state<File | null>(null);
     let fileInputRef = $state<HTMLInputElement | null>(null);
+    let loading = $state(false);
     let fileError = $state("");
-    let isLoading = $state(false);
 
     const ACCEPTED_EXTENSIONS = [".xlsx", ".xls"];
 
-    function validateFile(file: File | null): string {
-        if (!file) return "Please select an Excel file.";
-        const name = file.name.toLowerCase();
-        const valid = ACCEPTED_EXTENSIONS.some((ext) => name.endsWith(ext));
-        if (!valid) return "Only .xlsx or .xls files are accepted.";
-        return "";
+    function validateFile(f: File | null): string {
+        if (!f) return "Please select an Excel file.";
+        const valid = ACCEPTED_EXTENSIONS.some((ext) =>
+            f.name.toLowerCase().endsWith(ext),
+        );
+        return valid ? "" : "Only .xlsx or .xls files are accepted.";
     }
 
     function handleFileChange(e: Event) {
         const input = e.target as HTMLInputElement;
-        const file = input.files?.[0] ?? null;
-        selectedFile = file;
-        fileError = validateFile(file);
+        const selected = input.files?.[0] ?? null;
+        file = selected;
+        fileError = validateFile(selected);
     }
 
-    function handleClose() {
-        selectedFile = null;
+    function resetForm() {
+        file = null;
         fileError = "";
         if (fileInputRef) fileInputRef.value = "";
-        onOpenChange(false);
     }
 
-    async function handleSubmit(e: SubmitEvent) {
-        e.preventDefault();
-        fileError = validateFile(selectedFile);
-        if (fileError || !selectedFile) return;
+    async function handleImport() {
+        fileError = validateFile(file);
+        if (fileError || !file) return;
 
-        isLoading = true;
+        loading = true;
         try {
-            await onImport?.({ file: selectedFile });
-            handleClose();
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const res = await fetch("?/importMentorData", {
+                method: "POST",
+                body: formData,
+            });
+
+            const result = await res.json();
+
+            if (result?.type === "failure") {
+                toast.error(result?.data?.message ?? "Import failed!");
+                return;
+            }
+
+            toast.success("Import successfully!");
+            await invalidateAll();
+            resetForm();
+            onOpenChange(false);
         } catch {
-            // handle error từ bên ngoài nếu cần
+            toast.error("An unexpected error occurred.");
         } finally {
-            isLoading = false;
+            loading = false;
         }
     }
 </script>
 
-<Dialog.Root {open} {onOpenChange}>
+<Dialog.Root
+    {open}
+    onOpenChange={(v) => {
+        if (!v) resetForm();
+        onOpenChange(v);
+    }}
+>
     <Dialog.Content class="sm:max-w-md">
         <Dialog.Header>
             <Dialog.Title>Import Mentors</Dialog.Title>
@@ -66,7 +88,7 @@
             </Dialog.Description>
         </Dialog.Header>
 
-        <form onsubmit={handleSubmit} class="flex flex-col gap-5 py-2">
+        <div class="flex flex-col gap-5 py-2">
             <!-- File input -->
             <div class="flex flex-col gap-1.5">
                 <label class="text-sm font-medium">
@@ -81,11 +103,21 @@
                     role="button"
                     tabindex="0"
                     onclick={() => fileInputRef?.click()}
-                    onkeydown={(e) => e.key === "Enter" && fileInputRef?.click()}
+                    onkeydown={(e) =>
+                        e.key === "Enter" && fileInputRef?.click()}
                 >
-                    <FileSpreadsheetIcon class="text-muted-foreground size-5 shrink-0" />
-                    <span class={["text-sm truncate", !selectedFile ? "text-muted-foreground" : ""].join(" ")}>
-                        {selectedFile ? selectedFile.name : "Click to choose file (.xlsx, .xls)"}
+                    <FileSpreadsheetIcon
+                        class="text-muted-foreground size-5 shrink-0"
+                    />
+                    <span
+                        class={[
+                            "text-sm truncate",
+                            !file ? "text-muted-foreground" : "",
+                        ].join(" ")}
+                    >
+                        {file
+                            ? file.name
+                            : "Click to choose file (.xlsx, .xls)"}
                     </span>
                 </div>
 
@@ -103,22 +135,37 @@
             </div>
 
             <!-- Ghi chú -->
-            <div class="bg-muted/60 flex items-start gap-2 rounded-md px-3 py-2.5">
-                <InfoIcon class="text-muted-foreground mt-0.5 size-4 shrink-0" />
+            <div
+                class="bg-muted/60 flex items-start gap-2 rounded-md px-3 py-2.5"
+            >
+                <InfoIcon
+                    class="text-muted-foreground mt-0.5 size-4 shrink-0"
+                />
                 <p class="text-muted-foreground text-xs leading-relaxed">
-                    Sheet 1 of the Excel file must be named
-                    <span class="text-foreground font-semibold">"Thông tin mentor"</span>.
-                    Please ensure the column headers match the required format before importing.
+                    Please ensure the Excel file follows the required column
+                    format before importing.
                 </p>
             </div>
 
             <!-- Actions -->
             <div class="flex justify-end gap-3 pt-1">
-                <Button type="button" variant="outline" onclick={handleClose} disabled={isLoading}>
+                <Button
+                    type="button"
+                    variant="outline"
+                    onclick={() => {
+                        resetForm();
+                        onOpenChange(false);
+                    }}
+                    disabled={loading}
+                >
                     Cancel
                 </Button>
-                <Button type="submit" disabled={isLoading}>
-                    {#if isLoading}
+                <Button
+                    type="button"
+                    disabled={loading || !!fileError || !file}
+                    onclick={handleImport}
+                >
+                    {#if loading}
                         <span class="animate-spin mr-2">⏳</span>
                         Importing...
                     {:else}
@@ -127,6 +174,6 @@
                     {/if}
                 </Button>
             </div>
-        </form>
+        </div>
     </Dialog.Content>
 </Dialog.Root>

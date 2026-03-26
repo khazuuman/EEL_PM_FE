@@ -1,14 +1,14 @@
-import { getStudentsAvailableByClass } from "$lib/server/students";
 import type { Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { fail } from "@sveltejs/kit";
-import { inviteMember } from "$lib/server/groups";
-import { getInvitations } from "$lib/server/auth";
+import { getMySentInvitations } from "$lib/server/auth";
 
 export const load: PageServerLoad = async (event) => {
-    const invitationsRes = await getInvitations(event);
-    console.log("invitationsRes: ", invitationsRes.data?.data);
+    const { parent } = event;
+    const { user } = await parent();
+    const getMySentInvitationsRes = await getMySentInvitations(event, user.student.group.groupId);
+    console.log("getMySentInvitationsRes: ", getMySentInvitationsRes.data?.data);
     return {
-        invitations: invitationsRes?.data?.data ?? [],
+        invitations: getMySentInvitationsRes?.data?.data ?? [],
     };
 };

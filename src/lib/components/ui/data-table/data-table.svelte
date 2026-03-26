@@ -45,14 +45,7 @@
 		showView: boolean;
 		showAddButton?: boolean;
 		showAction?: boolean;
-		showImport?: boolean;
-		importDialog?: import("svelte").Snippet<
-			[{ open: boolean; setOpen: (v: boolean) => void }]
-		>;
-		showAutoGroup?: boolean;
-		autoGroupDialog?: import("svelte").Snippet<
-			[{ open: boolean; setOpen: (v: boolean) => void }]
-		>;
+		actions?: import("svelte").Snippet;
 	};
 
 	const {
@@ -71,10 +64,7 @@
 		showView,
 		showAddButton = true,
 		showAction = false,
-		showImport = false,
-		importDialog,
-		showAutoGroup = false,
-		autoGroupDialog,
+		actions
 	}: Props = $props();
 
 	setDataTableCtx(() => {
@@ -92,8 +82,6 @@
 	let initialLoad = $state(false);
 	let activeHeaders = $state<string[]>([]);
 	let deleteForms = $state<Map<string, HTMLFormElement>>(new Map());
-	let importOpen = $state(false);
-	let autoGroupOpen = $state(false);
 	const handleFormBind = (id: string, formEl: HTMLFormElement) => {
 		deleteForms.set(id, formEl);
 	};
@@ -307,14 +295,7 @@
 		{activeHeaders}
 		{setActiveHeaders}
 		{showAddButton}
-		{showImport}
-		{importDialog}
-		{importOpen}
-		setImportOpen={(v) => (importOpen = v)}
-		{showAutoGroup}
-		{autoGroupDialog}
-		{autoGroupOpen}
-		setAutoGroupOpen={(v) => (autoGroupOpen = v)}
+		{actions}
 	/>
 
 	{#if initialLoad}
@@ -429,16 +410,7 @@
 				class="flex h-full flex-1 flex-col items-center justify-center gap-6"
 			>
 				<p class="text-5xl font-bold">No records available!</p>
-
-				{#if showImport && importDialog}
-					<Button size="lg" onclick={() => (importOpen = true)}>
-						Import {tableName.toLocaleLowerCase()}
-					</Button>
-					{@render importDialog({
-						open: importOpen,
-						setOpen: (v) => (importOpen = v),
-					})}
-				{:else if showAddButton}
+				{#if showAddButton}
 					<Button
 						size="lg"
 						href={`${page.url.pathname}/create?redirectTo=${encodeURIComponent(`${page.url.pathname}?${page.url.searchParams.toString()}`)}`}

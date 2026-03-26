@@ -9,38 +9,17 @@
 	import debounce from "lodash/debounce.js";
 	import { onMount, type Snippet } from "svelte";
 	import * as Select from "$lib/components/ui/select/index.js";
-	import { UploadIcon } from "lucide-svelte";
 
 	let {
 		activeHeaders,
 		setActiveHeaders,
 		showAddButton = true,
-		showImport = false,
-		importDialog,
-		importOpen,
-		setImportOpen,
-
-		showAutoGroup = false,
-		autoGroupDialog,
-		autoGroupOpen,
-		setAutoGroupOpen,
+		actions,
 	}: {
 		activeHeaders: string[];
 		setActiveHeaders: (headers: string[]) => void;
 		showAddButton?: boolean;
-		showImport?: boolean;
-		importDialog?: Snippet<
-			[{ open: boolean; setOpen: (v: boolean) => void }]
-		>;
-		importOpen?: boolean;
-		setImportOpen?: (v: boolean) => void;
-
-		showAutoGroup?: boolean;
-		autoGroupDialog?: Snippet<
-			[{ open: boolean; setOpen: (v: boolean) => void }]
-		>;
-		autoGroupOpen?: boolean;
-		setAutoGroupOpen?: (v: boolean) => void;
+		actions?: Snippet;
 	} = $props();
 
 	let searchValue = $state("");
@@ -167,36 +146,19 @@
 				</DropdownMenu.Group>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
+		<div class="flex gap-2 h-8">
+			{#if actions}
+				{@render actions()}
+			{/if}
 
-		{#if showImport && importDialog}
-			<Button class="gap-2" onclick={() => setImportOpen?.(true)}>
-				<UploadIcon />
-				<span>Import {tableName.toLocaleLowerCase()}</span>
-			</Button>
-			{@render importDialog({
-				open: importOpen ?? false,
-				setOpen: setImportOpen ?? (() => {}),
-			})}
-		{/if}
-
-		{#if showAutoGroup && autoGroupDialog}
-			<Button class="gap-2" onclick={() => setAutoGroupOpen?.(true)}>
-				<UploadIcon />
-				<span>Active {tableName.toLocaleLowerCase()}</span>
-			</Button>
-			{@render autoGroupDialog({
-				open: autoGroupOpen ?? false,
-				setOpen: setAutoGroupOpen ?? (() => {}),
-			})}
-		{/if}
-
-		{#if showAddButton}
-			<Button
-				class="gap-2"
-				href={`${page.url.pathname}/create?redirectTo=${encodeURIComponent(`${page.url.pathname}?${page.url.searchParams.toString()}`)}`}
-			>
-				<span>+ {`Add ${tableName.toLocaleLowerCase()}`}</span>
-			</Button>
-		{/if}
+			{#if showAddButton}
+				<Button
+					class="gap-2 px-3 py-4 rounded-sm"
+					href={`${page.url.pathname}/create?redirectTo=${encodeURIComponent(`${page.url.pathname}?${page.url.searchParams.toString()}`)}`}
+				>
+					<span>+ {`Add ${tableName.toLocaleLowerCase()}`}</span>
+				</Button>
+			{/if}
+		</div>
 	</div>
 </div>
