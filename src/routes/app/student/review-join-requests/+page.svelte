@@ -77,7 +77,7 @@
                             <!-- Approve -->
                             <form
                                 method="POST"
-                                action="?/InviteMember"
+                                action="?/ReviewJoinRequest"
                                 use:enhance={() => {
                                     loadingMap[req.requestId] = true;
                                     return async ({ result }) => {
@@ -96,11 +96,6 @@
                                     };
                                 }}
                             >
-                                <input
-                                    type="hidden"
-                                    name="groupId"
-                                    value={data.groupId}
-                                />
                                 <input
                                     type="hidden"
                                     name="reqId"

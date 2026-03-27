@@ -213,10 +213,10 @@ export const joinRequest = async (event: RequestEvent, groupId: any, body: any) 
     };
 }
 
-export const reviewJoinRequest = async (event: RequestEvent, groupId: any, requestId: any, body: any) => {
+export const reviewJoinRequest = async (event: RequestEvent, requestId: any, body: any) => {
     const response = await fetcher({
         event,
-        url: `/groups/${groupId}/requests/${requestId}`,
+        url: `/groups/requests/${requestId}`,
         method: 'PUT',
         data: body
     });

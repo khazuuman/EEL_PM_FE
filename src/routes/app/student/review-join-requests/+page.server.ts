@@ -15,17 +15,12 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions: Actions = {
-    InviteMember: async (event) => {
+    ReviewJoinRequest: async (event) => {
         const formData = await event.request.formData();
-        const groupId = Number(formData.get("groupId"));
         const reqId = Number(formData.getAll("reqId"));
         const status = formData.get("status") as string;
 
-        if (!groupId) {
-            return fail(400, { message: "Group ID is required" });
-        }
-
-        const reviewJoinRes = await reviewJoinRequest(event, groupId, reqId, {
+        const reviewJoinRes = await reviewJoinRequest(event, reqId, {
             status
         });
         console.log("reviewJoin Res:", reviewJoinRes);
