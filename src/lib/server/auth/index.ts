@@ -88,3 +88,16 @@ export const getMySentInvitations = async (event: RequestEvent, groupId: any) =>
 	};
 };
 
+export const reviewInviteGroupRequest = async (event: RequestEvent, reqId: any, body: any) => {
+	const response = await fetcher({
+		event,
+		url: `/users/me/invitations/${reqId}`,
+		method: 'POST',
+		data: body
+	});
+	const data = await safeJsonParse(response);
+	return {
+		status: response.status,
+		data: data
+	};
+};

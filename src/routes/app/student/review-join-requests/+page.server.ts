@@ -17,7 +17,7 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
     ReviewJoinRequest: async (event) => {
         const formData = await event.request.formData();
-        const reqId = Number(formData.getAll("reqId"));
+        const reqId = Number(formData.get("reqId"));
         const status = formData.get("status") as string;
 
         const reviewJoinRes = await reviewJoinRequest(event, reqId, {

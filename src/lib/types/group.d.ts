@@ -6,6 +6,8 @@ export interface CreateGroup {
 }
 
 export interface UpdateGroup {
+    maxMembers: number;
+    minMembers: number;
     studentIds: number[];
 }
 

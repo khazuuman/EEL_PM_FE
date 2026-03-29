@@ -1,7 +1,7 @@
-import { createTopic, uploadLogo } from "$lib/server/topics";
+import { updateTopic, uploadLogo } from "$lib/server/topics";
 import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
-import type { CreateTopic } from "$lib/types/topics";
+import type { UpdateTopic } from "$lib/types/topics";
 import { getTopicByGroupId } from "$lib/server/topics";
 
 export const load: PageServerLoad = async (event) => {
@@ -9,7 +9,7 @@ export const load: PageServerLoad = async (event) => {
     const { user } = await parent();
     if (!url.searchParams.has("isCurrentVersion")) url.searchParams.set("isCurrentVersion", "true");
     const currentTopicRes = await getTopicByGroupId(event, user.student.group?.groupId);
-    console.log("currentTopicRes: ", currentTopicRes.data?.data);
+    console.log("currentTopicRes update: ", currentTopicRes.data?.data);
     return {
         currentTopic: currentTopicRes?.data?.data,
         groupId: user.student.group?.groupId
@@ -17,33 +17,31 @@ export const load: PageServerLoad = async (event) => {
 };
 
 export const actions: Actions = {
-    RegisterTopic: async (event) => {
+    UpdateTopic: async (event) => {
         const formData = await event.request.formData();
-        const groupId = Number(formData.get("groupId"));
+        const topicId = Number(formData.get("topicId"));
         const title = formData.get("title") as string;
         const description = formData.get("description") as string;
         const objectives = formData.get("objectives") as string;
         const logoUrl = formData.get("logoUrl") as string;
 
-        const createTopicRes = await createTopic(event, {
-            groupId,
+        const updateTopicRes = await updateTopic(event, topicId, {
             title,
             description,
             objectives,
             logoUrl
-        } as CreateTopic);
-        console.log("createTopic Res:", createTopicRes);
+        } as UpdateTopic);
+        console.log("updateTopic Res:", updateTopicRes);
 
-        if (!createTopicRes || createTopicRes.status !== 200) {
+        if (!updateTopicRes || updateTopicRes.status !== 200) {
             return fail(400, {
-                message: createTopicRes?.data?.message ?? "Failed to register topic",
+                message: updateTopicRes?.data?.message ?? "Failed to update topic",
             });
         }
 
-
         return {
             success: true,
-            result: createTopicRes?.data?.data ?? null,
+            result: updateTopicRes?.data?.data ?? null,
         };
     },
 
@@ -51,7 +49,11 @@ export const actions: Actions = {
         const formData = await event.request.formData();
         const file = formData.get("file");
 
-        const uploadImgRes = await uploadLogo(event, file);
+        const fd = new FormData();
+        fd.append("file", file as Blob);
+
+
+        const uploadImgRes = await uploadLogo(event, fd);
         console.log("uploadImgRes:", uploadImgRes);
 
         if (!uploadImgRes || uploadImgRes.status !== 200) {
@@ -60,10 +62,11 @@ export const actions: Actions = {
             });
         }
 
+        console.log("upload res: ", uploadImgRes?.data);
 
         return {
             success: true,
-            result: uploadImgRes?.data?.data ?? null,
+            result: uploadImgRes?.data ?? null,
         };
     },
 };

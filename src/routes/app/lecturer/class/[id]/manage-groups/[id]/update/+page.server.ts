@@ -40,9 +40,11 @@ export const actions: Actions = {
     update: async (event) => {
         const formData = await event.request.formData();
         const groupId = formData.get("groupId");
+        const minMembers = Number(formData.get("minMembers"));
+        const maxMembers = Number(formData.get("maxMembers"));
         const studentIds = formData.getAll("studentIds").map(Number);
 
-        const updateGroupRes = await updateGroup(event, groupId, { studentIds } as UpdateGroup);
+        const updateGroupRes = await updateGroup(event, groupId, { studentIds, maxMembers, minMembers } as UpdateGroup);
         if (!updateGroupRes || updateGroupRes.status !== 200) {
             return fail(400, {
                 message: updateGroupRes?.data?.message ?? "Failed to update group",
