@@ -66,16 +66,16 @@
             value: totalItems,
             icon: Layers2Icon,
         },
-        {
-            label: "TOTAL MEMBERS",
-            value: "58/60",
-            icon: Layers2Icon,
-        },
-        {
-            label: "FULL GROUPS",
-            value: "8",
-            icon: Layers2Icon,
-        },
+        // {
+        //     label: "TOTAL MEMBERS",
+        //     value: "58/60",
+        //     icon: Layers2Icon,
+        // },
+        // {
+        //     label: "FULL GROUPS",
+        //     value: "8",
+        //     icon: Layers2Icon,
+        // },
     ]);
 
     const statusClass: Record<string, string> = {
@@ -141,12 +141,18 @@
         </span>
     </div>
 {/snippet}
-<div class="pt-15">
-    <a
-        class="flex gap-2 items-center w-fit text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mt-10 mx-10"
-        href="/app"><ArrowLeftIcon />Back to Dashboard</a
-    >
-    <div class="p-10 bg-stone-100 w-full h-full">
+<div class="pt-20">
+    <div class="w-full flex items-center">
+        <Button
+            variant="ghost"
+            onclick={() => goto(`/app`)}
+            class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl px-4 py-6 transition-all cursor-pointer"
+        >
+            <ArrowLeftIcon class="w-5 h-5" />
+            <span class="text-base font-semibold">Home</span>
+        </Button>
+    </div>
+    <div class="p-6 bg-stone-100 w-full h-full">
         <h1 class="text-3xl font-extrabold mb-2">Groups</h1>
         <div class="flex flex-col lg:flex-row justify-between items-center">
             <p class="text-[16px] text-stone-500">
@@ -241,14 +247,16 @@
     />
 </div>
 <Dialog.Root bind:open={joinDialogOpen}>
-    <Dialog.Content class="max-w-md">
-        <Dialog.Header>
-            <Dialog.Title>Join Group</Dialog.Title>
-            <Dialog.Description>
+    <Dialog.Content class="max-w-xl">
+        <Dialog.Header class="space-y-2">
+            <Dialog.Title class="text-xl font-bold text-zinc-900">
+                Join Group
+            </Dialog.Title>
+            <Dialog.Description class="text-sm text-zinc-500">
                 Send a join request to
-                <span class="font-semibold text-black"
-                    >{selectedJoinGroup?.name}</span
-                >
+                <span class="font-semibold text-zinc-900">
+                    {selectedJoinGroup?.name}
+                </span>
             </Dialog.Description>
         </Dialog.Header>
 
@@ -259,21 +267,28 @@
         >
             <input type="hidden" name="groupId" value={selectedJoinGroup?.id} />
 
-            <div class="flex flex-col gap-2 my-4">
-                <Label for="join-message">
+            <div class="flex flex-col gap-2.5 my-6">
+                <Label
+                    for="join-message"
+                    class="text-sm font-semibold text-zinc-700"
+                >
                     Message <span class="text-red-500">*</span>
                 </Label>
                 <Textarea
                     id="join-message"
                     name="message"
                     bind:value={joinMessage}
-                    rows={4}
+                    rows={6}
                     placeholder="Nhập lý do bạn muốn tham gia nhóm này..."
+                    class="resize-none text-sm"
                     required
                 />
+                <p class="text-xs text-zinc-400">
+                    Hãy giới thiệu bản thân và lý do bạn muốn tham gia nhóm này.
+                </p>
             </div>
 
-            <Dialog.Footer>
+            <Dialog.Footer class="gap-2">
                 <Button
                     type="button"
                     variant="outline"
@@ -285,7 +300,7 @@
                 </Button>
                 <Button
                     type="submit"
-                    class="bg-amber-600 cursor-pointer"
+                    class="bg-amber-600 hover:bg-amber-700 cursor-pointer"
                     disabled={joinLoading || !joinMessage.trim()}
                 >
                     {joinLoading ? "Sending..." : "Send Request"}

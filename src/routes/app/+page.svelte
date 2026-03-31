@@ -47,10 +47,10 @@
     const studentLeaderGroup: NavigationGroup = {
         groupLabel: "Group (Leader)",
         items: [
-            {
-                name: "Edit My Group Information",
-                url: "/app/student/edit-my-group",
-            },
+            // {
+            //     name: "Edit My Group Information",
+            //     url: "/app/student/edit-my-group",
+            // },
             { name: "Manage My Group", url: "/app/student/my-group" },
             { name: "Invite Member", url: "/app/student/invite-member" },
             {

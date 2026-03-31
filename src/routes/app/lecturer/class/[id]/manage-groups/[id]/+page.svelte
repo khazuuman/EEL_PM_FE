@@ -391,7 +391,7 @@
                                             >
                                             <span class="text-stone-300">•</span
                                             >
-                                            <span>{member.majorCode}</span>
+                                            <span>{member.majorName}</span>
                                         </div>
                                     </div>
                                 </div>
