@@ -23,6 +23,15 @@ export const getStudentsAvailableByClass = async (event: RequestEvent, classId: 
     };
 };
 
+export const getStudentsAvailableByClassWithoutFilter = async (event: RequestEvent, classId: any) => {
+    const response = await fetcher({ event, url: `/Students/available?classId=${classId}&limit=100` });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const getStudents = async (event: RequestEvent) => {
     const { url } = event;
     const response = await fetcher({ event, url: `/Students?${url.searchParams.toString()}` });

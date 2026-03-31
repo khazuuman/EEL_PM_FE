@@ -1,7 +1,7 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { fetcher } from "../fetcher";
 import { safeJsonParse } from "$lib/utils";
-import type { CreateTopic, UpdateTopic } from "$lib/types/topics";
+import type { CreateTopic, ReviewTopic, UpdateTopic } from "$lib/types/topics";
 
 export const getTopicByClass = async (event: RequestEvent, classId: any) => {
     const { url } = event;
@@ -45,11 +45,48 @@ export const getTopicByGroupId = async (event: RequestEvent, groupId: any) => {
     };
 };
 
+export const getCurrentTopicByGroupId = async (event: RequestEvent, groupId: any) => {
+    const response = await fetcher({ event, url: `/project-topics/group/${groupId}?isCurrentVersion=true` });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const updateTopic = async (event: RequestEvent, topicId: any, body: UpdateTopic) => {
     const response = await fetcher({
         event,
         url: `/project-topics/${topicId}`,
         method: "PUT",
+        data: body
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+export const reviewTopic = async (event: RequestEvent, topicId: any, body: ReviewTopic) => {
+    const response = await fetcher({
+        event,
+        url: `/project-topics/${topicId}/approval`,
+        method: "PATCH",
+        data: body
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+export const resubmitTopic = async (event: RequestEvent, groupId: any, body: UpdateTopic) => {
+    const response = await fetcher({
+        event,
+        url: `/project-topics/group/${groupId}/resubmit`,
+        method: "POST",
         data: body
     });
     const data = await safeJsonParse(response);
@@ -65,6 +102,20 @@ export const uploadLogo = async (event: RequestEvent, body: any) => {
         url: `/upload/image`,
         method: 'POST',
         formData: body
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+export const changeTopic = async (event: RequestEvent, groupId: any, body: UpdateTopic) => {
+    const response = await fetcher({
+        event,
+        url: `/project-topics/${groupId}/change-request`,
+        method: "POST",
+        data: body
     });
     const data = await safeJsonParse(response);
     return {

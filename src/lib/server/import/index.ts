@@ -7,7 +7,7 @@ export const importAcademicData = async (
 ) => {
     const response = await fetcher({
         event: event,
-        url: `/v1/import/academic-data?semesterId=${semesterId}&campusId=${campusId}`,
+        url: `/import/academic-data?semesterId=${semesterId}&campusId=${campusId}`,
         method: 'POST',
         formData
     });
@@ -23,7 +23,7 @@ export const importMentorData = async (
 ) => {
     const response = await fetcher({
         event: event,
-        url: `/v1/import/mentors`,
+        url: `/import/mentors`,
         method: 'POST',
         formData
     });

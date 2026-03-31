@@ -1,14 +1,12 @@
-import { createTopic, uploadLogo } from "$lib/server/topics";
+import { createTopic, getCurrentTopicByGroupId, resubmitTopic, uploadLogo } from "$lib/server/topics";
 import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
-import type { CreateTopic } from "$lib/types/topics";
-import { getTopicByGroupId } from "$lib/server/topics";
+import type { CreateTopic, UpdateTopic } from "$lib/types/topics";
 
 export const load: PageServerLoad = async (event) => {
-    const { parent, url } = event;
+    const { parent } = event;
     const { user } = await parent();
-    if (!url.searchParams.has("isCurrentVersion")) url.searchParams.set("isCurrentVersion", "true");
-    const currentTopicRes = await getTopicByGroupId(event, user.student.group?.groupId);
+    const currentTopicRes = await getCurrentTopicByGroupId(event, user.student.group?.groupId);
     console.log("currentTopicRes: ", currentTopicRes.data?.data);
     return {
         currentTopic: currentTopicRes?.data?.data,
@@ -51,7 +49,11 @@ export const actions: Actions = {
         const formData = await event.request.formData();
         const file = formData.get("file");
 
-        const uploadImgRes = await uploadLogo(event, file);
+        const fd = new FormData();
+        fd.append("file", file as Blob);
+
+
+        const uploadImgRes = await uploadLogo(event, fd);
         console.log("uploadImgRes:", uploadImgRes);
 
         if (!uploadImgRes || uploadImgRes.status !== 200) {
@@ -60,10 +62,35 @@ export const actions: Actions = {
             });
         }
 
+        console.log("upload res: ", uploadImgRes?.data);
 
         return {
             success: true,
-            result: uploadImgRes?.data?.data ?? null,
+            result: uploadImgRes?.data ?? null,
+        };
+    },
+    resubmitTopic: async (event) => {
+        const formData = await event.request.formData();
+        const groupId = Number(formData.get("groupId"));
+        const title = formData.get("title") as string;
+        const description = formData.get("description") as string;
+        const objectives = formData.get("objectives") as string;
+        const logoUrl = formData.get("logoUrl") as string;
+
+        const resubmitTopicRes = await resubmitTopic(event, groupId,
+            {
+                title, description, objectives, logoUrl
+            } as UpdateTopic);
+        console.log("resubmitTopicRes res: ", resubmitTopicRes);
+        if (!resubmitTopicRes || resubmitTopicRes.status !== 200) {
+            return fail(400, {
+                message: resubmitTopicRes?.data?.message ?? "Failed to resubmit topic",
+            });
+        }
+
+        return {
+            success: true,
+            message: resubmitTopicRes?.data?.message ?? null,
         };
     },
 };

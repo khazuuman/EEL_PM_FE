@@ -15,19 +15,13 @@
     let { data }: { data: PageData } = $props();
     const classId = data?.classId;
     const group = data?.group;
-    let minMembers = $state<number | null>(group?.minMembers ?? null);
-    let maxMembers = $state<number | null>(group?.maxMembers ?? null);
     const students: Student[] = data?.students ?? [];
 
-    // Khởi tạo selectedStudentIds từ members của group hiện tại
     let selectedStudentIds = $state<Set<number>>(
         new Set(group?.members?.map((m: any) => m.studentId) ?? []),
     );
 
-    // --- Form state ---
     let isSubmitting = $state(false);
-
-    // --- Combobox state ---
     let open = $state(false);
 
     function toggleStudent(id: number) {
@@ -43,7 +37,6 @@
         selectedStudentIds = next;
     }
 
-    // Merge students list: available students + current members (tránh mất member cũ)
     const allStudents = $derived((): Student[] => {
         const existingIds = new Set(students.map((s) => s.id));
         const currentMembers: Student[] = (group?.members ?? [])
@@ -71,7 +64,6 @@
         return normalize(value).includes(normalize(search)) ? 1 : 0;
     }
 
-    // --- Submit ---
     const handleSubmit: import("@sveltejs/kit").SubmitFunction = () => {
         isSubmitting = true;
         return async ({ result, update }) => {
@@ -86,24 +78,12 @@
             await update();
         };
     };
-
-    const memberRangeError = $derived(
-        minMembers === null || maxMembers === null
-            ? "Min and max members are required."
-            : minMembers > maxMembers
-              ? "Min members must be less than or equal to max members."
-              : selectedStudentIds.size < minMembers
-                ? `Must have at least ${minMembers} student(s) selected (currently ${selectedStudentIds.size}).`
-                : null,
-    );
 </script>
 
-<!-- Main Form -->
 <div
     class="flex h-screen w-screen flex-col items-center justify-center bg-stone-100"
 >
     <form method="POST" action="?/update" use:enhance={handleSubmit}>
-        <!-- Hidden fields -->
         {#each [...selectedStudentIds] as id}
             <input type="hidden" name="studentIds" value={id} />
         {/each}
@@ -173,68 +153,6 @@
                     </span>
                 </div>
             </div>
-
-            <!-- Min / Max Members -->
-            <div class="mt-5 flex gap-5">
-                <Field.Field class="flex-1">
-                    <Field.Label>Min Members</Field.Label>
-                    <input
-                        type="number"
-                        name="minMembers"
-                        min="1"
-                        value={minMembers ?? ""}
-                        oninput={(e) =>
-                            (minMembers =
-                                e.currentTarget.valueAsNumber || null)}
-                        class={cn(
-                            "mt-1 flex h-9 w-full rounded-md border bg-white px-3 text-sm text-stone-800 outline-none transition focus:ring-2 focus:ring-amber-400",
-                            memberRangeError
-                                ? "border-red-400 bg-red-50"
-                                : "border-input",
-                        )}
-                    />
-                </Field.Field>
-
-                <Field.Field class="flex-1">
-                    <Field.Label>Max Members</Field.Label>
-                    <input
-                        type="number"
-                        name="maxMembers"
-                        min="1"
-                        value={maxMembers ?? ""}
-                        oninput={(e) =>
-                            (maxMembers =
-                                e.currentTarget.valueAsNumber || null)}
-                        class={cn(
-                            "mt-1 flex h-9 w-full rounded-md border bg-white px-3 text-sm text-stone-800 outline-none transition focus:ring-2 focus:ring-amber-400",
-                            memberRangeError
-                                ? "border-red-400 bg-red-50"
-                                : "border-input",
-                        )}
-                    />
-                </Field.Field>
-            </div>
-
-            <!-- Validation error -->
-            {#if memberRangeError}
-                <p
-                    class="mt-1.5 flex items-center gap-1.5 text-xs text-red-500"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-3.5 w-3.5 shrink-0"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                    >
-                        <path
-                            fill-rule="evenodd"
-                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                            clip-rule="evenodd"
-                        />
-                    </svg>
-                    {memberRangeError}
-                </p>
-            {/if}
 
             <!-- Students -->
             <div class="mt-6">
@@ -308,7 +226,6 @@
                         </Popover.Content>
                     </Popover.Root>
 
-                    <!-- Selected students tags -->
                     {#if selectedStudents.length > 0}
                         <div class="mt-2 flex flex-wrap gap-2">
                             {#each selectedStudents as student}
@@ -338,7 +255,7 @@
             class="flex w-[800px] items-center justify-between rounded-b-md border border-t-0 border-stone-300 bg-stone-50 px-8 py-5"
         >
             <p class="text-xs text-stone-400">
-                Add at least {minMembers ?? "—"} student(s) to update the group.
+                {selectedStudentIds.size} student(s) selected.
             </p>
             <div class="flex gap-3">
                 <Button
@@ -352,7 +269,7 @@
                 </Button>
                 <Button
                     type="submit"
-                    disabled={isSubmitting || !!memberRangeError}
+                    disabled={isSubmitting}
                     class="cursor-pointer bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-60"
                 >
                     {#if isSubmitting}

@@ -15,7 +15,7 @@ export const getMentorInformation = async (event: RequestEvent, classId: any) =>
 
 export const getMentors = async (event: RequestEvent) => {
     const { url } = event;
-    const response = await fetcher({ event, url: `/mentors?${url.searchParams.toString()}` });
+    const response = await fetcher({ event, url: `/mentors?IsActive=true&${url.searchParams.toString()}` });
     const data = await safeJsonParse(response);
     return {
         status: response.status,
@@ -51,6 +51,20 @@ export const updateMentor = async (event: RequestEvent, body: UpdateMentor, id: 
         event,
         url: `/mentors/${id}`,
         method: 'PUT',
+        data: body
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+export const assignMentor = async (event: RequestEvent, groupId: any, body: any) => {
+    const response = await fetcher({
+        event,
+        url: `/groups/${groupId}/assign-mentor`,
+        method: 'POST',
         data: body
     });
     const data = await safeJsonParse(response);

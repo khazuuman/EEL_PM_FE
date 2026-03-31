@@ -6,9 +6,9 @@ import type { PageServerLoad } from "./$types";
 export const load: PageServerLoad = async (event) => {
     const { params } = event;
     const { id } = params;
-
+    console.log("id: ", id);
     const groupResult = await getGroupDetail(event, id);
-    console.log("group detail: ", groupResult.data.data);
+    console.log("group detail: ", groupResult.data);
     if (groupResult.status !== 200) {
         throw error(404, {
             message: 'Not found group!'

@@ -28,11 +28,13 @@
 	import { page } from "$app/state";
 	import LoadingDataTable from "./components/loading-data-table.svelte";
 	import ActionsDataTable from "./components/actions-data-table.svelte";
+	import type { Snippet } from "svelte";
 	type Status = {
 		label: string;
 		value: string | number;
 		variant: string;
 	};
+	type ActionType = "view" | "update" | "delete";
 	type Props = DataTableCtx & {
 		cacheKeyName: string;
 		allowSortHeaders: string[];
@@ -42,10 +44,11 @@
 		totalItems?: number;
 		keyId?: string;
 		statuses: Status[];
-		showView: boolean;
+		actions?: ActionType[];
 		showAddButton?: boolean;
 		showAction?: boolean;
-		actions?: import("svelte").Snippet;
+		headerActions?: import("svelte").Snippet;
+		extraActions?: Snippet<[{ id: string }]>;
 	};
 
 	const {
@@ -61,10 +64,11 @@
 		filters,
 		keyId,
 		statuses,
-		showView,
+		actions = ["view", "update", "delete"],
 		showAddButton = true,
 		showAction = false,
-		actions
+		headerActions,
+		extraActions,
 	}: Props = $props();
 
 	setDataTableCtx(() => {
@@ -295,7 +299,7 @@
 		{activeHeaders}
 		{setActiveHeaders}
 		{showAddButton}
-		{actions}
+		actions={headerActions}
 	/>
 
 	{#if initialLoad}
@@ -396,7 +400,8 @@
 									<Table.Cell class="w-12">
 										<ActionsDataTable
 											id={d.id}
-											{showView}
+											{actions}
+											{extraActions}
 										/>
 									</Table.Cell>
 								{/if}

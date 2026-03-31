@@ -3,7 +3,7 @@ import type { UpdateGroup } from "$lib/types/group";
 import type { Actions } from "@sveltejs/kit";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
-import { getStudentsAvailableByClass } from "$lib/server/students";
+import { getStudentsAvailableByClassWithoutFilter } from "$lib/server/students";
 import { getGroupDetail } from "$lib/server/groups";
 
 export const load: PageServerLoad = async (event) => {
@@ -12,10 +12,11 @@ export const load: PageServerLoad = async (event) => {
     const segments = url.pathname.split("/");
     const classIndex = segments.indexOf("class");
     const classId = segments[classIndex + 1];
+
     // groupId
     const groupId = params.id;
     const [studentRes, groupRes] = await Promise.all([
-        getStudentsAvailableByClass(event, classId),
+        getStudentsAvailableByClassWithoutFilter(event, classId),
         getGroupDetail(event, groupId)
     ]);
 
@@ -24,7 +25,8 @@ export const load: PageServerLoad = async (event) => {
             message: 'Not found group!'
         });
     }
-    console.log("group res: ", groupRes?.data?.data);
+    // console.log("group res: ", groupRes?.data?.data);
+    // console.log("student res: ", studentRes);
     return {
         students: (studentRes.data?.data ?? []).map((s: any) => ({
             id: s.studentId,
@@ -40,11 +42,11 @@ export const actions: Actions = {
     update: async (event) => {
         const formData = await event.request.formData();
         const groupId = formData.get("groupId");
-        const minMembers = Number(formData.get("minMembers"));
-        const maxMembers = Number(formData.get("maxMembers"));
+        // const minMembers = Number(formData.get("minMembers"));
+        // const maxMembers = Number(formData.get("maxMembers"));
         const studentIds = formData.getAll("studentIds").map(Number);
 
-        const updateGroupRes = await updateGroup(event, groupId, { studentIds, maxMembers, minMembers } as UpdateGroup);
+        const updateGroupRes = await updateGroup(event, groupId, { studentIds } as UpdateGroup);
         if (!updateGroupRes || updateGroupRes.status !== 200) {
             return fail(400, {
                 message: updateGroupRes?.data?.message ?? "Failed to update group",

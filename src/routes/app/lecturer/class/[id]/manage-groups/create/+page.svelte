@@ -5,7 +5,6 @@
     import * as Field from "$lib/components/ui/field/index";
     import * as Popover from "$lib/components/ui/popover/index";
     import * as Command from "$lib/components/ui/command/index";
-    import Input from "$lib/components/ui/input/input.svelte";
     import { toast } from "svelte-sonner";
     import type { PageData } from "./$types";
     import { Check, ChevronsUpDown } from "@lucide/svelte";
@@ -17,22 +16,7 @@
     const classId = data?.classId;
     const students: Student[] = data?.students ?? [];
 
-    // --- Form state ---
     let isSubmitting = $state(false);
-    let minMembers = $state<number | undefined>(undefined);
-    let maxMembers = $state<number | undefined>(undefined);
-    let memberError = $state<string | null>(null);
-
-    function validateMembers() {
-        if (minMembers !== undefined && maxMembers !== undefined) {
-            if (minMembers > maxMembers) {
-                memberError = "Min members cannot be greater than max members.";
-                return false;
-            }
-        }
-        memberError = null;
-        return true;
-    }
 
     // --- Combobox state ---
     let open = $state(false);
@@ -67,11 +51,7 @@
     }
 
     // --- Submit ---
-    const handleSubmit: import("@sveltejs/kit").SubmitFunction = (event) => {
-        if (!validateMembers()) {
-            event.cancel();
-            return;
-        }
+    const handleSubmit: import("@sveltejs/kit").SubmitFunction = () => {
         isSubmitting = true;
         return async ({ result, update }) => {
             isSubmitting = false;
@@ -88,12 +68,10 @@
     };
 </script>
 
-<!-- Main Form -->
 <div
     class="flex min-h-screen w-screen flex-col items-center justify-center bg-stone-100"
 >
     <form method="POST" action="?/createGroup" use:enhance={handleSubmit}>
-        <!-- Hidden fields -->
         {#each [...selectedStudentIds] as id}
             <input type="hidden" name="studentIds" value={id} />
         {/each}
@@ -135,52 +113,6 @@
                     </span>
                 </div>
             </div>
-
-            <!-- Row: Min & Max Members -->
-            <div class="mt-6 flex gap-5">
-                <Field.Field class="flex-1">
-                    <Field.Label for="minMembers">
-                        Min Members<span class="text-orange-500">*</span>
-                    </Field.Label>
-                    <Input
-                        id="minMembers"
-                        name="minMembers"
-                        type="number"
-                        min="1"
-                        placeholder="e.g. 3"
-                        required
-                        bind:value={minMembers}
-                        oninput={validateMembers}
-                        class={memberError
-                            ? "border-red-400 focus-visible:ring-red-400"
-                            : ""}
-                    />
-                </Field.Field>
-
-                <Field.Field class="flex-1">
-                    <Field.Label for="maxMembers">
-                        Max Members<span class="text-orange-500">*</span>
-                    </Field.Label>
-                    <Input
-                        id="maxMembers"
-                        name="maxMembers"
-                        type="number"
-                        min="1"
-                        placeholder="e.g. 5"
-                        required
-                        bind:value={maxMembers}
-                        oninput={validateMembers}
-                        class={memberError
-                            ? "border-red-400 focus-visible:ring-red-400"
-                            : ""}
-                    />
-                </Field.Field>
-            </div>
-
-            <!-- Validation error -->
-            {#if memberError}
-                <p class="mt-1.5 text-xs text-red-500">{memberError}</p>
-            {/if}
 
             <!-- Students -->
             <div class="mt-6">
@@ -254,7 +186,6 @@
                         </Popover.Content>
                     </Popover.Root>
 
-                    <!-- Selected students tags -->
                     {#if selectedStudents.length > 0}
                         <div class="mt-2 flex flex-wrap gap-2">
                             {#each selectedStudents as student}
@@ -283,9 +214,7 @@
         <div
             class="flex w-[800px] items-center justify-between rounded-b-md border border-t-0 border-stone-300 bg-stone-50 px-8 py-5"
         >
-            <p class="text-xs text-stone-400">
-                <span class="text-orange-500">*</span> Required fields
-            </p>
+            <p class="text-xs text-stone-400">All fields are optional.</p>
             <div class="flex gap-3">
                 <Button
                     type="button"
@@ -298,7 +227,7 @@
                 </Button>
                 <Button
                     type="submit"
-                    disabled={isSubmitting || !!memberError}
+                    disabled={isSubmitting}
                     class="cursor-pointer bg-amber-600 text-white hover:bg-amber-700 disabled:opacity-60"
                 >
                     {#if isSubmitting}

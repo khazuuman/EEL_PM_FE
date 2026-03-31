@@ -5,6 +5,7 @@ import type { Actions } from "@sveltejs/kit";
 import { fail } from "@sveltejs/kit";
 import { allocateGroup, publicGroup } from "$lib/server/classes";
 import type { AllocateGroup } from "$lib/types/group";
+import { getMentors } from "$lib/server/mentor";
 
 export const load: PageServerLoad = async (event) => {
     const { depends, url, parent } = event;
@@ -29,14 +30,14 @@ export const actions: Actions = {
     autoAllocate: async (event) => {
         const formData = await event.request.formData();
         const classId = formData.get("classId");
-        const minMembers = Number(formData.get("minMembers"));
-        const maxMembers = Number(formData.get("maxMembers"));
+        // const minMembers = Number(formData.get("minMembers"));
+        // const maxMembers = Number(formData.get("maxMembers"));
         const groupCount = Number(formData.get("groupCount"));
-        const memberCount = Number(formData.get("memberCount"));
+        // const memberCount = Number(formData.get("memberCount"));
 
         const allocateGroupRes = await allocateGroup(event,
             {
-                maxMembers, minMembers, groupCount, memberCount
+                groupCount
             } as AllocateGroup, classId);
         console.log("allocateGroupRes res: ", allocateGroupRes);
         if (!allocateGroupRes || allocateGroupRes.status !== 200) {

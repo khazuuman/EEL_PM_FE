@@ -1,14 +1,12 @@
-import { updateTopic, uploadLogo } from "$lib/server/topics";
+import { getCurrentTopicByGroupId, updateTopic, uploadLogo } from "$lib/server/topics";
 import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import type { UpdateTopic } from "$lib/types/topics";
-import { getTopicByGroupId } from "$lib/server/topics";
 
 export const load: PageServerLoad = async (event) => {
-    const { parent, url } = event;
+    const { parent } = event;
     const { user } = await parent();
-    if (!url.searchParams.has("isCurrentVersion")) url.searchParams.set("isCurrentVersion", "true");
-    const currentTopicRes = await getTopicByGroupId(event, user.student.group?.groupId);
+    const currentTopicRes = await getCurrentTopicByGroupId(event, user.student.group?.groupId);
     console.log("currentTopicRes update: ", currentTopicRes.data?.data);
     return {
         currentTopic: currentTopicRes?.data?.data,

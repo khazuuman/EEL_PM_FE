@@ -23,6 +23,15 @@ export const getGroupsByClass = async (event: RequestEvent, classId: any) => {
     };
 };
 
+export const getApprovedGroupsByClass = async (event: RequestEvent, classId: any) => {
+    const response = await fetcher({ event, url: `/groups?ClassId=${classId}&status=Approved&limit=100` });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const createGroup = async (event: RequestEvent, body: CreateGroup) => {
     const response = await fetcher({
         event,

@@ -16,31 +16,11 @@
     let { open = $bindable(), classId, onClose }: Props = $props();
 
     let groupCount = $state<number | "">("");
-    let memberCount = $state<number | "">("");
-    let minMembers = $state<number | "">("");
-    let maxMembers = $state<number | "">("");
 
-    const memberError = $derived(
-        minMembers !== "" &&
-            maxMembers !== "" &&
-            Number(minMembers) > Number(maxMembers)
-            ? "Min members must be less than or equal to max members."
-            : null,
-    );
-
-    const isFormValid = $derived(
-        !!groupCount &&
-            !!memberCount &&
-            minMembers !== "" &&
-            maxMembers !== "" &&
-            !memberError,
-    );
+    const isFormValid = $derived(!!groupCount);
 
     function resetForm() {
         groupCount = "";
-        memberCount = "";
-        minMembers = "";
-        maxMembers = "";
     }
 </script>
 
@@ -105,61 +85,6 @@
                         required
                     />
                 </div>
-
-                <div class="grid gap-2">
-                    <Label for="memberCount">Members per Group</Label>
-                    <Input
-                        id="memberCount"
-                        name="memberCount"
-                        type="number"
-                        min="1"
-                        placeholder="e.g. 4"
-                        bind:value={memberCount}
-                        class="border-zinc-300"
-                        required
-                    />
-                </div>
-
-                <p class="text-[12px] text-zinc-500">
-                    Set the allowed member range for each group.
-                </p>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="grid gap-2">
-                        <Label for="minMembers">Min Members</Label>
-                        <Input
-                            id="minMembers"
-                            name="minMembers"
-                            type="number"
-                            min="1"
-                            placeholder="e.g. 3"
-                            bind:value={minMembers}
-                            class={memberError
-                                ? "border-red-400 focus-visible:ring-red-400"
-                                : "border-zinc-300"}
-                            required
-                        />
-                    </div>
-                    <div class="grid gap-2">
-                        <Label for="maxMembers">Max Members</Label>
-                        <Input
-                            id="maxMembers"
-                            name="maxMembers"
-                            type="number"
-                            min="1"
-                            placeholder="e.g. 5"
-                            bind:value={maxMembers}
-                            class={memberError
-                                ? "border-red-400 focus-visible:ring-red-400"
-                                : "border-zinc-300"}
-                            required
-                        />
-                    </div>
-                </div>
-
-                {#if memberError}
-                    <p class="text-xs text-red-500 -mt-2">{memberError}</p>
-                {/if}
             </div>
 
             <Dialog.Footer>

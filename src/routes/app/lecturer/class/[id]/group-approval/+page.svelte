@@ -145,11 +145,16 @@
     </div>
 {/snippet}
 <div class="px-5 pt-20">
-    <a
-        class="flex gap-2 items-center w-fit text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mt-10 mx-10"
-        href={`/app/lecturer/class/${data.classId}`}
-        ><ArrowLeftIcon />Back to Dashboard</a
-    >
+    <div class="w-full flex items-center">
+        <Button
+            variant="ghost"
+            onclick={() => goto(`/app/lecturer/class/${data.classId}`)}
+            class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl px-4 py-6 transition-all cursor-pointer"
+        >
+            <ArrowLeftIcon class="w-5 h-5" />
+            <span class="text-base font-semibold">Home</span>
+        </Button>
+    </div>
     <div class="p-10 bg-stone-100 w-full h-full">
         <h1 class="text-3xl font-extrabold mb-2">Groups</h1>
         <div class="flex flex-col lg:flex-row justify-between items-center">

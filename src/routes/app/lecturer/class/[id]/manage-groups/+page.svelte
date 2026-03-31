@@ -1,12 +1,18 @@
 <script lang="ts">
     import DataTable from "$lib/components/ui/data-table/data-table.svelte";
-    import { ArrowLeftIcon, ExternalLinkIcon, GroupIcon } from "lucide-svelte";
+    import {
+        ArrowLeftIcon,
+        ExternalLinkIcon,
+        GroupIcon,
+        UserRoundSearchIcon,
+    } from "lucide-svelte";
     import { GroupStatusTable } from "$lib/enums/group.js";
     import { Button } from "$lib/components/ui/button";
     import AutoAllocateDialog from "./components/auto-allocate-dialog.svelte";
     import { setActions } from "$lib/stores/actions.js";
     import { toast } from "svelte-sonner";
-    import { invalidateAll } from "$app/navigation";
+    import { goto, invalidateAll } from "$app/navigation";
+    import DropdownMenuItem from "$lib/components/ui/dropdown-menu/dropdown-menu-item.svelte";
 
     const { data } = $props();
     let groups = $derived(data?.groups || []);
@@ -70,19 +76,23 @@
 </script>
 
 <div
-    class="bg-white w-full px-10 rounded-md pt-30 min-h-screen overflow-x-hidden pb-10 z-10 select-none"
+    class="bg-white w-full px-10 rounded-md pt-20 min-h-screen overflow-x-hidden pb-10 z-10 select-none"
 >
-    <a
-        class="flex gap-2 w-fit items-center text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mb-5"
-        href={`/app/lecturer/class/${data?.classId}`}
-    >
-        <ArrowLeftIcon />Back to Dashboard
-    </a>
-
+<!-- Top Header: Back Button -->
+    <div class="w-full flex items-center mb-8">
+        <Button
+            variant="ghost"
+            onclick={() => goto(`/app/lecturer/class/${data?.classId}`)}
+            class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl px-4 py-6 transition-all cursor-pointer"
+        >
+            <ArrowLeftIcon class="w-5 h-5" />
+            <span class="text-base font-semibold">Back to Class</span>
+        </Button>
+    </div>
     <DataTable
+        actions={['view', 'update', 'delete']}
         showAction={true}
         showAddButton={true}
-        showView={true}
         statuses={GroupStatusTable}
         keyId={"id"}
         {cacheKeyName}
@@ -96,7 +106,27 @@
         matchSearchColumns={["name"]}
         {filters}
     >
-        {#snippet actions()}
+        {#snippet extraActions({ id })}
+            <DropdownMenuItem>
+                <a
+                    href={`/app/lecturer/class/${data.classId}/manage-groups/${id}/assign-mentor`}
+                    class="flex items-center gap-2"
+                >
+                    <UserRoundSearchIcon class="h-4 w-4" />
+                    Assign Mentor
+                </a>
+            </DropdownMenuItem>
+            <!-- <DropdownMenuItem>
+                <button
+                    class="flex items-center gap-2"
+                    onclick={() => handleSomeCustomAction(id)}
+                >
+                    <UserRoundSearchIcon class="h-4 w-4" />
+                    Assign Mentor
+                </button>
+            </DropdownMenuItem> -->
+        {/snippet}
+        {#snippet headerActions()}
             <Button
                 variant="outline"
                 class="gap-2 px-3 py-4 rounded-sm border-orange-400 text-orange-500 hover:bg-orange-50 hover:text-orange-600 cursor-pointer"
@@ -108,7 +138,7 @@
                 class="gap-2 px-3 py-4 rounded-sm cursor-pointer"
                 onclick={() => (autoGroupOpen = true)}
             >
-                <GroupIcon />Active group
+                <GroupIcon />Divide into Groups
             </Button>
             <AutoAllocateDialog
                 bind:open={autoGroupOpen}

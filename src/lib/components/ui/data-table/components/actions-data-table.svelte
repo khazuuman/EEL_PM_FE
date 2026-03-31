@@ -1,47 +1,61 @@
 <script lang="ts">
-	import { getAction } from '../data-table.helper';
+	import { getAction } from "../data-table.helper";
 	import {
 		DropdownMenu,
 		DropdownMenuLabel,
 		DropdownMenuSeparator,
 		DropdownMenuContent,
 		DropdownMenuTrigger,
-		DropdownMenuItem
-	} from '$lib/components/ui/dropdown-menu/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { MoreHorizontalIcon } from '@lucide/svelte';
-	import { getDataTableCTX } from '../ctx/data-table.ctx';
-	import { setActions } from '$lib/stores/actions';
-	import { page } from '$app/state';
-	import { enhance } from '$app/forms';
-	import { setIsRootLoading } from '$lib/stores/root-loading';
-	import type { SubmitFunction } from '@sveltejs/kit';
-	import { toast } from 'svelte-sonner';
-	import { invalidateAll } from '$app/navigation';
-	let { id, showView } = $props();
+		DropdownMenuItem,
+	} from "$lib/components/ui/dropdown-menu/index.js";
+	import { Button } from "$lib/components/ui/button/index.js";
+	import { MoreHorizontalIcon } from "@lucide/svelte";
+	import { getDataTableCTX } from "../ctx/data-table.ctx";
+	import { setActions } from "$lib/stores/actions";
+	import { page } from "$app/state";
+	import { enhance } from "$app/forms";
+	import { setIsRootLoading } from "$lib/stores/root-loading";
+	import type { SubmitFunction } from "@sveltejs/kit";
+	import { toast } from "svelte-sonner";
+	import { invalidateAll } from "$app/navigation";
+	import type { Snippet } from "svelte";
+
+	type ActionType = "view" | "update" | "delete";
+
+	let {
+		id,
+		actions = ["view", "update", "delete"],
+		extraActions,
+	}: {
+		id: string;
+		actions?: ActionType[];
+		extraActions?: Snippet<[{ id: string }]>;
+	} = $props();
+
 	const dataTableCtx = getDataTableCTX();
 	const { tableName } = $derived(dataTableCtx());
 	let isSubmiting = $state(false);
 	const pageUrl = $derived(page.url.pathname);
 	let deleteFormEl: HTMLFormElement | null = $state(null);
+
 	const handleEnhanceDeleteForm: SubmitFunction = () => {
 		setIsRootLoading(true);
 		isSubmiting = true;
 		return async ({ result, update }) => {
 			setIsRootLoading(false);
 			isSubmiting = false;
-			if (result.type === 'failure') {
+			if (result.type === "failure") {
 				toast.error(result.data?.message);
-			} else if (result.type === 'success') {
+			} else if (result.type === "success") {
 				await update();
-			} else if (result.type === 'redirect') {
-				toast.success(`Deleted ${tableName.toLocaleLowerCase()} successfully!`);
+			} else if (result.type === "redirect") {
+				toast.success(
+					`Deleted ${tableName.toLocaleLowerCase()} successfully!`,
+				);
 				await invalidateAll();
 			}
 		};
 	};
-	
-	const actions = showView as string[] ? ['view', 'update', 'delete'] : ['update', 'delete']
 </script>
 
 <DropdownMenu>
@@ -51,12 +65,15 @@
 		</Button>
 	</DropdownMenuTrigger>
 	<DropdownMenuContent align="end">
-		<DropdownMenuLabel>{'Actions'}</DropdownMenuLabel>
+		<DropdownMenuLabel>{"Actions"}</DropdownMenuLabel>
 		<DropdownMenuSeparator />
+		{#if extraActions}
+			{@render extraActions({ id })}
+		{/if}
 		{#each actions as action (action)}
 			{@const actionConfig = getAction(action)}
 			{@const Icon = actionConfig?.icon}
-			{#if action === 'delete'}
+			{#if action === "delete"}
 				<DropdownMenuSeparator />
 				<DropdownMenuItem
 					class="bg-destructive data-highlighted:bg-destructive/80 cursor-pointer text-white data-highlighted:text-white"
@@ -68,13 +85,12 @@
 							setActions({
 								active: true,
 								description:
-									'This action cannot be undone. This will permanently delete and remove this student account from our servers.',
+									"This action cannot be undone. This will permanently delete and remove this student account from our servers.",
 								cb: () => {
-                                    console.log("cb called, deleteFormEl:", deleteFormEl);
 									if (deleteFormEl) {
 										deleteFormEl.requestSubmit();
 									}
-								}
+								},
 							})}
 						class="flex items-center gap-2"
 					>
@@ -87,7 +103,7 @@
 			{:else}
 				<DropdownMenuItem>
 					<a
-						href={`${pageUrl}/${action === 'update' ? `${id}/update` : id}?redirectTo=${encodeURIComponent(`${pageUrl}?${page.url.searchParams.toString()}`)}`}
+						href={`${pageUrl}/${action === "update" ? `${id}/update` : id}?redirectTo=${encodeURIComponent(`${pageUrl}?${page.url.searchParams.toString()}`)}`}
 						class="flex items-center gap-2"
 					>
 						{#if Icon}
@@ -101,11 +117,13 @@
 	</DropdownMenuContent>
 </DropdownMenu>
 
-<form
-	bind:this={deleteFormEl}
-	method="POST"
-	action="{pageUrl}/{id}?/delete"
-	use:enhance={handleEnhanceDeleteForm}
-	class="hidden"
-	aria-hidden="true"
-></form>
+{#if actions.includes("delete")}
+	<form
+		bind:this={deleteFormEl}
+		method="POST"
+		action="{pageUrl}/{id}?/delete"
+		use:enhance={handleEnhanceDeleteForm}
+		class="hidden"
+		aria-hidden="true"
+	></form>
+{/if}

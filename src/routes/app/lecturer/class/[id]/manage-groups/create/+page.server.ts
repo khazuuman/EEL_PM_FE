@@ -32,13 +32,11 @@ export const actions: Actions = {
     createGroup: async (event) => {
         const formData = await event.request.formData();
         const classId = Number(formData.get("classId"));
-        const minMembers = Number(formData.get("minMembers"));
-        const maxMembers = Number(formData.get("maxMembers"));
+        // const minMembers = Number(formData.get("minMembers"));
+        // const maxMembers = Number(formData.get("maxMembers"));
         const studentIds = formData.getAll("studentIds").map(Number);
 
         const res = await createGroup(event, {
-            minMembers,
-            maxMembers,
             classId,
             studentIds,
         } as CreateGroup);

@@ -2,6 +2,8 @@
     import { ArrowLeftIcon } from "lucide-svelte";
     import type { PageData } from "../$types";
     import type { NavigationGroup } from "../../../+page.svelte";
+    import { goto } from "$app/navigation";
+    import Button from "$lib/components/ui/button/button.svelte";
     let { data } = $props<{ data: PageData }>();
     const classId = data.classDetails?.classId;
 
@@ -15,10 +17,6 @@
             {
                 name: "Group Approval",
                 url: `/app/lecturer/class/${classId}/group-approval`,
-            },
-            {
-                name: "Assign Mentor to Group",
-                url: `/app/lecturer/class/${classId}/assign-mentor`,
             },
         ],
     };
@@ -73,10 +71,20 @@
 </script>
 
 <div class="pt-15">
-    <a
+    <!-- <a
         class="flex gap-2 items-center w-fit text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mt-10 mx-10"
         href="/app/lecturer/class"><ArrowLeftIcon />Back to Classes</a
-    >
+    > -->
+    <div class="w-full flex items-center pt-5 pl-10">
+        <Button
+            variant="ghost"
+            onclick={() => goto(`/app/lecturer/class`)}
+            class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl px-4 py-6 transition-all cursor-pointer"
+        >
+            <ArrowLeftIcon class="w-5 h-5" />
+            <span class="text-base font-semibold">Classes</span>
+        </Button>
+    </div>
     <h1 class="w-full text-center pt-10 text-3xl font-bold text-amber-900">
         Lecturer Home Page
     </h1>

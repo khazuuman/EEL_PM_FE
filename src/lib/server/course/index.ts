@@ -11,7 +11,7 @@ export const getCourses = async (
     const { url } = event;
     const response = await fetcher({
         event,
-        url: `/v1/courses?${url.searchParams.toString()}`
+        url: `/courses?${url.searchParams.toString()}`
     });
     const data = await safeJsonParse(response);
     return {
@@ -26,7 +26,7 @@ export const getCourseDetails = async (
     const { url } = event;
     const response = await fetcher({
         event,
-        url: `/v1/courses/${id}`
+        url: `/courses/${id}`
     });
     const data = await safeJsonParse(response);
     return {
@@ -40,7 +40,7 @@ export const createCourse = async (
 ) => {
     const response = await fetcher({
         event,
-        url: `/v1/courses`,
+        url: `/courses`,
         method: 'POST',
         data: body
     });
@@ -56,7 +56,7 @@ export const updateCourse = async (
 ) => {
     const response = await fetcher({
         event,
-        url: `/v1/courses/${id}`,
+        url: `/courses/${id}`,
         method: 'PUT',
         data: body
     });
@@ -72,7 +72,7 @@ export const deleteCourse = async (
 ) => {
     const response = await fetcher({
         event,
-        url: `/v1/courses/${id}`,
+        url: `//courses/${id}`,
         method: 'DELETE',
     });
     const data = await safeJsonParse(response);

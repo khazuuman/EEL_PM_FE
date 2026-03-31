@@ -1,80 +1,63 @@
 <script lang="ts">
     import { enhance } from "$app/forms";
     import { Button } from "$lib/components/ui/button";
-    import { Input } from "$lib/components/ui/input";
-    import { Textarea } from "$lib/components/ui/textarea";
-    import { Label } from "$lib/components/ui/label";
     import { Separator } from "$lib/components/ui/separator";
     import * as Card from "$lib/components/ui/card";
-    import {
-        LinkIcon,
-        UploadCloudIcon,
-        XIcon,
-        ArrowLeftIcon,
-    } from "lucide-svelte";
-    import { goto } from "$app/navigation";
+    import { ArrowLeftIcon } from "lucide-svelte";
+    import { goto, invalidateAll } from "$app/navigation";
     import { toast } from "svelte-sonner";
     import type { PageData, ActionData } from "./$types";
+
+    // ── Shared child components ──────────────────────────────────────────────
+    import LogoUploader from "./components/LogoUploader.svelte";
+    import TopicFormFields from "./components/TopicFormFields.svelte";
+    import PageHeader from "./components/PageHeader.svelte";
 
     let { data, form }: { data: PageData; form: ActionData } = $props();
 
     let logoUrl = $state("");
-    let isUploading = $state(false);
-    let uploadError = $state("");
     let previewUrl = $state("");
-    let isDragging = $state(false);
+    let isUploading = $state(false);
+    let isResubmitting = $state(false);
 
-    async function handleFileUpload(file: File) {
-        if (!file) return;
-        isUploading = true;
-        uploadError = "";
-
-        const fd = new FormData();
-        fd.append("file", file);
-
-        const toastId = toast.loading("Uploading logo...");
-
-        const res = await fetch("?/UploadLogo", {
-            method: "POST",
-            body: fd,
-            headers: { "x-sveltekit-action": "true" },
-        });
-
-        const result = await res.json();
-
-        if (result?.type === "success" && result?.data?.result) {
-            logoUrl = result.data.result;
-            previewUrl = URL.createObjectURL(file);
-            toast.success("Logo uploaded successfully", { id: toastId });
-        } else {
-            uploadError = result?.data?.message ?? "Failed to upload logo";
-            toast.error(uploadError, { id: toastId });
-        }
-
-        isUploading = false;
+    function enterResubmit() {
+        const topic = data.currentTopic?.[0];
+        logoUrl = topic?.logoUrl ?? "";
+        previewUrl = topic?.logoUrl ?? "";
+        isResubmitting = true;
     }
 
-    function onFileInput(e: Event) {
-        const input = e.target as HTMLInputElement;
-        const file = input.files?.[0];
-        if (file) handleFileUpload(file);
-    }
-
-    function onDrop(e: DragEvent) {
-        e.preventDefault();
-        isDragging = false;
-        const file = e.dataTransfer?.files?.[0];
-        if (file) handleFileUpload(file);
-    }
-
-    function removeImage() {
-        logoUrl = "";
-        previewUrl = "";
-        toast.info("Logo removed");
+    function makeEnhancer(
+        loadingMsg: string,
+        successMsg: string,
+        redirectTo: string,
+        onSuccess?: () => void,
+    ) {
+        return () => {
+            const toastId = toast.loading(loadingMsg);
+            return async ({ result, update }: any) => {
+                if (result.type === "success") {
+                    toast.success(successMsg, { id: toastId });
+                    onSuccess?.();
+                    await invalidateAll();
+                    await goto(redirectTo);
+                } else {
+                    const msg =
+                        result.type === "failure"
+                            ? ((result.data?.message as string) ??
+                              "An error occurred")
+                            : "An unexpected error occurred";
+                    toast.error(msg, { id: toastId });
+                    await update();
+                }
+            };
+        };
     }
 </script>
 
-<!-- Guard: chưa có nhóm -->
+<!-- ══════════════════════════════════════════════════════════════════════════
+     GUARD: No group
+═══════════════════════════════════════════════════════════════════════════ -->
 {#if !data.groupId}
     <div
         class="flex min-h-[calc(100vh-80px)] items-center justify-center px-8 pt-20"
@@ -114,24 +97,17 @@
                 class="mt-2 w-full rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-left"
             >
                 <p
-                    class="text-xs font-semibold uppercase tracking-widest text-orange-500 mb-1"
+                    class="mb-1 text-xs font-semibold uppercase tracking-widest text-orange-500"
                 >
                     Note
                 </p>
                 <ul class="flex flex-col gap-1 text-sm text-orange-700">
-                    <li class="flex items-start gap-2">
-                        <span class="mt-0.5 text-orange-400">•</span>
-                        Topic registration requires an active group membership.
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="mt-0.5 text-orange-400">•</span>
-                        Each group can only register one topic at a time.
-                    </li>
-                    <li class="flex items-start gap-2">
-                        <span class="mt-0.5 text-orange-400">•</span>
-                        Contact your lecturer if you have not been assigned to a
-                        group.
-                    </li>
+                    {#each ["Topic registration requires an active group membership.", "Each group can only register one topic at a time.", "Contact your lecturer if you have not been assigned to a group."] as note}
+                        <li class="flex items-start gap-2">
+                            <span class="mt-0.5 text-orange-400">•</span>
+                            {note}
+                        </li>
+                    {/each}
                 </ul>
             </div>
 
@@ -146,325 +122,159 @@
             </Button>
         </div>
     </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+     TOPIC EXISTS
+═══════════════════════════════════════════════════════════════════════════ -->
 {:else if data.currentTopic && data.currentTopic.length > 0}
-    <!-- Đã có topic -->
     {@const topic = data.currentTopic[0]}
 
-    <!-- Top bar -->
-    <div
-        class="sticky top-0 z-10 border-b border-zinc-200 bg-white px-8 pb-5 pt-20"
-    >
-        <div class="mx-auto flex max-w-5xl items-center justify-between">
-            <div class="flex items-center gap-3">
-                <button
-                    type="button"
-                    onclick={() => goto("/app")}
-                    class="flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 transition"
-                >
-                    <ArrowLeftIcon class="h-4 w-4" />
-                    Back
-                </button>
-                <Separator orientation="vertical" class="h-5" />
-                <div>
-                    <h1 class="text-base font-semibold text-zinc-900">
-                        Registered Topic
-                    </h1>
-                    <p class="text-xs text-zinc-400">
-                        Your group has already registered a topic
-                    </p>
-                </div>
-            </div>
-
-            {#if topic.status !== "Approved"}
-                <Button
-                    type="button"
-                    class="bg-orange-500 text-white hover:bg-orange-600"
-                    onclick={() => goto(`./register-topic/update`)}
-                >
-                    Update Topic
-                </Button>
-            {/if}
-        </div>
-    </div>
-
-    <!-- Topic summary -->
-    <div class="mx-auto max-w-5xl px-8 py-8">
-        <!-- Notice banner -->
-        <div
-            class="mb-6 flex items-start gap-3 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3"
+    {#if isResubmitting}
+        <!-- ── RESUBMIT FORM ──────────────────────────────────────────────── -->
+        <PageHeader
+            title="Resubmit Topic"
+            subtitle="Update and resubmit your rejected topic for review"
+            onBack={() => (isResubmitting = false)}
         >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="mt-0.5 h-4 w-4 shrink-0 text-orange-500"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
-                />
-            </svg>
-            <div>
-                <p class="text-sm font-medium text-orange-700">
-                    Topic already registered
-                </p>
-                <p class="text-xs text-orange-600 mt-0.5">
-                    Your group has submitted a topic. You can update it below if
-                    needed.
-                </p>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-3 gap-8">
-            <!-- LEFT: Topic detail (2/3) -->
-            <div class="col-span-2">
-                <Card.Root class="rounded-xl border border-zinc-200 shadow-sm">
-                    <Card.Header>
-                        <p
-                            class="text-xs font-semibold uppercase tracking-widest text-zinc-400"
-                        >
-                            Topic Information
-                        </p>
-                    </Card.Header>
-                    <Separator />
-                    <Card.Content class="p-0">
-                        {#each [{ label: "Title", value: topic.title }, { label: "Description", value: topic.description }, { label: "Objectives", value: topic.objectives }, { label: "Submitted At", value: new Intl.DateTimeFormat( "en-US", { month: "long", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", hour12: true }, ).format(new Date(topic.submittedAt)) }] as field, i}
-                            <div class="flex items-start gap-4 px-6 py-4">
-                                <span
-                                    class="w-36 shrink-0 text-sm text-zinc-500"
-                                    >{field.label}</span
-                                >
-                                {#if field.value}
-                                    <span
-                                        class="text-sm font-medium text-zinc-900"
-                                        >{field.value}</span
-                                    >
-                                {:else}
-                                    <span class="text-sm italic text-zinc-400"
-                                        >Not specified</span
-                                    >
-                                {/if}
-                            </div>
-                            {#if i < 3}
-                                <Separator />
-                            {/if}
-                        {/each}
-
-                        <Separator />
-                        <div class="flex items-center gap-4 px-6 py-4">
-                            <span class="w-36 shrink-0 text-sm text-zinc-500"
-                                >Status</span
-                            >
-                            <span
-                                class={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
-                                ${
-                                    topic.status === "Pending"
-                                        ? "bg-orange-500 text-white"
-                                        : topic.status === "Approved"
-                                          ? "bg-green-600 text-white"
-                                          : topic.status === "Rejected"
-                                            ? "bg-red-500 text-white"
-                                            : "bg-zinc-200 text-zinc-800"
-                                }`}
-                            >
-                                {topic.status}
-                            </span>
-                        </div>
-                    </Card.Content>
-                </Card.Root>
-            </div>
-
-            <!-- RIGHT: Submitted by + Group (1/3) -->
-            <div class="col-span-1 flex flex-col gap-6">
-                <!-- Logo -->
-                {#if topic.logoUrl}
-                    <Card.Root
-                        class="rounded-xl border border-zinc-200 shadow-sm"
-                    >
-                        <Card.Header>
-                            <p
-                                class="text-xs font-semibold uppercase tracking-widest text-zinc-400"
-                            >
-                                Project Logo
-                            </p>
-                        </Card.Header>
-                        <Separator />
-                        <Card.Content
-                            class="flex flex-col items-center gap-3 py-5"
-                        >
-                            <img
-                                src={topic.logoUrl}
-                                alt="Project logo"
-                                class="h-24 w-24 rounded-lg object-cover border border-zinc-200"
-                            />
-                            <p
-                                class="text-xs text-zinc-400 text-center break-all px-2"
-                            >
-                                {topic.logoUrl}
-                            </p>
-                        </Card.Content>
-                    </Card.Root>
-                {/if}
-                <!-- Submitted By -->
-                <Card.Root class="rounded-xl border border-zinc-200 shadow-sm">
-                    <Card.Header>
-                        <p
-                            class="text-xs font-semibold uppercase tracking-widest text-zinc-400"
-                        >
-                            Submitted By
-                        </p>
-                    </Card.Header>
-                    <Separator />
-                    <Card.Content class="p-0">
-                        <div
-                            class="flex flex-col gap-0 divide-y divide-zinc-100"
-                        >
-                            <div class="px-5 py-3">
-                                <p class="text-xs text-zinc-400">Full Name</p>
-                                <p class="text-sm font-medium text-zinc-900">
-                                    {topic.submittedBy?.fullName ?? "—"}
-                                </p>
-                            </div>
-                            <div class="px-5 py-3">
-                                <p class="text-xs text-zinc-400">
-                                    Student Code
-                                </p>
-                                <p class="text-sm font-medium text-zinc-900">
-                                    {topic.submittedBy?.studentCode ?? "—"}
-                                </p>
-                            </div>
-                            <div class="px-5 py-3">
-                                <p class="text-xs text-zinc-400">Email</p>
-                                <p
-                                    class="text-sm font-medium text-zinc-900 break-all"
-                                >
-                                    {topic.submittedBy?.email ?? "—"}
-                                </p>
-                            </div>
-                        </div>
-                    </Card.Content>
-                </Card.Root>
-
-                <!-- Group -->
-                <Card.Root class="rounded-xl border border-zinc-200 shadow-sm">
-                    <Card.Header>
-                        <p
-                            class="text-xs font-semibold uppercase tracking-widest text-zinc-400"
-                        >
-                            Group
-                        </p>
-                    </Card.Header>
-                    <Separator />
-                    <Card.Content class="p-0">
-                        <div
-                            class="flex flex-col gap-0 divide-y divide-zinc-100"
-                        >
-                            <div class="px-5 py-3">
-                                <p class="text-xs text-zinc-400">Group Name</p>
-                                <p class="text-sm font-medium text-zinc-900">
-                                    {topic.group?.groupName ?? "—"}
-                                </p>
-                            </div>
-                            <div class="px-5 py-3">
-                                <p class="text-xs text-zinc-400">Class Code</p>
-                                <p class="text-sm font-medium text-zinc-900">
-                                    {topic.group?.classCode ?? "—"}
-                                </p>
-                            </div>
-                            <div class="px-5 py-3">
-                                <p class="text-xs text-zinc-400">Members</p>
-                                <p class="text-sm font-medium text-zinc-900">
-                                    {topic.group?.memberCount ?? 0} members
-                                </p>
-                            </div>
-                        </div>
-                    </Card.Content>
-                </Card.Root>
-            </div>
-        </div>
-    </div>
-{:else}
-    <!-- Top bar -->
-    <div
-        class="sticky top-0 z-10 border-b border-zinc-200 bg-white px-8 pb-5 pt-20"
-    >
-        <div class="mx-auto flex max-w-5xl items-center justify-between">
-            <div class="flex items-center gap-3">
-                <button
-                    type="button"
-                    onclick={() => goto(`/app`)}
-                    class="flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 transition"
-                >
-                    <ArrowLeftIcon class="h-4 w-4" />
-                    Back
-                </button>
-                <Separator orientation="vertical" class="h-5" />
-                <div>
-                    <h1 class="text-base font-semibold text-zinc-900">
-                        Register Topic
-                    </h1>
-                    <p class="text-xs text-zinc-400">
-                        Fill in the details for your graduation project
-                    </p>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-2">
+            {#snippet actions()}
                 <Button
                     type="button"
                     variant="outline"
-                    class="border-zinc-200 text-zinc-700 hover:bg-zinc-100 cursor-pointer"
-                    onclick={() => goto("/app")}
+                    class="cursor-pointer border-zinc-200 text-zinc-700 hover:bg-zinc-100"
+                    onclick={() => (isResubmitting = false)}
                 >
                     Cancel
                 </Button>
                 <Button
-                    form="register-topic-form"
+                    form="resubmit-topic-form"
                     type="submit"
                     disabled={isUploading}
                     class="bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50"
                 >
-                    Register Topic
+                    Resubmit Topic
                 </Button>
-            </div>
-        </div>
-    </div>
+            {/snippet}
+        </PageHeader>
 
-    <!-- Page body -->
-    <div class="mx-auto max-w-5xl px-8 py-8">
-        <form
-            id="register-topic-form"
-            method="POST"
-            action="?/RegisterTopic"
-            use:enhance={() => {
-                const toastId = toast.loading("Registering topic...");
-                return async ({ result, update }) => {
-                    if (result.type === "success") {
-                        toast.success("Topic registered successfully!", {
-                            id: toastId,
-                        });
-                        await goto("/app/register-topic");
-                    } else {
-                        const msg =
-                            result.type === "failure"
-                                ? ((result.data?.message as string) ??
-                                  "Failed to register topic")
-                                : "An unexpected error occurred";
-                        toast.error(msg, { id: toastId });
-                        await update();
-                    }
-                };
-            }}
+        <div class="mx-auto max-w-5xl px-8 py-8">
+            {#if topic.reviewComment}
+                <div
+                    class="mb-6 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        class="mt-0.5 h-4 w-4 shrink-0 text-red-500"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                        />
+                    </svg>
+                    <div>
+                        <p class="text-sm font-medium text-red-700">
+                            Rejection Reason
+                        </p>
+                        <p class="mt-0.5 text-xs text-red-600">
+                            {topic.reviewComment}
+                        </p>
+                    </div>
+                </div>
+            {/if}
+
+            <form
+                id="resubmit-topic-form"
+                method="POST"
+                action="?/resubmitTopic"
+                use:enhance={makeEnhancer(
+                    "Resubmitting topic...",
+                    "Topic resubmitted successfully!",
+                    "/app/student/register-topic",
+                    () => (isResubmitting = false),
+                )}
+            >
+                <input type="hidden" name="groupId" value={data.groupId} />
+                <input type="hidden" name="logoUrl" value={logoUrl} />
+
+                <div class="grid grid-cols-3 gap-8">
+                    <div class="col-span-2 flex flex-col gap-6">
+                        <TopicFormFields
+                            title={topic.title}
+                            description={topic.description}
+                            objectives={topic.objectives ?? ""}
+                            errorMessage={form?.message as string}
+                        />
+                    </div>
+                    <div class="col-span-1 flex flex-col gap-6">
+                        <LogoUploader bind:logoUrl bind:previewUrl />
+                    </div>
+                </div>
+            </form>
+        </div>
+    {:else}
+        <!-- ── VIEW TOPIC ─────────────────────────────────────────────────── -->
+        <PageHeader
+            title="Registered Topic"
+            subtitle="Your group has already registered a topic"
+            onBack={() => goto("/app")}
         >
-            <input type="hidden" name="groupId" value={data.groupId} />
-            <input type="hidden" name="logoUrl" value={logoUrl} />
+            {#snippet actions()}
+                {#if topic.status === "Rejected"}
+                    <Button
+                        type="button"
+                        class="bg-orange-500 text-white hover:bg-orange-600"
+                        onclick={enterResubmit}
+                    >
+                        Resubmit Topic
+                    </Button>
+                {:else if topic.status !== "Approved"}
+                    <Button
+                        type="button"
+                        class="bg-orange-500 text-white hover:bg-orange-600"
+                        onclick={() => goto("./register-topic/update")}
+                    >
+                        Update Topic
+                    </Button>
+                {/if}
+            {/snippet}
+        </PageHeader>
+
+        <div class="mx-auto max-w-5xl px-8 py-8">
+            <div
+                class="mb-6 flex items-start gap-3 rounded-lg border border-orange-200 bg-orange-50 px-4 py-3"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="mt-0.5 h-4 w-4 shrink-0 text-orange-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
+                    />
+                </svg>
+                <div>
+                    <p class="text-sm font-medium text-orange-700">
+                        Topic already registered
+                    </p>
+                    <p class="mt-0.5 text-xs text-orange-600">
+                        Your group has submitted a topic. You can update it
+                        below if needed.
+                    </p>
+                </div>
+            </div>
 
             <div class="grid grid-cols-3 gap-8">
-                <!-- LEFT: Main fields (2/3) -->
-                <div class="col-span-2 flex flex-col gap-6">
+                <!-- Topic detail (2/3) -->
+                <div class="col-span-2">
                     <Card.Root
                         class="rounded-xl border border-zinc-200 shadow-sm"
                     >
@@ -476,187 +286,207 @@
                             </p>
                         </Card.Header>
                         <Separator />
-                        <Card.Content class="flex flex-col gap-5 pt-5">
-                            <div class="flex flex-col gap-1.5">
-                                <Label
-                                    for="title"
-                                    class="text-sm font-medium text-zinc-900"
+                        <Card.Content class="p-0">
+                            {@const fields = [
+                                { label: "Title", value: topic.title },
+                                {
+                                    label: "Description",
+                                    value: topic.description,
+                                },
+                                {
+                                    label: "Objectives",
+                                    value: topic.objectives,
+                                },
+                                {
+                                    label: "Submitted At",
+                                    value: new Intl.DateTimeFormat("en-US", {
+                                        month: "long",
+                                        day: "numeric",
+                                        year: "numeric",
+                                        hour: "numeric",
+                                        minute: "2-digit",
+                                        hour12: true,
+                                    }).format(new Date(topic.submittedAt)),
+                                },
+                            ]}
+                            {#each fields as field, i}
+                                <div class="flex items-start gap-4 px-6 py-4">
+                                    <span
+                                        class="w-36 shrink-0 text-sm text-zinc-500"
+                                        >{field.label}</span
+                                    >
+                                    {#if field.value}
+                                        <span
+                                            class="text-sm font-medium text-zinc-900"
+                                            >{field.value}</span
+                                        >
+                                    {:else}
+                                        <span
+                                            class="text-sm italic text-zinc-400"
+                                            >Not specified</span
+                                        >
+                                    {/if}
+                                </div>
+                                {#if i < fields.length - 1}<Separator />{/if}
+                            {/each}
+
+                            <Separator />
+                            <div class="flex items-center gap-4 px-6 py-4">
+                                <span
+                                    class="w-36 shrink-0 text-sm text-zinc-500"
+                                    >Status</span
                                 >
-                                    Topic Title
-                                </Label>
-                                <Input
-                                    id="title"
-                                    name="title"
-                                    placeholder="e.g., E-commerce Management System"
-                                    required
-                                    class="border-zinc-200 focus-visible:ring-orange-500"
-                                />
-                                <p class="text-xs text-zinc-400">
-                                    Provide a clear, concise title for your
-                                    project.
-                                </p>
+                                <span
+                                    class={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold
+                                    ${
+                                        topic.status === "Pending"
+                                            ? "bg-orange-500 text-white"
+                                            : topic.status === "Approved"
+                                              ? "bg-green-600 text-white"
+                                              : topic.status === "Rejected"
+                                                ? "bg-red-500 text-white"
+                                                : "bg-zinc-200 text-zinc-800"
+                                    }`}
+                                >
+                                    {topic.status}
+                                </span>
                             </div>
 
-                            <div class="flex flex-col gap-1.5">
-                                <Label
-                                    for="description"
-                                    class="text-sm font-medium text-zinc-900"
-                                >
-                                    Description
-                                </Label>
-                                <Textarea
-                                    id="description"
-                                    name="description"
-                                    placeholder="Briefly describe your project..."
-                                    required
-                                    class="min-h-[120px] resize-y border-zinc-200 focus-visible:ring-orange-500"
-                                />
-                            </div>
-
-                            <div class="flex flex-col gap-1.5">
-                                <Label
-                                    for="objectives"
-                                    class="text-sm font-medium text-zinc-900"
-                                >
-                                    Objectives
-                                </Label>
-                                <Textarea
-                                    id="objectives"
-                                    name="objectives"
-                                    placeholder="What are the main goals of this project?"
-                                    required
-                                    class="min-h-[120px] resize-y border-zinc-200 focus-visible:ring-orange-500"
-                                />
-                            </div>
+                            {#if topic.status === "Rejected" && topic.reviewComment}
+                                <Separator />
+                                <div class="flex items-start gap-4 px-6 py-4">
+                                    <span
+                                        class="w-36 shrink-0 text-sm text-zinc-500"
+                                        >Rejection Reason</span
+                                    >
+                                    <span
+                                        class="text-sm font-medium text-red-600"
+                                        >{topic.reviewComment}</span
+                                    >
+                                </div>
+                            {/if}
                         </Card.Content>
                     </Card.Root>
-
-                    {#if form?.message}
-                        <p
-                            class="rounded-md bg-red-50 px-3 py-2 text-sm text-red-500 border border-red-200"
-                        >
-                            {form.message}
-                        </p>
-                    {/if}
                 </div>
 
-                <!-- RIGHT: Logo upload (1/3) -->
+                <!-- Sidebar (1/3) -->
                 <div class="col-span-1 flex flex-col gap-6">
-                    <Card.Root
-                        class="rounded-xl border border-zinc-200 shadow-sm"
-                    >
-                        <Card.Header>
-                            <p
-                                class="text-xs font-semibold uppercase tracking-widest text-zinc-400"
-                            >
-                                Project Logo
-                            </p>
-                            <p class="text-xs text-zinc-400 mt-1">
-                                Optional — upload a logo for your project
-                            </p>
-                        </Card.Header>
-                        <Separator />
-                        <Card.Content class="flex flex-col gap-4 pt-5">
-                            {#if previewUrl}
-                                <div
-                                    class="relative flex flex-col items-center gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4"
+                    {#if topic.logoUrl}
+                        <Card.Root
+                            class="rounded-xl border border-zinc-200 shadow-sm"
+                        >
+                            <Card.Header>
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-widest text-zinc-400"
                                 >
-                                    <img
-                                        src={previewUrl}
-                                        alt="Logo preview"
-                                        class="h-24 w-24 rounded-lg object-cover border border-zinc-200"
-                                    />
-                                    <p
-                                        class="text-xs text-zinc-400 text-center break-all"
-                                    >
-                                        {logoUrl}
-                                    </p>
-                                    <button
-                                        type="button"
-                                        onclick={removeImage}
-                                        class="absolute right-2 top-2 rounded-full p-0.5 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-700 transition"
-                                    >
-                                        <XIcon class="h-4 w-4" />
-                                    </button>
-                                </div>
-                            {:else}
-                                <label
-                                    class="flex cursor-pointer flex-col items-center gap-2 rounded-lg border-2 border-dashed px-4 py-10 transition
-                                        {isDragging
-                                        ? 'border-orange-400 bg-orange-50'
-                                        : 'border-zinc-200 bg-zinc-50 hover:border-orange-300 hover:bg-orange-50/50'}"
-                                    ondragover={(e) => {
-                                        e.preventDefault();
-                                        isDragging = true;
-                                    }}
-                                    ondragleave={() => (isDragging = false)}
-                                    ondrop={onDrop}
-                                >
-                                    {#if isUploading}
-                                        <div
-                                            class="h-8 w-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent"
-                                        ></div>
-                                        <p class="text-sm text-zinc-500">
-                                            Uploading...
-                                        </p>
-                                    {:else}
-                                        <div
-                                            class="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100"
-                                        >
-                                            <UploadCloudIcon
-                                                class="h-5 w-5 text-orange-500"
-                                            />
-                                        </div>
-                                        <p
-                                            class="text-sm text-center text-zinc-600"
-                                        >
-                                            <span
-                                                class="font-medium text-orange-500"
-                                                >Click to upload</span
-                                            >
-                                            <br />or drag and drop
-                                        </p>
-                                        <p class="text-xs text-zinc-400">
-                                            PNG, JPG, SVG (max. 10MB)
-                                        </p>
-                                    {/if}
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        class="hidden"
-                                        onchange={onFileInput}
-                                        disabled={isUploading}
-                                    />
-                                </label>
-                            {/if}
-
-                            {#if uploadError}
-                                <p class="text-xs text-red-500">
-                                    {uploadError}
+                                    Project Logo
                                 </p>
-                            {/if}
-
-                            <div class="flex flex-col gap-1.5">
-                                <Label
-                                    for="logoUrlDisplay"
-                                    class="text-sm font-medium text-zinc-900"
+                            </Card.Header>
+                            <Separator />
+                            <Card.Content
+                                class="flex flex-col items-center gap-3 py-5"
+                            >
+                                <img
+                                    src={topic.logoUrl}
+                                    alt="Project logo"
+                                    class="h-24 w-24 rounded-lg object-cover border border-zinc-200"
+                                />
+                                <p
+                                    class="break-all px-2 text-center text-xs text-zinc-400"
                                 >
-                                    Or paste URL
-                                </Label>
-                                <div class="relative flex items-center">
-                                    <LinkIcon
-                                        class="absolute left-3 h-4 w-4 text-zinc-400"
-                                    />
-                                    <Input
-                                        id="logoUrlDisplay"
-                                        bind:value={logoUrl}
-                                        placeholder="https://..."
-                                        class="pl-9 border-zinc-200 focus-visible:ring-orange-500"
-                                    />
+                                    {topic.logoUrl}
+                                </p>
+                            </Card.Content>
+                        </Card.Root>
+                    {/if}
+
+                    <!-- Submitted By / Group — shared row renderer -->
+                    {#each [{ heading: "Submitted By", rows: [{ label: "Full Name", value: topic.submittedBy?.fullName }, { label: "Student Code", value: topic.submittedBy?.studentCode }, { label: "Email", value: topic.submittedBy?.email }] }, { heading: "Group", rows: [{ label: "Group Name", value: topic.group?.groupName }, { label: "Class Code", value: topic.group?.classCode }, { label: "Members", value: topic.group?.memberCount != null ? `${topic.group.memberCount} members` : undefined }] }] as section}
+                        <Card.Root
+                            class="rounded-xl border border-zinc-200 shadow-sm"
+                        >
+                            <Card.Header>
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-widest text-zinc-400"
+                                >
+                                    {section.heading}
+                                </p>
+                            </Card.Header>
+                            <Separator />
+                            <Card.Content class="p-0">
+                                <div
+                                    class="flex flex-col divide-y divide-zinc-100"
+                                >
+                                    {#each section.rows as row}
+                                        <div class="px-5 py-3">
+                                            <p class="text-xs text-zinc-400">
+                                                {row.label}
+                                            </p>
+                                            <p
+                                                class="break-all text-sm font-medium text-zinc-900"
+                                            >
+                                                {row.value ?? "—"}
+                                            </p>
+                                        </div>
+                                    {/each}
                                 </div>
-                            </div>
-                        </Card.Content>
-                    </Card.Root>
+                            </Card.Content>
+                        </Card.Root>
+                    {/each}
+                </div>
+            </div>
+        </div>
+    {/if}
+
+    <!-- ══════════════════════════════════════════════════════════════════════════
+     REGISTER FORM
+═══════════════════════════════════════════════════════════════════════════ -->
+{:else}
+    <PageHeader
+        title="Register Topic"
+        subtitle="Fill in the details for your graduation project"
+        onBack={() => goto("/app")}
+    >
+        {#snippet actions()}
+            <Button
+                type="button"
+                variant="outline"
+                class="cursor-pointer border-zinc-200 text-zinc-700 hover:bg-zinc-100"
+                onclick={() => goto("/app")}
+            >
+                Cancel
+            </Button>
+            <Button
+                form="register-topic-form"
+                type="submit"
+                disabled={isUploading}
+                class="bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50"
+            >
+                Register Topic
+            </Button>
+        {/snippet}
+    </PageHeader>
+
+    <div class="mx-auto max-w-5xl px-8 py-8">
+        <form
+            id="register-topic-form"
+            method="POST"
+            action="?/RegisterTopic"
+            use:enhance={makeEnhancer(
+                "Registering topic...",
+                "Topic registered successfully!",
+                "/app/student/register-topic",
+            )}
+        >
+            <input type="hidden" name="groupId" value={data.groupId} />
+            <input type="hidden" name="logoUrl" value={logoUrl} />
+
+            <div class="grid grid-cols-3 gap-8">
+                <div class="col-span-2 flex flex-col gap-6">
+                    <TopicFormFields errorMessage={form?.message as string} />
+                </div>
+                <div class="col-span-1 flex flex-col gap-6">
+                    <LogoUploader bind:logoUrl bind:previewUrl />
                 </div>
             </div>
         </form>

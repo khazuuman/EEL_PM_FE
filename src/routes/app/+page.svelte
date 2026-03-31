@@ -37,6 +37,10 @@
                 name: "Create Topic Change Request",
                 url: "/app/student/topic-change",
             },
+            {
+                name: "View Topic History",
+                url: "/app/student/view-topic-history",
+            },
         ],
     };
 

@@ -1,18 +1,27 @@
-import { getTopicByClass, reviewTopic } from "$lib/server/topics";
-import { fail, type Actions } from "@sveltejs/kit";
+import { getTopicByClass, getTopicById } from "$lib/server/topics";
+import { fail } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
+import type { Actions } from "@sveltejs/kit";
+import { reviewTopic } from "$lib/server/topics";
 import type { ReviewTopic } from "$lib/types/topics";
 
 export const load: PageServerLoad = async (event) => {
-    const { parent, url } = event;
-    const { classDetails } = await parent();
+    const { params, url } = event;
+    const { id } = params;
 
-    if (!url.searchParams.has("status")) url.searchParams.set("status", "Pending");
-    const getTopicByClassRes = await getTopicByClass(event, classDetails.classId);
-    console.log('getTopicByClassRes: ', getTopicByClassRes?.data?.data?.data);
+    // Parse classId trực tiếp từ URL path
+    const segments = url.pathname.split("/");
+    const classIndex = segments.indexOf("class");
+    const classId = segments[classIndex + 1];
+
+    const getTopicByIdRes = await getTopicById(event, id);
+    console.log("getTopicByIdRes: ", getTopicByIdRes);
+    if (!getTopicByIdRes || getTopicByIdRes.status != 200) {
+        return fail(404, "Not found topic");
+    }
     return {
-        topics: getTopicByClassRes?.data?.data?.data ?? [],
-        classId: classDetails.classId,
+        topicDetail: getTopicByIdRes?.data?.data,
+        classId: classId,
     };
 };
 

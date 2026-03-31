@@ -11,7 +11,7 @@ export const load: PageServerLoad = async (event) => {
     const classId = user.student.classId;
 
     const studentsRes = await getStudentsAvailableByClass(event, classId);
-    console.log("studentsRes: ", studentsRes.data?.data);
+    console.log("studentsRes: ", studentsRes);
     return {
         students: studentsRes?.data?.data ?? [],
         user
