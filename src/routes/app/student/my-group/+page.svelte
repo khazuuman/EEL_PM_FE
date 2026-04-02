@@ -203,7 +203,7 @@
     </div>
 {/snippet}
 
-<div class="min-h-screen bg-white pt-20">
+<div class="min-h-screen bg-white pt-10">
     <!-- Top Bar -->
     <div
         class="sticky top-0 z-10 border-b border-zinc-100 bg-white/95 backdrop-blur-sm pl-3"
@@ -219,6 +219,12 @@
     </div>
 
     <div class="px-6 py-6 space-y-5">
+        <div class="mb-6">
+            <h1 class="text-2xl font-extrabold text-zinc-900">My Group</h1>
+            <p class="mt-1 text-sm text-zinc-400">
+                Your centralized group management hub.
+            </p>
+        </div>
         {#if data?.group}
             <!-- ── Header Card ─────────────────────────────── -->
             <div

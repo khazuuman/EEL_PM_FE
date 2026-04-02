@@ -96,7 +96,7 @@
     }
 </script>
 
-<div class="min-h-screen bg-white pt-20">
+<div class="min-h-screen bg-white pt-10">
     <!-- Top Bar -->
     <div
         class="sticky top-0 z-10 border-b border-zinc-100 bg-white/95 backdrop-blur-sm px-6"

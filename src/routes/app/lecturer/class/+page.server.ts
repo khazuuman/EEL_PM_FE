@@ -1,6 +1,7 @@
 import { APP_CLASSES_LECTURER } from "$lib/constants/depend";
 import { getClassesForLecturer } from "$lib/server/classes";
 import { getSemesters } from "$lib/server/semesters";
+import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {
@@ -25,11 +26,11 @@ export const load: PageServerLoad = async (event) => {
         semesters[0] ?? null
     );
 
-    // Nếu URL chưa có semesterId, tự inject vào searchParams
     if (!url.searchParams.get("semesterId") && latestSemester?.semesterId) {
-        url.searchParams.set("semesterId", String(latestSemester.semesterId));
+        const newUrl = new URL(url);
+        newUrl.searchParams.set("semesterId", String(latestSemester.semesterId));
+        redirect(302, newUrl.pathname + "?" + newUrl.searchParams.toString());
     }
-
 
     const classResult = await getClassesForLecturer(event, lecturerId);
     console.log("class: ", classResult);

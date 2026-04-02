@@ -56,6 +56,7 @@
 		tableName,
 		defaultHeaders,
 		allowSortHeaders,
+		checkboxSelection = false,
 		items,
 		totalItems,
 		activePaginate,
@@ -308,7 +309,8 @@
 				<Table.Root>
 					<Table.Header class="bg-muted/50">
 						<Table.Row>
-							<Table.Head class="w-12 px-2">
+						{#if checkboxSelection}
+								<Table.Head class="w-12 px-2">
 								<Checkbox
 									tabindex={-1}
 									class="m-auto size-5"
@@ -317,6 +319,7 @@
 									onCheckedChange={handleSelectAll}
 								/>
 							</Table.Head>
+						{/if}
 							{#each activeHeaders as header (header)}
 								<Table.Head
 									class={[
@@ -348,7 +351,8 @@
 					<Table.Body>
 						{#each sortedData as d, rowIndex (d.id)}
 							<Table.Row class="border-b">
-								<Table.Cell class="w-12 px-2">
+							{#if  checkboxSelection}
+									<Table.Cell class="w-12 px-2">
 									<Checkbox
 										class="m-auto size-5"
 										checked={selectedRows.has(d.id)}
@@ -359,6 +363,7 @@
 										}}
 									/>
 								</Table.Cell>
+							{/if}
 								{#each activeHeaders as header, colIndex (header)}
 									<Table.Cell
 										class={[

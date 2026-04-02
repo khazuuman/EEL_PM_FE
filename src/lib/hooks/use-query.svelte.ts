@@ -29,7 +29,7 @@ export const createQuery = (
 		});
 	} else if (typeof keys === 'string' && typeof values === 'string') {
 		if (values && values.trim() !== '') {
-			// ✅ Chỉ reset page khi KHÔNG phải đang set page
+			// ✅ Chỉ reset page khi KHÔNG phải đang set pageNumber
 			if (keys !== 'page' && hasPage) {
 				searchParams.set('page', '1');
 			}

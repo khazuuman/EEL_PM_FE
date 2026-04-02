@@ -2,8 +2,7 @@
 	import { goto } from "$app/navigation";
 	import Button from "$lib/components/ui/button/button.svelte";
 	import DataTable from "$lib/components/ui/data-table/data-table.svelte";
-	import { ArrowLeftIcon } from "lucide-svelte";
-	import { ArrowLeft } from "phosphor-svelte";
+	import { ArrowLeftIcon, UsersIcon } from "lucide-svelte";
 
 	const { data } = $props();
 	console.log("data client: ", data);
@@ -20,7 +19,6 @@
 		},
 	]);
 	let defaultHeaders = $state([
-		// "avatarUrl",
 		"studentCode",
 		"fullName",
 		"email",
@@ -28,7 +26,6 @@
 		"majorName",
 	]);
 	let headerValues = $state({
-		// avatarUrl: "Avatar",
 		studentCode: "Student Code",
 		fullName: "Full Name",
 		email: "Email",
@@ -37,16 +34,48 @@
 	});
 </script>
 
-<div class="bg-white px-5 pt-20 pb-10 rounded-md min-h-screen">
+<div class="bg-white px-5 pt-10 pb-10 rounded-md min-h-screen">
 	<div class="w-full flex items-center">
 		<Button
 			variant="ghost"
+			type="button"
 			onclick={() => goto(`/app/lecturer/class/${data.classId}`)}
 			class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl px-4 py-6 transition-all cursor-pointer"
 		>
 			<ArrowLeftIcon class="w-5 h-5" />
 			<span class="text-base font-semibold">Home</span>
 		</Button>
+	</div>
+	<!-- Page Title -->
+	<div class="flex items-center justify-between mb-6 mt-2 px-1">
+		<div class="flex items-center gap-3">
+			<div
+				class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0"
+			>
+				<UsersIcon class="w-5 h-5 text-amber-500" />
+			</div>
+			<div>
+				<p
+					class="text-[11px] font-semibold text-amber-500 uppercase tracking-widest leading-none mb-0.5"
+				>
+					Management
+				</p>
+				<h1
+					class="text-2xl font-extrabold text-stone-900 leading-tight"
+				>
+					Student List
+				</h1>
+			</div>
+		</div>
+		<div
+			class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-50 border border-stone-100"
+		>
+			<span class="text-sm text-stone-400 font-medium">Total</span>
+			<span class="text-sm font-extrabold text-stone-800"
+				>{totalCount}</span
+			>
+			<span class="text-sm text-stone-400">students</span>
+		</div>
 	</div>
 	<DataTable
 		actions={["view"]}
@@ -64,5 +93,5 @@
 		activePaginate
 		matchSearchColumns={["fullName", "studentCode"]}
 		{filters}
-	/>
+	></DataTable>
 </div>

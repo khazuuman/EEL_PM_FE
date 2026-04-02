@@ -1,3 +1,4 @@
+<!-- nav-data-table.svelte -->
 <script lang="ts">
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 	import { Button } from "$lib/components/ui/button/index.js";
@@ -23,9 +24,6 @@
 	} = $props();
 
 	let searchValue = $state("");
-	onMount(
-		() => (searchValue = page.url.searchParams.get("searchTerm") ?? ""),
-	);
 	const dataTableCtx = getDataTableCTX();
 	const {
 		filters,
@@ -48,7 +46,18 @@
 			maxWait: 2000,
 		},
 	);
-	$effect(() => debounceSearch(searchValue));
+
+
+onMount(() => {
+    searchValue = page.url.searchParams.get("searchTerm") ?? "";
+});
+
+$effect(() => {
+    const current = page.url.searchParams.get("searchTerm") ?? "";
+    if (searchValue !== current) {  // chỉ gọi khi user thực sự thay đổi
+        debounceSearch(searchValue);
+    }
+});
 	let allParamKeys = $derived.by(() => {
 		return Array.from(page.url.searchParams.keys());
 	});

@@ -6,12 +6,9 @@ export const getMajors = async (
     event: RequestEvent,
 ) => {
     const { url } = event;
-    // Clone để không mutate params gốc
-    const params = new URLSearchParams(url.searchParams);
-    params.set("isActive", "true");
     const response = await fetcher({
         event,
-        url: `/majors?${url.searchParams.toString()}`
+        url: `/majors?${url.searchParams.toString()}&isActive=true`
     });
     const data = await safeJsonParse(response);
     return {

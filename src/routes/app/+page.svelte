@@ -233,7 +233,7 @@
         roleLabel.length > 1 ? roleLabel.join(" & ") : (roleLabel[0] ?? "");
 </script>
 
-<div class="pt-15 bg-white z-100 min-h-screen">
+<div class="pt-10 bg-white z-100 min-h-screen">
     <h1 class="w-full text-center pt-10 text-3xl font-bold text-amber-900">
         {displayLabel} Home Page
     </h1>

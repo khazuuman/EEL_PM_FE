@@ -1,11 +1,14 @@
+<!-- paginate-data-table.svelte -->
 <script lang="ts">
-	import Paginate from '$lib/components/ui/paginate/paginate.svelte';
+	import Paginate from "$lib/components/ui/paginate/paginate.svelte";
 
-	import * as Select from '$lib/components/ui/select/index.js';
-	import { page } from '$app/state';
-	import { createQuery } from '$lib/hooks/use-query.svelte.js';
+	import * as Select from "$lib/components/ui/select/index.js";
+	import { page } from "$app/state";
+	import { createQuery } from "$lib/hooks/use-query.svelte.js";
 	const { count } = $props();
-	const selectedPerPage = $derived.by(() => page.url.searchParams.get('limit') || '10');
+	const selectedPerPage = $derived.by(
+		() => page.url.searchParams.get("limit") || "10",
+	);
 </script>
 
 {#if count > 0}
@@ -15,11 +18,13 @@
 			<Select.Root
 				type="single"
 				value={selectedPerPage}
-				onValueChange={(v) =>
+				onValueChange={(v) => {
+					if (v === selectedPerPage) return;
 					createQuery({
-						keys: 'limit',
-						values: v
-					})}
+						keys: ["limit", "page"],
+						values: [v, "1"],
+					});
+				}}
 			>
 				<Select.Trigger>{selectedPerPage}</Select.Trigger>
 				<Select.Content>

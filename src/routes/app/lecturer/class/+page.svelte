@@ -54,7 +54,7 @@
     });
 </script>
 
-<div class="flex flex-col h-screen pt-20">
+<div class="flex flex-col h-screen pt-10">
     <main
         class="h-full w-screen justify-center items-center bg-stone-100 py-10 px-20 overflow-x-hidden"
     >
