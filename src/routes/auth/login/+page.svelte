@@ -110,9 +110,9 @@
     <Button
         onclick={() => goto("/auth/login-FEID")}
         variant="default"
-        class="group bg-white border border-amber-500 text-black font-bold mt-5 h-10 hover:text-white cursor-pointer flex justify-center items-center mb-10"
+        class="group bg-white border border-amber-500 text-black font-bold mt-5 h-10 hover:text-amber-600 cursor-pointer flex justify-center items-center mb-10"
         ><CircleUserIcon
-            class="text-black group-hover:text-white h-10 text-center"
+            class="text-black group-hover:text-amber-600 h-10 text-center"
         /> Login with FEID</Button
     >
 

@@ -187,7 +187,7 @@ export async function sendMessage(groupId: string, content: string, attachments:
     onNewMessage?.();
 
     try {
-        await hub.invoke('SendMessage', groupId, content, []);
+        await hub.invoke('SendMessage', groupId, content, attachments);
     } catch (err: any) {
         console.error('❌ SendMessage lỗi:', err?.message ?? err);
         // ✅ Rollback nếu gửi thất bại

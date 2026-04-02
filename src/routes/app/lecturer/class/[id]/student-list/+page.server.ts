@@ -11,14 +11,14 @@ export const load: PageServerLoad = async (event) => {
     depends(APP_LECTURER_MANAGE_STUDENT);
 
     const { classDetails } = await parent();
-    if(!classDetails.classId) 	throw error(404, {
-			message: 'Not found student!'
-		});
+    if (!classDetails.classId) throw error(404, {
+        message: 'Not found student!'
+    });
     // const page = url.searchParams.get("page") ?? "1";
-    // const limit = url.searchParams.get("limit") ?? "10";
+    const limit = url.searchParams.get("limit") ?? "10";
 
     // url.searchParams.set("page", page);
-    // url.searchParams.set("limit", limit);
+    url.searchParams.set("limit", limit);
 
     const [studentsRes, majorsRes] = await Promise.all([
         getStudentsByClass(event, classDetails.classId),
