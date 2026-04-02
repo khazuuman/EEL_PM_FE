@@ -124,11 +124,11 @@
             {#if group}
                 <div class="flex items-center gap-2 text-sm text-zinc-500">
                     <LayersIcon class="h-4 w-4 text-orange-500" />
-                    <span class="font-semibold text-zinc-800"
+                    <span class="font-semibold text-zinc-800 text-[16px]"
                         >{group.groupName}</span
                     >
                     <span class="text-zinc-300">·</span>
-                    <span>Assign Mentor</span>
+                    <span class="text-[16px]">Assign Mentor</span>
                 </div>
             {/if}
 
@@ -142,10 +142,10 @@
             class="rounded-xl border border-zinc-200 bg-white shadow-sm overflow-hidden"
         >
             <div class="px-6 py-5 border-b border-zinc-100">
-                <h1 class="text-lg font-bold text-zinc-900">
+                <h1 class="text-xl font-bold text-zinc-900">
                     Available Mentors
                 </h1>
-                <p class="text-sm text-zinc-500 mt-0.5">
+                <p class="text-md text-zinc-500 mt-0.5">
                     Select a mentor to assign to group
                     <span class="font-semibold text-zinc-800"
                         >{group?.groupName}</span
@@ -156,7 +156,7 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left">
                     <thead
-                        class="text-[11px] text-zinc-500 uppercase font-bold bg-zinc-50/70 border-b border-zinc-100"
+                        class="text-[13px] text-zinc-500 uppercase font-bold bg-zinc-50/70 border-b border-zinc-100"
                     >
                         <tr>
                             <th class="px-6 py-3 tracking-wider">Mentor</th>
@@ -175,7 +175,7 @@
                             <tr>
                                 <td
                                     colspan="5"
-                                    class="px-6 py-12 text-center text-zinc-400 text-sm italic"
+                                    class="px-6 py-12 text-center text-zinc-400 text-xl italic"
                                 >
                                     No mentors available.
                                 </td>
@@ -186,19 +186,19 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="h-9 w-9 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold shrink-0"
+                                            class="h-9 w-9 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-[14px] font-bold shrink-0"
                                         >
                                             {getInitials(mentor.fullName)}
                                         </div>
                                         <div>
                                             <span
-                                                class="font-semibold text-zinc-900 block leading-tight"
+                                                class="font-semibold text-[16px] text-zinc-900 block leading-tight"
                                             >
                                                 {mentor.fullName}
                                             </span>
                                             {#if mentor.currentPosition || mentor.currentCompany}
                                                 <span
-                                                    class="text-xs text-zinc-400 mt-0.5"
+                                                    class="text-[14px] text-zinc-400 mt-0.5"
                                                 >
                                                     {mentor.currentPosition} · {mentor.currentCompany}
                                                 </span>
@@ -209,12 +209,12 @@
                                 <td class="px-6 py-4">
                                     <Badge
                                         variant="secondary"
-                                        class="bg-zinc-100 text-zinc-600 font-mono font-normal text-xs hover:bg-zinc-100"
+                                        class="bg-zinc-100 text-zinc-600 font-mono font-normal text-[14px] hover:bg-zinc-100"
                                     >
                                         {mentor.mentorCode}
                                     </Badge>
                                 </td>
-                                <td class="px-6 py-4 text-zinc-500 text-xs"
+                                <td class="px-6 py-4 text-zinc-500 text-[14px]"
                                     >{mentor.email}</td
                                 >
                                 <td class="px-6 py-4">
@@ -222,7 +222,7 @@
                                         <Users
                                             class="h-3.5 w-3.5 text-zinc-400"
                                         />
-                                        <span class="text-zinc-600 font-medium"
+                                        <span class="text-zinc-600 font-medium text-[14px]"
                                             >{mentor.activeGroupCount ??
                                                 0}</span
                                         >
@@ -270,7 +270,7 @@
                                                 disabled={isFetchingDetail &&
                                                     activeLoadingId ===
                                                         mentor.mentorId}
-                                                class="h-8 px-3 text-xs text-zinc-500 hover:text-zinc-900 cursor-pointer"
+                                                class="h-8 px-3 text-[14px] text-zinc-500 hover:text-zinc-900 cursor-pointer"
                                             >
                                                 {#if isFetchingDetail && activeLoadingId === mentor.mentorId}
                                                     <Loader2
@@ -287,7 +287,7 @@
                                             disabled={isAssigning &&
                                                 targetMentorId ===
                                                     mentor.mentorId}
-                                            class="h-8 px-4 text-xs bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow-sm cursor-pointer"
+                                            class="h-8 px-4 text-[14px] bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow-sm cursor-pointer"
                                             onclick={() => {
                                                 targetMentorId =
                                                     mentor.mentorId;
@@ -321,7 +321,7 @@
                 <div
                     class="flex items-center justify-between px-6 py-4 border-t border-zinc-100 bg-zinc-50/40"
                 >
-                    <span class="text-xs text-zinc-500">
+                    <span class="text-[14px] text-zinc-500">
                         Page <span class="font-semibold text-zinc-700"
                             >{pagination.page}</span
                         >
@@ -345,7 +345,7 @@
                             {#if pageNum === pagination.page}
                                 <Button
                                     variant="outline"
-                                    class="h-7 w-7 rounded-md p-0 text-xs bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 font-semibold cursor-default"
+                                    class="h-8 w-8 rounded-md p-0 text-[14px] bg-orange-50 text-orange-600 border-orange-200 hover:bg-orange-100 font-semibold cursor-default"
                                     >{pageNum}</Button
                                 >
                             {:else}
@@ -382,7 +382,7 @@
                     class="px-5 py-4 border-b border-zinc-100 bg-zinc-50/50 flex items-center justify-between"
                 >
                     <span
-                        class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider"
+                        class="text-[16px] font-bold text-zinc-400 uppercase tracking-wider"
                         >Topic</span
                     >
                     {#if topic}
@@ -413,15 +413,15 @@
                                     />
                                 {:else}
                                     <div
-                                        class="h-12 w-12 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0"
+                                        class="h-15 w-15 rounded-lg bg-zinc-100 border border-zinc-200 flex items-center justify-center shrink-0"
                                     >
                                         <BookOpen
-                                            class="h-5 w-5 text-zinc-400"
+                                            class="h-8 w-8 text-zinc-400"
                                         />
                                     </div>
                                 {/if}
                                 <h3
-                                    class="text-sm font-bold text-zinc-900 leading-tight"
+                                    class="text-[13px] font-bold text-zinc-900 leading-tight"
                                 >
                                     {topic.title}
                                 </h3>
@@ -429,24 +429,24 @@
                             <Separator />
                             <div>
                                 <p
-                                    class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5"
+                                    class="text-[14px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5"
                                 >
                                     Description
                                 </p>
                                 <p
-                                    class="text-xs text-zinc-600 leading-relaxed bg-zinc-50 border border-zinc-100 rounded-lg p-3"
+                                    class="text-[13px] text-zinc-600 leading-relaxed bg-zinc-50 border border-zinc-100 rounded-lg p-3"
                                 >
                                     {topic.description}
                                 </p>
                             </div>
                             <div>
                                 <p
-                                    class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5"
+                                    class="text-[14px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5"
                                 >
                                     Objectives
                                 </p>
                                 <p
-                                    class="text-xs text-zinc-600 leading-relaxed bg-zinc-50 border border-zinc-100 rounded-lg p-3"
+                                    class="text-[13px] text-zinc-600 leading-relaxed bg-zinc-50 border border-zinc-100 rounded-lg p-3"
                                 >
                                     {topic.objectives}
                                 </p>
@@ -457,14 +457,14 @@
                             class="flex flex-col items-center justify-center gap-2 py-10 text-center"
                         >
                             <div
-                                class="h-10 w-10 rounded-full bg-zinc-100 flex items-center justify-center mb-1"
+                                class="h-15 w-15 rounded-full bg-zinc-100 flex items-center justify-center mb-1"
                             >
-                                <BookOpen class="h-5 w-5 text-zinc-400" />
+                                <BookOpen class="h-8 w-8 text-zinc-400" />
                             </div>
-                            <p class="text-sm font-medium text-zinc-500">
+                            <p class="text-[14px] font-medium text-zinc-500">
                                 No topic assigned
                             </p>
-                            <p class="text-xs text-zinc-400">
+                            <p class="text-[14px] text-zinc-400">
                                 This group has not been assigned a topic yet.
                             </p>
                         </div>
@@ -481,23 +481,23 @@
                         class="px-5 py-4 border-b border-zinc-100 bg-zinc-50/50 flex items-center justify-between"
                     >
                         <span
-                            class="text-[11px] font-bold text-zinc-400 uppercase tracking-wider"
+                            class="text-[16px] font-bold text-zinc-400 uppercase tracking-wider"
                             >Group</span
                         >
                         <Badge
                             variant="outline"
-                            class="bg-green-50 text-green-700 border-green-200 text-xs"
+                            class="bg-green-50 text-green-700 border-green-200 text-[14px]"
                         >
                             {group.status}
                         </Badge>
                     </div>
                     <div class="px-5 py-4">
                         <div class="mb-4">
-                            <h2 class="text-base font-bold text-zinc-900">
+                            <h2 class="text-[18px] font-bold text-zinc-900">
                                 {group.groupName}
                             </h2>
                             <div
-                                class="flex items-center gap-3 text-xs text-zinc-500 mt-1"
+                                class="flex items-center gap-3 text-[14px] text-zinc-500 mt-1"
                             >
                                 <span class="flex items-center gap-1">
                                     <BookOpen class="h-3.5 w-3.5" />
@@ -520,17 +520,17 @@
                                         class="flex items-center gap-2.5 min-w-0"
                                     >
                                         <div
-                                            class="h-7 w-7 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-[10px] font-bold shrink-0"
+                                            class="h-8 w-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-[14px] font-bold shrink-0"
                                         >
                                             {getInitials(member.fullName)}
                                         </div>
                                         <div class="min-w-0">
                                             <span
-                                                class="text-xs font-semibold text-zinc-800 truncate block"
+                                                class="text-[14px] font-semibold text-zinc-800 truncate block"
                                                 >{member.fullName}</span
                                             >
                                             <span
-                                                class="text-[10px] text-zinc-400 font-mono"
+                                                class="text-[13px] text-zinc-400 font-mono"
                                                 >{member.studentCode}</span
                                             >
                                         </div>
@@ -538,15 +538,15 @@
                                     {#if member.isLeader}
                                         <Badge
                                             variant="outline"
-                                            class="bg-orange-50 text-orange-600 border-orange-200 text-[10px] px-1.5 py-0 gap-1 shrink-0"
+                                            class="bg-orange-50 text-orange-600 border-orange-200 text-[14px] px-1.5 py-0 gap-1 shrink-0"
                                         >
                                             <Star
-                                                class="h-2.5 w-2.5 fill-orange-500"
+                                                class="h-3 w-3 fill-orange-500"
                                             /> Leader
                                         </Badge>
                                     {:else}
                                         <span
-                                            class="text-[10px] text-zinc-400 shrink-0"
+                                            class="text-[14px] text-zinc-400 shrink-0"
                                             >Member</span
                                         >
                                     {/if}
@@ -572,7 +572,7 @@
                         {getInitials(selectedMentor.fullName)}
                     </div>
                     <div>
-                        <Dialog.Title class="text-lg font-bold text-zinc-900">
+                        <Dialog.Title class="text-xl font-bold text-zinc-900">
                             {selectedMentor.fullName}
                         </Dialog.Title>
                         <Dialog.Description
@@ -580,13 +580,13 @@
                         >
                             <Badge
                                 variant="secondary"
-                                class="bg-zinc-100 text-zinc-600 font-mono text-xs font-normal"
+                                class="bg-zinc-100 text-zinc-600 font-mono text-[14px] font-normal"
                             >
                                 {selectedMentor.mentorCode}
                             </Badge>
                             {#if selectedMentor.isActive}
                                 <span
-                                    class="flex items-center gap-1 text-[11px] text-green-600 font-semibold"
+                                    class="flex items-center gap-1 text-[14px] text-green-600 font-semibold"
                                 >
                                     <span
                                         class="h-1.5 w-1.5 rounded-full bg-green-500"
@@ -604,18 +604,18 @@
                     class="rounded-lg bg-zinc-50 border border-zinc-100 p-4 space-y-2.5"
                 >
                     <p
-                        class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest"
+                        class="text-[14px] font-bold text-zinc-400 uppercase tracking-widest"
                     >
                         Contact
                     </p>
                     <div class="flex items-center gap-2.5 text-zinc-700">
                         <Mail class="h-4 w-4 text-zinc-400 shrink-0" />
-                        <span class="text-xs">{selectedMentor.email}</span>
+                        <span class="text-[14px]">{selectedMentor.email}</span>
                     </div>
                     {#if selectedMentor.phoneNumber}
                         <div class="flex items-center gap-2.5 text-zinc-700">
                             <Phone class="h-4 w-4 text-zinc-400 shrink-0" />
-                            <span class="text-xs"
+                            <span class="text-[14px]"
                                 >{selectedMentor.phoneNumber}</span
                             >
                         </div>
@@ -627,7 +627,7 @@
                     class="rounded-lg bg-zinc-50 border border-zinc-100 p-4 space-y-3"
                 >
                     <p
-                        class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest"
+                        class="text-[14px] font-bold text-zinc-400 uppercase tracking-widest"
                     >
                         Professional
                     </p>
@@ -636,10 +636,10 @@
                             class="h-4 w-4 text-zinc-400 mt-0.5 shrink-0"
                         />
                         <div>
-                            <p class="text-sm font-semibold text-zinc-800">
+                            <p class="text-[14px] font-semibold text-zinc-800">
                                 {selectedMentor.currentPosition || "N/A"}
                             </p>
-                            <p class="text-xs text-zinc-500">
+                            <p class="text-[14px] text-zinc-500">
                                 at {selectedMentor.currentCompany || "N/A"}
                             </p>
                         </div>
@@ -648,18 +648,18 @@
                         class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-200"
                     >
                         <div>
-                            <p class="text-[10px] text-zinc-400 mb-0.5">
+                            <p class="text-[14px] text-zinc-400 mb-0.5">
                                 Field of Work
                             </p>
-                            <p class="text-xs font-semibold text-zinc-800">
+                            <p class="text-[13px] font-semibold text-zinc-800">
                                 {selectedMentor.fieldOfWork || "N/A"}
                             </p>
                         </div>
                         <div>
-                            <p class="text-[10px] text-zinc-400 mb-0.5">
+                            <p class="text-[14px] text-zinc-400 mb-0.5">
                                 Experience
                             </p>
-                            <p class="text-xs font-semibold text-zinc-800">
+                            <p class="text-[13px] font-semibold text-zinc-800">
                                 {selectedMentor.yearsOfExperience
                                     ? `${selectedMentor.yearsOfExperience} years`
                                     : "N/A"}
@@ -673,9 +673,9 @@
                     class="rounded-lg bg-zinc-50 border border-zinc-100 p-4 space-y-2.5"
                 >
                     <p
-                        class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5"
+                        class="text-[14px] font-bold text-zinc-400 uppercase tracking-widest flex items-center gap-1.5"
                     >
-                        <Users class="h-3 w-3" />
+                        <Users class="h-4 w-4" />
                         Mentoring ({selectedMentor.assignedGroups?.length || 0})
                     </p>
                     {#if selectedMentor.assignedGroups?.length > 0}
@@ -686,12 +686,12 @@
                                 >
                                     <div>
                                         <p
-                                            class="text-xs font-semibold text-zinc-900"
+                                            class="text-[14px] font-semibold text-zinc-900"
                                         >
                                             {ag.groupName}
                                         </p>
                                         <p
-                                            class="text-[10px] text-zinc-500 flex items-center gap-1 mt-0.5"
+                                            class="text-[14px] text-zinc-500 flex items-center gap-1 mt-0.5"
                                         >
                                             <Star
                                                 class="h-2.5 w-2.5 fill-orange-500 text-orange-500"
@@ -701,14 +701,14 @@
                                     </div>
                                     <Badge
                                         variant="outline"
-                                        class="text-[10px] text-zinc-500 font-normal"
+                                        class="text-[12px] text-zinc-500 font-normal"
                                         >#{ag.groupId}</Badge
                                     >
                                 </div>
                             {/each}
                         </div>
                     {:else}
-                        <p class="text-xs text-zinc-400 italic">
+                        <p class="text-[14px] text-zinc-400 italic">
                             Not mentoring any groups.
                         </p>
                     {/if}
@@ -720,11 +720,11 @@
                         class="rounded-lg bg-zinc-50 border border-zinc-100 p-4"
                     >
                         <p
-                            class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2"
+                            class="text-[14px] font-bold text-zinc-400 uppercase tracking-widest mb-2"
                         >
                             Biography
                         </p>
-                        <p class="text-xs text-zinc-600 leading-relaxed">
+                        <p class="text-[13px] text-zinc-600 leading-relaxed">
                             {selectedMentor.biography}
                         </p>
                     </div>

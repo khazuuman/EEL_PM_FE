@@ -3,6 +3,7 @@
     import {
         ArrowLeftIcon,
         ExternalLinkIcon,
+        FolderClockIcon,
         GroupIcon,
         UserRoundSearchIcon,
     } from "lucide-svelte";
@@ -114,6 +115,15 @@
                 >
                     <UserRoundSearchIcon class="h-4 w-4" />
                     Assign Mentor
+                </a>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+                <a
+                    href={`/app/lecturer/class/${data.classId}/manage-groups/${id}/topic-history`}
+                    class="flex items-center gap-2"
+                >
+                    <FolderClockIcon class="h-4 w-4" />
+                    View Topic History
                 </a>
             </DropdownMenuItem>
             <!-- <DropdownMenuItem>

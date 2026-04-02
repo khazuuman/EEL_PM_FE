@@ -4,7 +4,15 @@
     import { GraduationCapIcon } from "lucide-svelte";
     import NavUser from "./components/nav-user.svelte";
     import { goto } from "$app/navigation";
+    import ChatWidget from "$lib/components/chat/ChatWidget.svelte";
+    import { page } from "$app/stores";
+    import * as Tooltip from "$lib/components/ui/tooltip/index";
     let { data, children } = $props<{ data: LayoutData; children: any }>();
+
+    const user = $page.data.user;
+    const token = $page.data.accessToken;
+
+    console.log("user: ", user);
 </script>
 
 <header
@@ -35,7 +43,27 @@
         <NavUser user={data.user} />
     </div>
 </header>
-<div class="w-full min-h-screen bg-stone-100 overflow-x-hidden">
+
+<Tooltip.Provider>
+    <div class="w-full min-h-screen bg-stone-100 overflow-x-hidden">
+        {@render children()}
+    </div>
+    {#if user}
+        {#if user?.roles.includes("Student")}
+            <ChatWidget
+                groupId={user.student.group.groupId}
+                {token}
+                userId={user.userId}
+                {user}
+            />
+        {/if}
+    {/if}
+</Tooltip.Provider>
+<!-- <div class="w-full min-h-screen bg-stone-100 overflow-x-hidden">
     {@render children()}
 </div>
-
+{#if user}
+    {#if user?.roles.includes("Student")}
+        <ChatWidget groupId={user.student.group.groupId} {token} />
+    {/if}
+{/if} -->

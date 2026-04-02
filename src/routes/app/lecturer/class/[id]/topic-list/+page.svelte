@@ -1,7 +1,6 @@
 <script lang="ts">
     import type { PageData } from "./$types";
     import { Input } from "$lib/components/ui/input";
-    import * as Card from "$lib/components/ui/card";
     import * as Select from "$lib/components/ui/select";
     import { Button } from "$lib/components/ui/button";
     import { goto } from "$app/navigation";
@@ -24,26 +23,26 @@
         {
             label: "Total Topics",
             icon: BookOpen,
-            color: "text-orange-500",
-            bg: "bg-orange-50",
+            color: "text-orange-600",
+            bg: "bg-orange-100",
         },
         {
             label: "Pending Review",
             icon: Clock,
-            color: "text-blue-400",
-            bg: "bg-blue-50",
+            color: "text-blue-600",
+            bg: "bg-blue-100",
         },
         {
             label: "Approved",
             icon: CheckCircle2,
-            color: "text-green-500",
-            bg: "bg-green-50",
+            color: "text-green-600",
+            bg: "bg-green-100",
         },
         {
             label: "Rejected",
             icon: XCircle,
-            color: "text-red-400",
-            bg: "bg-red-50",
+            color: "text-red-600",
+            bg: "bg-red-100",
         },
     ] as const;
 
@@ -104,9 +103,9 @@
     }
 
     const statusColors: Record<string, string> = {
-        Pending: "border-orange-400 text-orange-500 bg-orange-50",
-        Approved: "border-green-400 text-green-600 bg-green-50",
-        Rejected: "border-red-400 text-red-500 bg-red-50",
+        Pending: "border-orange-200 text-orange-600 bg-orange-50",
+        Approved: "border-green-200 text-green-700 bg-green-50",
+        Rejected: "border-red-200 text-red-600 bg-red-50",
     };
 
     const statusOptions = [
@@ -121,21 +120,29 @@
     );
 </script>
 
-<div class="min-h-screen bg-gray-50 p-6 font-sans pt-20">
-    <a
-        class="flex gap-2 w-fit items-center text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mb-5"
-        href="/app/lecturer/class/{data.classId}"
+<div class="min-h-screen bg-white pt-20 font-sans">
+    <!-- ── Sticky Top Bar ──────────────────────────────────────── -->
+    <div
+        class="sticky top-0 z-10 px-6 py-3 flex items-center"
     >
-        <ArrowLeftIcon /> Back to Dashboard
-    </a>
+        <Button
+            variant="ghost"
+            onclick={() => goto(`/app/lecturer/class/${data.classId}`)}
+            class="flex items-center gap-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl px-3 py-4 transition-all cursor-pointer"
+        >
+            <ArrowLeftIcon class="w-4 h-4" />
+            <span class="text-sm font-semibold">Home</span>
+        </Button>
+    </div>
 
-    <div class="mx-auto max-w-7xl space-y-6">
-        <!-- Header -->
+    <!-- ── Main Content ────────────────────────────────────────── -->
+    <div class="px-6 py-6 space-y-6">
+        <!-- Header & Filters -->
         <div
-            class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"
+            class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between"
         >
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">
+                <h1 class="text-2xl font-extrabold text-gray-900">
                     Class Project Topics
                 </h1>
                 <p class="mt-1 text-sm text-gray-500">
@@ -144,8 +151,8 @@
             </div>
 
             <!-- Search + Filter + Reset -->
-            <div class="flex items-center gap-2">
-                <div class="relative w-56">
+            <div class="flex items-center gap-2 flex-wrap">
+                <div class="relative w-64">
                     <Search
                         class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
                     />
@@ -153,7 +160,7 @@
                         bind:value={searchTerm}
                         oninput={onSearchInput}
                         placeholder="Search by title..."
-                        class="pl-9 bg-white border-gray-200"
+                        class="pl-9 bg-gray-50 border-gray-200 h-10"
                     />
                 </div>
 
@@ -162,7 +169,9 @@
                     bind:value={filterStatus}
                     onValueChange={onStatusChange}
                 >
-                    <Select.Trigger class="w-36 bg-white border-gray-200">
+                    <Select.Trigger
+                        class="w-40 bg-gray-50 border-gray-200 h-10"
+                    >
                         {selectedLabel}
                     </Select.Trigger>
                     <Select.Content>
@@ -179,7 +188,7 @@
                     <Button
                         variant="outline"
                         onclick={resetFilter}
-                        class="gap-1.5 border-red-300 text-red-500 hover:bg-red-50 hover:text-red-600"
+                        class="gap-1.5 border-red-200 text-red-500 hover:bg-red-50 hover:text-red-600 h-10"
                     >
                         <X class="h-4 w-4" /> Reset
                     </Button>
@@ -188,61 +197,84 @@
         </div>
 
         <!-- Stats -->
-        <div class="grid grid-cols-2 gap-5 sm:grid-cols-4">
+        <div class="flex flex-wrap gap-4">
             {#each statCards as stat, i}
-                <Card.Root class="border border-gray-100 bg-white shadow-sm">
-                    <Card.Content class="flex items-center gap-4 p- 3">
-                        <div class="rounded-lg p-2.5 {stat.bg}">
-                            <svelte:component
-                                this={stat.icon}
-                                class="h-8 w-8 {stat.color}"
-                            />
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400">{stat.label}</p>
-                            <p class="text-2xl font-bold text-gray-900">
-                                {statValues[i]}
-                            </p>
-                        </div>
-                    </Card.Content>
-                </Card.Root>
+                <div
+                    class="flex flex-1 min-w-[200px] items-center gap-4 px-5 py-4 rounded-xl bg-white border border-gray-200 shadow-sm"
+                >
+                    <div
+                        class="rounded-full p-2.5 flex items-center justify-center shrink-0 {stat.bg}"
+                    >
+                        <svelte:component
+                            this={stat.icon}
+                            class="h-5 w-5 {stat.color}"
+                        />
+                    </div>
+                    <div>
+                        <p
+                            class="text-xs text-gray-400 font-semibold uppercase tracking-wide"
+                        >
+                            {stat.label}
+                        </p>
+                        <p class="text-xl font-bold text-gray-900">
+                            {statValues[i]}
+                        </p>
+                    </div>
+                </div>
             {/each}
         </div>
 
-        <!-- Cards -->
+        <!-- Cards Grid -->
         {#if topics.length === 0}
-            <div class="py-20 text-center text-gray-400">No topics found.</div>
+            <div
+                class="col-span-full flex flex-col items-center justify-center py-24 text-gray-400 gap-3"
+            >
+                <BookOpen class="w-14 h-14 text-gray-300" />
+                <p class="text-lg font-semibold text-gray-500">
+                    No topics found
+                </p>
+                <p class="text-sm text-gray-400">
+                    There are no topics matching your criteria.
+                </p>
+            </div>
         {:else}
-            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <!-- Lưới tự động mở rộng theo màn hình -->
+            <div
+                class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+            >
                 {#each topics as topic (topic.topicId)}
-                    <Card.Root
-                        class="group p-0 flex flex-col justify-between border border-gray-100 bg-white shadow-sm transition-all hover:border-orange-400 hover:shadow-md"
+                    <div
+                        class="group flex flex-col justify-between rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:border-orange-300 hover:shadow-md overflow-hidden"
                     >
-                        <Card.Content class="flex flex-col gap-3 p-5">
+                        <!-- Card Body -->
+                        <div class="flex flex-col gap-3 p-5">
                             <div class="flex items-start justify-between gap-2">
                                 <h3
-                                    class="text-[18px] font-bold leading-snug text-gray-900 group-hover:text-orange-500 transition-colors"
+                                    class="text-base font-bold leading-snug text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2"
                                 >
                                     {topic.title}
                                 </h3>
                                 <span
-                                    class="shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium {statusColors[
+                                    class="shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold {statusColors[
                                         topic.status
-                                    ] ?? 'bg-gray-100 text-gray-500'}"
+                                    ] ??
+                                        'border-gray-200 bg-gray-50 text-gray-500'}"
                                 >
                                     {topic.status}
                                 </span>
                             </div>
 
                             <div
-                                class="flex items-center gap-1.5 text-sm text-gray-500"
+                                class="flex items-center gap-2 text-sm text-gray-600 mt-1"
                             >
-                                <Layers class="h-4 w-4 shrink-0" />
-                                <span class="font-semibold text-gray-700"
+                                <Layers
+                                    class="h-4 w-4 shrink-0 text-orange-500"
+                                />
+                                <span class="font-semibold text-gray-800"
                                     >{topic.group?.classCode}</span
                                 >
                                 <span
-                                    class="bg-gray-700 rounded-full w-1 h-1 block"
+                                    class="bg-gray-300 rounded-full w-1 h-1 block shrink-0"
                                 ></span>
                                 <span class="truncate"
                                     >{topic.group?.groupName}</span
@@ -250,45 +282,50 @@
                             </div>
 
                             <div
-                                class="flex items-center gap-1.5 text-sm text-gray-500"
+                                class="flex items-center gap-2 text-sm text-gray-600"
                             >
-                                <Users class="h-4 w-4 shrink-0" />
+                                <Users class="h-4 w-4 shrink-0 text-gray-400" />
                                 <span>{topic.group?.memberCount} Members</span>
                             </div>
 
                             {#if topic.description}
-                                <p class="line-clamp-2 text-sm text-gray-400">
+                                <p
+                                    class="line-clamp-2 text-sm text-gray-500 mt-2"
+                                >
                                     {topic.description}
                                 </p>
                             {/if}
-                        </Card.Content>
+                        </div>
 
+                        <!-- Card Footer -->
                         <div
-                            class="border-t border-gray-100 px-5 py-3 text-xs text-gray-400 bg-stone-100 flex items-center justify-between gap-3"
+                            class="border-t border-gray-100 px-5 py-3 text-xs text-gray-500 bg-gray-50 flex items-center justify-between gap-3"
                         >
-                            <span>
-                                Submitted by
-                                <span class="font-semibold text-gray-600"
-                                    >{topic.submittedBy?.fullName}</span
-                                >
-                                ({topic.submittedBy?.studentCode}) · {topic
-                                    .submittedBy?.email}
-                                <br />on {formatDate(topic.submittedAt)}
-                            </span>
+                            <div class="flex-1 min-w-0">
+                                <p class="truncate">
+                                    By <span class="font-semibold text-gray-700"
+                                        >{topic.submittedBy?.fullName}</span
+                                    >
+                                    ({topic.submittedBy?.studentCode})
+                                </p>
+                                <p class="mt-0.5 text-gray-400">
+                                    on {formatDate(topic.submittedAt)}
+                                </p>
+                            </div>
 
                             <Button
                                 variant="outline"
-                                class="shrink-0 cursor-pointer gap-1.5 border-orange-300 text-orange-500 hover:bg-orange-50 hover:text-orange-600 h-8 px-3 text-xs"
+                                class="shrink-0 cursor-pointer gap-1.5 border-orange-200 text-orange-600 hover:bg-orange-100 hover:text-orange-700 hover:border-orange-300 h-8 px-3 text-xs bg-white transition-colors"
                                 onclick={() =>
                                     goto(
                                         `/app/lecturer/class/${data.classId}/topic-list/${topic.topicId}`,
                                     )}
                             >
                                 <BookOpen class="h-3.5 w-3.5" />
-                                View Detail
+                                View
                             </Button>
                         </div>
-                    </Card.Root>
+                    </div>
                 {/each}
             </div>
         {/if}

@@ -1,6 +1,5 @@
 <script lang="ts">
     import type { PageData } from "./$types";
-    import * as Card from "$lib/components/ui/card";
     import * as Dialog from "$lib/components/ui/dialog";
     import { Button } from "$lib/components/ui/button";
     import { Textarea } from "$lib/components/ui/textarea";
@@ -26,26 +25,26 @@
         {
             label: "Total Topics",
             icon: BookOpen,
-            color: "text-orange-500",
-            bg: "bg-orange-50",
+            color: "text-orange-600",
+            bg: "bg-orange-100",
         },
         {
             label: "Pending Review",
             icon: Clock,
-            color: "text-blue-400",
-            bg: "bg-blue-50",
+            color: "text-blue-600",
+            bg: "bg-blue-100",
         },
         {
             label: "Approved",
             icon: CheckCircle2,
-            color: "text-green-500",
-            bg: "bg-green-50",
+            color: "text-green-600",
+            bg: "bg-green-100",
         },
         {
             label: "Rejected",
             icon: XCircle,
-            color: "text-red-400",
-            bg: "bg-red-50",
+            color: "text-red-600",
+            bg: "bg-red-100",
         },
     ] as const;
 
@@ -88,132 +87,185 @@
     }
 
     const statusColors: Record<string, string> = {
-        Pending: "border-orange-400 text-orange-500 bg-orange-50",
-        Approved: "border-green-400 text-green-600 bg-green-50",
-        Rejected: "border-red-400 text-red-500 bg-red-50",
+        Pending: "border-orange-200 text-orange-600 bg-orange-50",
+        Approved: "border-green-200 text-green-700 bg-green-50",
+        Rejected: "border-red-200 text-red-600 bg-red-50",
     };
-
-    console.log("logo: ", data.topics.logoUrl);
 </script>
 
-<div class="min-h-screen bg-gray-50 p-6 pt-20 font-sans">
-    <a
-        class="mb-5 flex w-fit items-center gap-2 rounded-2xl px-2 py-1 text-xl transition-all duration-200 hover:bg-amber-200"
-        href="/app/lecturer/class/{data.classId}"
-    >
-        <ArrowLeftIcon /> Back to Dashboard
-    </a>
+<div class="min-h-screen bg-white pt-16 font-sans">
+    <!-- ── Sticky Top Bar ──────────────────────────────────────── -->
+    <div class="sticky top-0 z-10 px-6 py-3 flex items-center">
+        <Button
+            variant="ghost"
+            onclick={() => goto(`/app/lecturer/class/${data.classId}`)}
+            class="flex items-center gap-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl px-3 py-2 transition-all cursor-pointer"
+        >
+            <ArrowLeftIcon class="w-4 h-4" />
+            <span class="text-sm font-semibold">Home</span>
+        </Button>
+    </div>
 
-    <div class="mx-auto max-w-7xl space-y-6">
+    <!-- ── Main Content ────────────────────────────────────────── -->
+    <div class="px-6 py-6 space-y-6">
         <!-- Header -->
         <div>
-            <h1 class="text-3xl font-bold text-gray-900">Topic Review</h1>
+            <h1 class="text-2xl font-extrabold text-gray-900">Topic Review</h1>
             <p class="mt-1 text-sm text-gray-500">
                 Review and approve or reject student project topic submissions.
             </p>
         </div>
 
         <!-- Stats -->
-        <div class="grid grid-cols-2 gap-5 sm:grid-cols-4">
+        <div class="flex flex-wrap gap-4">
             {#each statCards as stat, i}
-                <Card.Root class="border border-gray-100 bg-white shadow-sm">
-                    <Card.Content class="flex items-center gap-4 p-3">
-                        <div class="rounded-lg p-2.5 {stat.bg}">
-                            <svelte:component
-                                this={stat.icon}
-                                class="h-8 w-8 {stat.color}"
-                            />
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-400">{stat.label}</p>
-                            <p class="text-2xl font-bold text-gray-900">
-                                {statValues[i]}
-                            </p>
-                        </div>
-                    </Card.Content>
-                </Card.Root>
+                <div
+                    class="flex flex-1 min-w-[200px] items-center gap-4 px-5 py-4 rounded-xl bg-white border border-gray-200 shadow-sm"
+                >
+                    <div
+                        class="rounded-full p-2.5 flex items-center justify-center shrink-0 {stat.bg}"
+                    >
+                        <svelte:component
+                            this={stat.icon}
+                            class="h-5 w-5 {stat.color}"
+                        />
+                    </div>
+                    <div>
+                        <p
+                            class="text-xs text-gray-400 font-semibold uppercase tracking-wide"
+                        >
+                            {stat.label}
+                        </p>
+                        <p class="text-xl font-bold text-gray-900">
+                            {statValues[i]}
+                        </p>
+                    </div>
+                </div>
             {/each}
         </div>
 
-        <!-- Topic Cards -->
+        <!-- Topic Cards Grid -->
         {#if topics.length === 0}
-            <div class="py-20 text-center text-gray-400">No topics found.</div>
+            <div
+                class="col-span-full flex flex-col items-center justify-center py-24 text-gray-400 gap-3"
+            >
+                <BookOpen class="w-14 h-14 text-gray-300" />
+                <p class="text-lg font-semibold text-gray-500">
+                    No topics found
+                </p>
+                <p class="text-sm text-gray-400">
+                    There are no topics pending review.
+                </p>
+            </div>
         {:else}
-            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <!-- Lưới tự động mở rộng theo màn hình -->
+            <div
+                class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+            >
                 {#each topics as topic (topic.topicId)}
-                    <Card.Root
-                        class="group flex flex-col justify-between border border-gray-100 bg-white p-0 shadow-sm transition-all hover:border-orange-400 hover:shadow-md"
+                    <div
+                        class="group flex flex-col justify-between rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:border-orange-300 hover:shadow-md overflow-hidden"
                     >
-                        <Card.Content class="flex flex-col gap-3 p-5">
-                            <!-- Logo -->
-                            {#if topic.logoUrl}
-                                <img
-                                    src={topic.logoUrl}
-                                    alt="Project logo"
-                                    class="h-12 w-12 rounded-lg object-cover border border-zinc-200"
-                                />
-                            {/if}
-
-                            <div class="flex items-start justify-between gap-2">
-                                <h3
-                                    class="text-[18px] font-bold leading-snug text-gray-900 transition-colors group-hover:text-orange-500"
-                                >
-                                    {topic.title}
-                                </h3>
-                                <span
-                                    class="shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium {statusColors[
-                                        topic.status
-                                    ] ?? 'bg-gray-100 text-gray-500'}"
-                                >
-                                    {topic.status}
-                                </span>
+                        <!-- Card Body -->
+                        <div class="flex flex-col gap-3 p-5">
+                            <!-- Logo & Title -->
+                            <div class="flex items-start gap-3">
+                                {#if topic.logoUrl}
+                                    <img
+                                        src={topic.logoUrl}
+                                        alt="Project logo"
+                                        class="h-12 w-12 shrink-0 rounded-lg object-cover border border-gray-200"
+                                        onerror={(e) =>
+                                            ((
+                                                e.currentTarget as HTMLImageElement
+                                            ).style.display = "none")}
+                                    />
+                                {/if}
+                                <div class="flex-1 min-w-0">
+                                    <div
+                                        class="flex items-start justify-between gap-2"
+                                    >
+                                        <h3
+                                            class="text-base font-bold leading-tight text-gray-900 transition-colors group-hover:text-orange-600 line-clamp-2"
+                                        >
+                                            {topic.title}
+                                        </h3>
+                                        <span
+                                            class="shrink-0 rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide {statusColors[
+                                                topic.status
+                                            ] ??
+                                                'border-gray-200 bg-gray-50 text-gray-500'}"
+                                        >
+                                            {topic.status}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div
-                                class="flex items-center gap-1.5 text-sm text-gray-500"
-                            >
-                                <Layers class="h-4 w-4 shrink-0" />
-                                <span class="font-semibold text-gray-700"
-                                    >{topic.group?.classCode}</span
+                            <!-- Meta -->
+                            <div class="flex flex-col gap-1.5 mt-2">
+                                <div
+                                    class="flex items-center gap-2 text-sm text-gray-600"
                                 >
-                                <span
-                                    class="block h-1 w-1 rounded-full bg-gray-700"
-                                ></span>
-                                <span class="truncate"
-                                    >{topic.group?.groupName}</span
-                                >
-                            </div>
+                                    <Layers
+                                        class="h-4 w-4 shrink-0 text-orange-500"
+                                    />
+                                    <span class="font-semibold text-gray-800"
+                                        >{topic.group?.classCode}</span
+                                    >
+                                    <span
+                                        class="block h-1 w-1 rounded-full bg-gray-300 shrink-0"
+                                    ></span>
+                                    <span class="truncate"
+                                        >{topic.group?.groupName}</span
+                                    >
+                                </div>
 
-                            <div
-                                class="flex items-center gap-1.5 text-sm text-gray-500"
-                            >
-                                <Users class="h-4 w-4 shrink-0" />
-                                <span>{topic.group?.memberCount} Members</span>
+                                <div
+                                    class="flex items-center gap-2 text-sm text-gray-600"
+                                >
+                                    <Users
+                                        class="h-4 w-4 shrink-0 text-gray-400"
+                                    />
+                                    <span
+                                        >{topic.group?.memberCount} Members</span
+                                    >
+                                </div>
                             </div>
 
                             {#if topic.description}
-                                <p class="line-clamp-2 text-sm text-gray-400">
+                                <p
+                                    class="line-clamp-2 text-sm text-gray-500 mt-1"
+                                >
                                     {topic.description}
                                 </p>
                             {/if}
-                        </Card.Content>
+                        </div>
 
+                        <!-- Card Footer -->
                         <div
-                            class="flex items-center justify-between gap-2 border-t border-gray-100 bg-stone-100 px-5 py-3"
+                            class="flex flex-col gap-3 border-t border-gray-100 bg-gray-50 px-5 py-4"
                         >
-                            <span class="text-xs text-gray-400">
-                                <span class="font-semibold text-gray-600"
-                                    >{topic.submittedBy?.fullName}</span
+                            <!-- Submitter Info -->
+                            <div
+                                class="flex items-center justify-between gap-2 text-xs text-gray-500"
+                            >
+                                <div class="truncate">
+                                    <span class="font-semibold text-gray-700"
+                                        >{topic.submittedBy?.fullName}</span
+                                    >
+                                    ({topic.submittedBy?.studentCode})
+                                </div>
+                                <span class="shrink-0 text-gray-400"
+                                    >{formatDate(topic.submittedAt)}</span
                                 >
-                                ({topic.submittedBy?.studentCode})
-                                <br />{formatDate(topic.submittedAt)}
-                            </span>
+                            </div>
 
-                            <div class="flex shrink-0 items-center gap-1.5">
-                                <!-- View Detail -->
+                            <!-- Action Buttons -->
+                            <div class="flex items-center gap-2">
                                 <Button
                                     variant="outline"
-                                    class="h-8 cursor-pointer gap-1 border-zinc-300 px-2.5 text-xs text-zinc-500 hover:bg-zinc-50"
+                                    class="flex-1 h-8 cursor-pointer gap-1.5 border-gray-300 px-2.5 text-xs text-gray-600 hover:bg-white hover:text-gray-900 bg-white"
                                     onclick={() =>
                                         goto(
                                             `/app/lecturer/class/${data.classId}/topic-registration/${topic.topicId}`,
@@ -223,11 +275,10 @@
                                     Detail
                                 </Button>
 
-                                <!-- Approve -->
                                 {#if topic.status !== "Approved"}
                                     <Button
                                         variant="outline"
-                                        class="h-8 cursor-pointer gap-1 border-green-300 px-2.5 text-xs text-green-600 hover:bg-green-50"
+                                        class="flex-1 h-8 cursor-pointer gap-1.5 border-green-200 px-2.5 text-xs text-green-700 hover:bg-green-50 hover:border-green-300 bg-white"
                                         onclick={() =>
                                             openReviewDialog(
                                                 topic.topicId,
@@ -239,11 +290,10 @@
                                     </Button>
                                 {/if}
 
-                                <!-- Reject -->
                                 {#if topic.status !== "Rejected"}
                                     <Button
                                         variant="outline"
-                                        class="h-8 cursor-pointer gap-1 border-red-300 px-2.5 text-xs text-red-500 hover:bg-red-50"
+                                        class="flex-1 h-8 cursor-pointer gap-1.5 border-red-200 px-2.5 text-xs text-red-600 hover:bg-red-50 hover:border-red-300 bg-white"
                                         onclick={() =>
                                             openReviewDialog(
                                                 topic.topicId,
@@ -256,7 +306,7 @@
                                 {/if}
                             </div>
                         </div>
-                    </Card.Root>
+                    </div>
                 {/each}
             </div>
         {/if}
@@ -265,18 +315,18 @@
 
 <!-- Review Dialog -->
 <Dialog.Root bind:open={dialogOpen}>
-    <Dialog.Content class="sm:max-w-md">
+    <Dialog.Content class="sm:max-w-md bg-white">
         <Dialog.Header>
             <Dialog.Title class="flex items-center gap-2">
                 {#if reviewAction === "Approved"}
-                    <ThumbsUp class="h-5 w-5 text-green-500" />
-                    <span>Approve Topic</span>
+                    <ThumbsUp class="h-5 w-5 text-green-600" />
+                    <span class="text-gray-900">Approve Topic</span>
                 {:else}
-                    <ThumbsDown class="h-5 w-5 text-red-500" />
-                    <span>Reject Topic</span>
+                    <ThumbsDown class="h-5 w-5 text-red-600" />
+                    <span class="text-gray-900">Reject Topic</span>
                 {/if}
             </Dialog.Title>
-            <Dialog.Description>
+            <Dialog.Description class="text-gray-500">
                 {#if reviewAction === "Approved"}
                     You are about to approve this topic. You may leave optional
                     feedback for the student.
@@ -317,19 +367,19 @@
                     }
                 };
             }}
-            class="flex flex-col gap-4 pt-1"
+            class="flex flex-col gap-4 pt-2"
         >
             <input type="hidden" name="topicId" value={selectedTopicId} />
             <input type="hidden" name="status" value={reviewAction} />
 
-            <div class="flex flex-col gap-1.5">
+            <div class="flex flex-col gap-2">
                 <Label
                     for="reviewFeedback"
-                    class="text-sm font-medium text-zinc-900"
+                    class="text-sm font-medium text-gray-900"
                 >
                     Feedback
                     {#if reviewAction === "Approved"}
-                        <span class="ml-1 font-normal text-zinc-400"
+                        <span class="ml-1 font-normal text-gray-400"
                             >(Optional)</span
                         >
                     {/if}
@@ -342,21 +392,21 @@
                         ? "Any comments for the student..."
                         : "Explain why this topic is being rejected..."}
                     required={reviewAction === "Rejected"}
-                    class="min-h-[100px] resize-y border-zinc-200 focus-visible:ring-orange-500"
+                    class="min-h-[100px] resize-y border-gray-200 focus-visible:ring-orange-500 bg-white"
                 />
                 {#if reviewAction === "Rejected"}
-                    <p class="text-xs text-zinc-400">
-                        Feedback is required when rejecting a topic.
+                    <p class="text-xs text-red-500">
+                        * Feedback is required when rejecting a topic.
                     </p>
                 {/if}
             </div>
 
-            <Dialog.Footer class="gap-2 sm:gap-2">
+            <Dialog.Footer class="gap-2 sm:gap-2 mt-2">
                 <Dialog.Close>
                     <Button
                         type="button"
                         variant="outline"
-                        class="border-zinc-200 text-zinc-700 hover:bg-zinc-100"
+                        class="border-gray-200 text-gray-700 hover:bg-gray-50 cursor-pointer"
                     >
                         Cancel
                     </Button>
@@ -365,7 +415,7 @@
                 {#if reviewAction === "Approved"}
                     <Button
                         type="submit"
-                        class="bg-green-600 text-white hover:bg-green-700"
+                        class="bg-green-600 text-white hover:bg-green-700 cursor-pointer shadow-sm"
                     >
                         <ThumbsUp class="mr-1.5 h-4 w-4" />
                         Confirm Approve
@@ -373,7 +423,7 @@
                 {:else}
                     <Button
                         type="submit"
-                        class="bg-red-500 text-white hover:bg-red-600"
+                        class="bg-red-600 text-white hover:bg-red-700 cursor-pointer shadow-sm"
                     >
                         <ThumbsDown class="mr-1.5 h-4 w-4" />
                         Confirm Reject

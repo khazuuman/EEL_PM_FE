@@ -1,7 +1,7 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { fetcher } from "../fetcher";
 import { safeJsonParse } from "$lib/utils";
-import type { CreateTopic, ReviewTopic, UpdateTopic } from "$lib/types/topics";
+import type { ChangeTopic, CreateTopic, ReviewTopic, UpdateTopic } from "$lib/types/topics";
 
 export const getTopicByClass = async (event: RequestEvent, classId: any) => {
     const { url } = event;
@@ -12,6 +12,16 @@ export const getTopicByClass = async (event: RequestEvent, classId: any) => {
         data: data
     };
 };
+
+export const getPendingTopicByClassId = async (event: RequestEvent, classId: any) => {
+    const response = await fetcher({ event, url: `/project-topics/${classId}/pending` });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 
 export const getTopicById = async (event: RequestEvent, topicId: any) => {
     const response = await fetcher({ event, url: `/project-topics/${topicId}` });
@@ -47,6 +57,15 @@ export const getTopicByGroupId = async (event: RequestEvent, groupId: any) => {
 
 export const getCurrentTopicByGroupId = async (event: RequestEvent, groupId: any) => {
     const response = await fetcher({ event, url: `/project-topics/group/${groupId}?isCurrentVersion=true` });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+export const getCurrentChangeTopicByGroupId = async (event: RequestEvent, groupId: any) => {
+    const response = await fetcher({ event, url: `/project-topics/group/${groupId}?isChangeRequest=true` });
     const data = await safeJsonParse(response);
     return {
         status: response.status,
@@ -110,7 +129,7 @@ export const uploadLogo = async (event: RequestEvent, body: any) => {
     };
 };
 
-export const changeTopic = async (event: RequestEvent, groupId: any, body: UpdateTopic) => {
+export const changeTopic = async (event: RequestEvent, groupId: any, body: ChangeTopic) => {
     const response = await fetcher({
         event,
         url: `/project-topics/${groupId}/change-request`,

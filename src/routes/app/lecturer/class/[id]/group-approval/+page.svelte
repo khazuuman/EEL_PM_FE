@@ -129,7 +129,7 @@
 {#snippet overviewCard(o: (typeof overviewData)[number])}
     {@const Icon = o.icon}
     <div
-        class="flex w-fit px-8 py-4 rounded-4xl bg-white gap-4 justify-center items-center"
+        class="flex w-fit px-8 py-4 rounded-4xl  gap-4 justify-center items-center border border-amber-500 bg-amber-50"
     >
         <span
             class="bg-amber-100 rounded-full p-2 w-10 h-10 flex justify-center items-center"
@@ -144,7 +144,7 @@
         </span>
     </div>
 {/snippet}
-<div class="px-5 pt-20">
+<div class="px-5 pt-20 min-h-screen bg-white">
     <div class="w-full flex items-center">
         <Button
             variant="ghost"
@@ -155,7 +155,7 @@
             <span class="text-base font-semibold">Home</span>
         </Button>
     </div>
-    <div class="p-10 bg-stone-100 w-full h-full">
+    <div class="p-10 w-full h-full">
         <h1 class="text-3xl font-extrabold mb-2">Groups</h1>
         <div class="flex flex-col lg:flex-row justify-between items-center">
             <p class="text-[16px] text-stone-500">
@@ -194,7 +194,7 @@
                 </div>
             {:else}
                 {#each groups as group}
-                    <div class="card rounded-md p-4 bg-white">
+                    <div class="card rounded-md p-4 bg-amber-50 border border-amber-600">
                         <span
                             class="w-full flex justify-between font-bold text-xl items-center mb-3"
                             >{group.name}

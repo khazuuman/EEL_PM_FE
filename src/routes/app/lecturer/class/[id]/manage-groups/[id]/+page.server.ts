@@ -2,6 +2,7 @@ import { deleteGroup, getGroupDetail } from "$lib/server/groups";
 import type { Actions } from "@sveltejs/kit";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
+import { getStudentDetail } from "$lib/server/students";
 
 export const load: PageServerLoad = async (event) => {
     const { params } = event;
@@ -32,5 +33,17 @@ export const actions: Actions = {
         console.log("url: ", event.url.pathname.replace(`/${id}`, ""));
 
         redirect(303, event.url.pathname.replace(`/${id}`, ""));
+    },
+    getStudentDetail: async (event) => {
+        const formData = await event.request.formData();
+        const stuId = formData.get("stuId");
+        const studentRes: any = await getStudentDetail(event, stuId);
+        console.log("studentRes: ", studentRes?.data?.data);
+        if (!studentRes || studentRes.status != 200) {
+            return fail(404, "Not found student");
+        }
+        return {
+            students: studentRes?.data?.data
+        };
     },
 };

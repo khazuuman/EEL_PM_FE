@@ -1,4 +1,4 @@
-import { getTopicByClass, reviewTopic } from "$lib/server/topics";
+import { getPendingTopicByClassId, reviewTopic } from "$lib/server/topics";
 import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import type { ReviewTopic } from "$lib/types/topics";
@@ -8,10 +8,10 @@ export const load: PageServerLoad = async (event) => {
     const { classDetails } = await parent();
 
     if (!url.searchParams.has("status")) url.searchParams.set("status", "Pending");
-    const getTopicByClassRes = await getTopicByClass(event, classDetails.classId);
-    console.log('getTopicByClassRes: ', getTopicByClassRes?.data?.data?.data);
+    const getTopicByClassRes = await getPendingTopicByClassId(event, classDetails.classId);
+    console.log('getTopicByClassRes: ', getTopicByClassRes?.data?.data);
     return {
-        topics: getTopicByClassRes?.data?.data?.data ?? [],
+        topics: getTopicByClassRes?.data?.data ?? [],
         classId: classDetails.classId,
     };
 };
