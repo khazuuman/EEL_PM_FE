@@ -83,7 +83,7 @@
     }
 </script>
 
-<div class="min-h-screen bg-white pt-16 font-sans">
+<div class="min-h-screen bg-white pt-5 font-sans">
     <!-- ── Sticky Top Bar ───────────────────────────────────────── -->
     <div
         class="sticky top-0 z-10 flex items-center justify-between gap-3 px-6 py-3 backdrop-blur-sm"
@@ -94,7 +94,7 @@
             class="flex items-center gap-2 rounded-xl px-3 py-2 text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
         >
             <ArrowLeftIcon class="h-4 w-4" />
-            <span class="text-sm font-semibold">Home</span>
+            <span class="text-sm font-semibold">Back to Home</span>
         </Button>
     </div>
 

@@ -29,10 +29,10 @@
     }
 </script>
 
-<div class="min-h-screen bg-white pt-20">
+<div class="min-h-screen bg-white pt-10">
     <!-- Top Bar -->
     <div
-        class="sticky top-0 z-10 border-b border-zinc-100 bg-white/95 backdrop-blur-sm px-6"
+        class="sticky top-0 z-10 backdrop-blur-sm px-6"
     >
         <button
             type="button"
@@ -40,7 +40,7 @@
             class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 transition cursor-pointer"
         >
             <ArrowLeftIcon class="h-4 w-4" />
-            Home
+            Back to Home
         </button>
     </div>
 

@@ -38,7 +38,7 @@
 </script>
 
 <!-- Giao diện full-screen với nền trắng hoàn toàn (bg-white) -->
-<div class="min-h-screen w-full bg-white relative flex flex-col pt-20">
+<div class="min-h-screen w-full bg-white relative flex flex-col">
     <!-- Top Header: Back Button -->
     <div class="w-full pt-6 lg:pt-10 px-6 lg:px-12 xl:px-16 flex items-center">
         <Button
@@ -47,7 +47,7 @@
             class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl px-4 py-6 transition-all cursor-pointer"
         >
             <ArrowLeft class="w-5 h-5" />
-            <span class="text-base font-semibold">Back to Class</span>
+            <span class="text-base font-semibold">Back to Students</span>
         </Button>
     </div>
 

@@ -7,15 +7,13 @@
     import ChatWidget from "$lib/components/chat/ChatWidget.svelte";
     import { page } from "$app/stores";
     import * as Tooltip from "$lib/components/ui/tooltip/index";
+    import { setHeaderCtx } from "$lib/contexts/header.context.svelte";
 
     let { data, children } = $props<{ data: LayoutData; children: any }>();
 
     const user = $page.data.user;
     const token = $page.data.accessToken;
-
-    let mobileMenuOpen = $state(false);
-
-    console.log("user: ", user);
+    const headerCtx = setHeaderCtx();
 </script>
 
 <header
@@ -46,14 +44,24 @@
         </button>
     </div>
 
-    <!-- Center: Class Code (desktop only) -->
-    {#if data.user.student?.classCode}
+    {#if headerCtx.subtitle}
         <div
             class="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200"
         >
             <span class="w-2 h-2 rounded-full bg-amber-400"></span>
             <span
-                class="text-md font-semibold text-amber-700 tracking-wide uppercase"
+                class="text-sm font-semibold text-amber-700 tracking-wide uppercase"
+            >
+                {headerCtx.subtitle}
+            </span>
+        </div>
+    {:else if data.user.student?.classCode}
+        <div
+            class="hidden md:flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200"
+        >
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <span
+                class="text-sm font-semibold text-amber-700 tracking-wide uppercase"
             >
                 {data.user.student.classCode}
             </span>
@@ -92,7 +100,7 @@
         {@render children()}
     </div>
     {#if user}
-        {#if user?.roles.includes("Student")}
+        {#if user?.roles.includes("Student") && user?.student?.group !== null}
             <ChatWidget
                 groupId={user.student.group.groupId}
                 {token}

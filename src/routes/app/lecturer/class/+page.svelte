@@ -4,10 +4,8 @@
         ArrowRightIcon,
         BookUserIcon,
         CalendarIcon,
-        GraduationCapIcon,
         MapPinIcon,
         SearchIcon,
-        UserIcon,
     } from "lucide-svelte";
     import SemesterDropDown from "./components/SemesterDropDown.svelte";
     import Badge from "$lib/components/ui/badge/badge.svelte";
@@ -21,7 +19,6 @@
     let { data } = $props<{ data: PageData }>();
     let searchQuery = $state(page.url.searchParams.get("search") ?? "");
 
-    //Dữ liệu từ server
     const semesters = $derived(data.semesters as Semester[]);
     const classes = $derived(data.classes as ClassDetail[]);
     let selectedSemesterId = $state(
@@ -35,95 +32,144 @@
         debounceTimer = setTimeout(() => {
             const params = new URLSearchParams();
             if (searchQuery) params.set("searchNameAndCode", searchQuery);
-            if (selectedSemesterId)
-                params.set("semesterId", selectedSemesterId);
-
+            if (selectedSemesterId) params.set("semesterId", selectedSemesterId);
             goto(`?${params.toString()}`, {
-                replaceState: true, // không tạo history entry mới mỗi lần gõ
+                replaceState: true,
                 keepFocus: true,
                 noScroll: true,
             });
         }, 300);
     }
 
-    // Tự động update URL khi state thay đổi
     $effect(() => {
         searchQuery;
         selectedSemesterId;
         updateURL();
     });
+
+    const statusConfig: Record<string, { class: string; dot: string }> = {
+        Active:    { class: "bg-emerald-50 text-emerald-600 border border-emerald-200", dot: "bg-emerald-400" },
+        Inactive:  { class: "bg-stone-100 text-stone-500 border border-stone-200",      dot: "bg-stone-400" },
+        Pending:   { class: "bg-amber-50 text-amber-600 border border-amber-200",        dot: "bg-amber-400" },
+        Completed: { class: "bg-blue-50 text-blue-600 border border-blue-200",           dot: "bg-blue-400" },
+    };
 </script>
 
-<div class="flex flex-col h-screen pt-10">
-    <main
-        class="h-full w-screen justify-center items-center bg-stone-100 py-10 px-20 overflow-x-hidden"
-    >
-        <h1 class="text-3xl font-extrabold mb-2">My Classes</h1>
-        <div class="flex flex-col lg:flex-row justify-between">
-            <p class="text-xl text-stone-500 mb-3">
-                Select one class to manage student and grade.
-            </p>
-            <div class="flex flex-col lg:flex-row gap-4">
-                <div class="relative w-70">
+<div class="min-h-screen bg-white">
+    <main class="px-6 sm:px-10 lg:px-16 py-10">
+
+        <!-- Page Header -->
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
+            <div>
+                <p class="text-xs font-bold text-amber-500 uppercase tracking-widest mb-1">Lecturer Portal</p>
+                <h1 class="text-3xl font-extrabold text-stone-900 leading-tight">My Classes</h1>
+                <p class="text-base text-stone-400 mt-1">Select a class to manage students and grades</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-col sm:flex-row gap-3">
+                <div class="relative">
+                    <SearchIcon class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
                     <Input
                         id="search"
                         placeholder="Search class code or name..."
-                        class="ps-8"
+                        class="pl-9 w-full sm:w-72 bg-stone-50 border-stone-200 focus:bg-white focus:border-amber-400 transition-colors text-sm rounded-lg"
                         bind:value={searchQuery}
-                    />
-                    <SearchIcon
-                        class="pointer-events-none absolute start-2 top-1/2 size-4 -translate-y-1/2 opacity-50 select-none"
                     />
                 </div>
                 <SemesterDropDown {semesters} bind:selectedSemesterId />
             </div>
         </div>
-        <div class="pt-10 grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {#each classes as classCard}
-                <div
-                    class="classCard p-4 border border-stone-300 rounded-md bg-white"
-                >
-                    <span
-                        class="flex justify-between items-center font-bold text-xl mb-4"
-                        >{classCard.className}<Badge
-                            class="px-3 py-1 bg-green-100 text-green-600"
-                            >{classCard.status}</Badge
-                        ></span
-                    >
-                    <div class="flex flex-col gap-2">
-                        <span class="flex items-center gap-2 text-stone-600"
-                            ><BookUserIcon
-                                class="w-5 h-5 text-amber-600"
-                            />Class Code: {classCard.classCode}</span
-                        >
-                        <!-- <span class="flex items-center gap-2 text-stone-600"
-                            ><CodepenIcon
-                                class="w-5 h-5 text-amber-600"
-                            />Number of Students: {classCard.currentStudentCount}</span
-                        > -->
-                        <span class="flex items-center gap-2 text-stone-600"
-                            ><CalendarIcon
-                                class="w-5 h-5 text-amber-600"
-                            />{classCard.semesterName}</span
-                        >
-                        <span class="flex items-center gap-2 text-stone-600"
-                            ><MapPinIcon
-                                class="w-5 h-5 text-amber-600"
-                            />{classCard.campusName}</span
-                        >
-                    </div>
-                    <Separator class="my-4" />
-                    <div class="flex justify-end">
-                        <a
-                            class="text-amber-600 text-[17px] flex items-center gap-2"
-                            href="/app/lecturer/class/{classCard.classId}"
-                            >Manage Class <ArrowRightIcon
-                                class="text-amber-600"
-                            /></a
-                        >
-                    </div>
-                </div>
-            {/each}
+
+        <!-- Stats bar -->
+        <div class="flex items-center gap-3 mb-8">
+            <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-50 border border-stone-100">
+                <span class="text-sm text-stone-400 font-medium">Total</span>
+                <span class="text-base font-extrabold text-stone-800">{classes.length}</span>
+                <span class="text-sm text-stone-400">classes</span>
+            </div>
         </div>
+
+        <!-- Class Grid -->
+        {#if classes.length === 0}
+            <div class="flex flex-col items-center justify-center py-24 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-stone-50 border border-stone-100 flex items-center justify-center mb-4">
+                    <BookUserIcon class="w-6 h-6 text-stone-300" />
+                </div>
+                <p class="text-lg font-semibold text-stone-400">No classes found</p>
+                <p class="text-sm text-stone-300 mt-1">Try adjusting your search or semester filter</p>
+            </div>
+        {:else}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {#each classes as classCard}
+                    {@const cfg = statusConfig[classCard.status] ?? { class: "bg-stone-100 text-stone-500 border border-stone-200", dot: "bg-stone-400" }}
+                    <div class="group relative flex flex-col bg-white border border-stone-200 rounded-2xl overflow-hidden hover:border-amber-300 hover:shadow-lg transition-all duration-200">
+
+                        <div class="h-0.5 w-full bg-gradient-to-r from-amber-400 to-amber-300 opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
+
+                        <div class="p-6 flex flex-col flex-1">
+                            <!-- Header -->
+                            <div class="flex items-start justify-between gap-3 mb-6">
+                                <h3 class="font-bold text-stone-900 text-lg leading-snug line-clamp-2 flex-1">
+                                    {classCard.className}
+                                </h3>
+                                <span class="inline-flex items-center gap-1.5 shrink-0 px-3 py-1 rounded-full text-xs font-semibold {cfg.class}">
+                                    <span class="w-1.5 h-1.5 rounded-full {cfg.dot}"></span>
+                                    {classCard.status}
+                                </span>
+                            </div>
+
+                            <!-- Info rows -->
+                            <div class="flex flex-col gap-3 flex-1">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                                        <BookUserIcon class="w-4 h-4 text-amber-500" />
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-stone-400 leading-none mb-0.5">Class Code</p>
+                                        <p class="text-base font-semibold text-stone-700">{classCard.classCode}</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                                        <CalendarIcon class="w-4 h-4 text-amber-500" />
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-stone-400 leading-none mb-0.5">Semester</p>
+                                        <p class="text-base font-semibold text-stone-700">{classCard.semesterName}</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0">
+                                        <MapPinIcon class="w-4 h-4 text-amber-500" />
+                                    </div>
+                                    <div>
+                                        <p class="text-xs text-stone-400 leading-none mb-0.5">Campus</p>
+                                        <p class="text-base font-semibold text-stone-700">{classCard.campusName}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Footer -->
+                            <div class="mt-6 pt-4 border-t border-stone-100">
+                                <a
+                                    href="/app/lecturer/class/{classCard.classId}"
+                                    class="flex items-center justify-between w-full group/link"
+                                >
+                                    <span class="text-base font-semibold text-amber-500 group-hover/link:text-amber-600 transition-colors">
+                                        Manage Class
+                                    </span>
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 group-hover/link:bg-amber-100 transition-colors">
+                                        <ArrowRightIcon class="w-4 h-4 text-amber-500 group-hover/link:translate-x-0.5 transition-transform duration-150" />
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {/each}
+            </div>
+        {/if}
     </main>
 </div>

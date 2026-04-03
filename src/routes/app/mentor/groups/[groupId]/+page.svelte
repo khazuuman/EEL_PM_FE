@@ -10,69 +10,46 @@
     let { data } = $props<{ data: PageData }>();
     const classId = data.classDetails?.classId;
 
-    const lecturerGroupManage: NavigationGroup = {
-        groupLabel: "Student Group",
+    const mentorGroupNav: NavigationGroup = {
+        groupLabel: "Group",
         items: [
             {
-                name: "Manage Group",
-                url: `/app/lecturer/class/${classId}/manage-groups`,
-            },
-            {
-                name: "Group Approval",
-                url: `/app/lecturer/class/${classId}/group-approval`,
+                name: "Manage Meeting Schedule",
+                url: "/app/mentor/manage-schedule",
             },
         ],
     };
-    const lecturerStudentManage: NavigationGroup = {
-        groupLabel: "Student Management",
+
+    const mentorProjectNav: NavigationGroup = {
+        groupLabel: "Project",
         items: [
+            { name: "View Group Project", url: "/app/mentor/group-project" },
             {
-                name: "View Student List",
-                url: `/app/lecturer/class/${classId}/student-list`,
+                name: "View Project Documents",
+                url: "/app/mentor/project-documents",
             },
         ],
     };
-    const lecturerProjectManage: NavigationGroup = {
-        groupLabel: "Student Project",
+
+    const mentorAssignmentNav: NavigationGroup = {
+        groupLabel: "Assignment / Checkpoint",
         items: [
             {
-                name: "View Topic List",
-                url: `/app/lecturer/class/${classId}/topic-list`,
-            },
-            {
-                name: "Review Group Topic Registration",
-                url: `/app/lecturer/class/${classId}/topic-registration`,
-            },
-            {
-                name: "View project documents",
-                url: `/app/lecturer/class/${classId}/project-documents`,
-            },
-        ],
-    };
-    const lecturerAssignmentManage: NavigationGroup = {
-        groupLabel: "Assignment / Checkpoint Management",
-        items: [
-            {
-                name: "Checkpoints Management",
-                url: `/app/lecturer/class/${classId}/checkpoints-management`,
-            },
-            {
-                name: "Assignment Management",
-                url: `/app/lecturer/class/${classId}/assignments-management`,
+                name: "View Checkpoint/Assignment",
+                url: "/app/mentor/assignment-checkpoint",
             },
         ],
     };
     let finalNavGroups = [] as NavigationGroup[];
-    finalNavGroups.push(lecturerStudentManage);
-    finalNavGroups.push(lecturerGroupManage);
-    finalNavGroups.push(lecturerProjectManage);
-    finalNavGroups.push(lecturerAssignmentManage);
+    finalNavGroups.push(mentorGroupNav);
+    finalNavGroups.push(mentorProjectNav);
+    finalNavGroups.push(mentorAssignmentNav);
 
     const headerCtx = getHeaderCtx();
 
     // Set subtitle khi vào trang
     $effect(() => {
-        headerCtx.setSubtitle(data.classDetails?.classCode ?? null);
+        headerCtx.setSubtitle(data.groupDetails.groupName ?? null);
     });
 
     // Xóa khi rời trang
@@ -84,15 +61,15 @@
 <div class="w-full flex items-center pt-5 pl-10">
     <Button
         variant="ghost"
-        onclick={() => goto(`/app/lecturer/class`)}
+        onclick={() => goto(`/app/mentor/groups`)}
         class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl px-4 py-6 transition-all cursor-pointer"
     >
         <ArrowLeftIcon class="w-5 h-5" />
-        <span class="text-base font-semibold">Classes</span>
+        <span class="text-base font-semibold">Groups</span>
     </Button>
 </div>
 <h1 class="w-full text-center pt-10 text-3xl font-bold text-amber-900">
-    Lecturer Home Page
+    Mentor Home Page
 </h1>
 
 <div class="w-full p-20 flex flex-col gap-10">

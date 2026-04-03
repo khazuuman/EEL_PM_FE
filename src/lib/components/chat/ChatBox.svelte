@@ -144,7 +144,7 @@
                         class:bg-muted-foreground={!chatState.isConnected}
                     ></span>
                     <Card.Title class="text-sm font-semibold"
-                        >Nhóm chat</Card.Title
+                        >Group Chat</Card.Title
                     >
                 </div>
 

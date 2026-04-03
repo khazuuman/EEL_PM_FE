@@ -6,6 +6,7 @@
         FolderClockIcon,
         GroupIcon,
         UserRoundSearchIcon,
+        UsersIcon,
     } from "lucide-svelte";
     import { GroupStatusTable } from "$lib/enums/group.js";
     import { Button } from "$lib/components/ui/button";
@@ -18,6 +19,7 @@
     const { data } = $props();
     let groups = $derived(data?.groups || []);
     let totalCount = $derived(data?.totalCount || 0);
+    console.log("totalCount group: ", totalCount);
     const cacheKeyName = "lecturer-group-management";
 
     let filters = $derived([]);
@@ -77,10 +79,10 @@
 </script>
 
 <div
-    class="bg-white w-full px-10 rounded-md pt-20 min-h-screen overflow-x-hidden pb-10 z-10 select-none"
+    class="bg-white w-full px-10 rounded-md pt-5 min-h-screen overflow-x-hidden pb-10 z-10 select-none"
 >
 <!-- Top Header: Back Button -->
-    <div class="w-full flex items-center mb-8">
+    <div class="w-full flex items-center mb-5">
         <Button
             variant="ghost"
             onclick={() => goto(`/app/lecturer/class/${data?.classId}`)}
@@ -90,6 +92,37 @@
             <span class="text-base font-semibold">Back to Class</span>
         </Button>
     </div>
+    <!-- Page Title -->
+	<div class="flex items-center justify-between mb-6 mt-2 px-1">
+		<div class="flex items-center gap-3">
+			<div
+				class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0"
+			>
+				<UsersIcon class="w-5 h-5 text-amber-500" />
+			</div>
+			<div>
+				<p
+					class="text-[11px] font-semibold text-amber-500 uppercase tracking-widest leading-none mb-0.5"
+				>
+					Management
+				</p>
+				<h1
+					class="text-2xl font-extrabold text-stone-900 leading-tight"
+				>
+					Group List
+				</h1>
+			</div>
+		</div>
+		<div
+			class="hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-50 border border-stone-100"
+		>
+			<span class="text-sm text-stone-400 font-medium">Total</span>
+			<span class="text-sm font-extrabold text-stone-800"
+				>{totalCount}</span
+			>
+			<span class="text-sm text-stone-400">groups</span>
+		</div>
+	</div>
     <DataTable
         actions={['view', 'update', 'delete']}
         showAction={true}

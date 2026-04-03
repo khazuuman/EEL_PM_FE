@@ -205,16 +205,14 @@
 
 <div class="min-h-screen bg-white pt-10">
     <!-- Top Bar -->
-    <div
-        class="sticky top-0 z-10 border-b border-zinc-100 bg-white/95 backdrop-blur-sm pl-3"
-    >
+    <div class="sticky top-0 z-10 pl-3">
         <Button
             variant="ghost"
             onclick={() => history.back()}
             class="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg px-3 py-2 transition-all cursor-pointer"
         >
             <ArrowLeftIcon class="w-4 h-4" />
-            <span class="text-sm font-semibold">Home</span>
+            <span class="text-sm font-semibold">Back to Home</span>
         </Button>
     </div>
 

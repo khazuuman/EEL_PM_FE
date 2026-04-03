@@ -23,6 +23,16 @@ export const getMentors = async (event: RequestEvent) => {
     };
 };
 
+export const getMentorGroups = async (event: RequestEvent) => {
+    const { url } = event;
+    const response = await fetcher({ event, url: `/mentors/me/group&${url.searchParams.toString()}` });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const getMentorDetails = async (event: RequestEvent, mentorId: any) => {
     const response = await fetcher({ event, url: `/mentors/${mentorId}` });
     const data = await safeJsonParse(response);

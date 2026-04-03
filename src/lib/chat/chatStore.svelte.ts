@@ -1,5 +1,5 @@
 import type { HubConnection } from "@microsoft/signalr";
-import { createConnection } from "./signalR";
+import { createConnection, setToken } from "./signalR";
 
 interface Message {
     messageId: string;
@@ -55,14 +55,79 @@ export function setCurrentUser(userId: string, userName: string, avatarUrl = '')
 
 let hub: HubConnection | null = null;
 
+// export async function joinGroup(groupId: string, token: string) {
+//     // ✅ Nếu đã có hub cũ → stop trước khi tạo mới, tránh duplicate
+//     if (hub) {
+//         hub.off('ReceiveMessage'); // gỡ listener cũ
+//         await hub.stop();
+//         hub = null;
+//     }
+//     hub = createConnection(token);
+
+//     hub.onreconnecting((err) => {
+//         console.warn('🟡 SignalR: Đang reconnect...', err);
+//         chatState.isConnected = false;
+//     });
+
+//     hub.onreconnected((connectionId) => {
+//         console.log('🟢 SignalR: Reconnected! connectionId =', connectionId);
+//         chatState.isConnected = true;
+//     });
+
+//     hub.onclose((err) => {
+//         console.error('🔴 SignalR: Kết nối đóng', err);
+//         chatState.isConnected = false;
+//     });
+
+//     hub.on('ReceiveMessage', (message: Message) => {
+//         console.log('📨 ReceiveMessage:', message);
+
+//         // ✅ Tránh duplicate message (nếu server echo lại tin của mình)
+//         const exists = chatState.messages.some(m => m.messageId === message.messageId);
+//         if (!exists) {
+//             chatState.messages = [...chatState.messages, message];
+//             onNewMessage?.();
+//         }
+//     });
+
+//     console.log('⏳ SignalR: Đang kết nối...');
+//     try {
+//         await hub.start();
+//         console.log('✅ SignalR: Kết nối thành công! State:', hub.state, '| ID:', hub.connectionId);
+//         chatState.isConnected = true;
+//     } catch (err) {
+//         console.error('❌ SignalR: Kết nối thất bại!', err);
+//         chatState.isConnected = false;
+//         return;
+//     }
+
+//     console.log(`🚪 SignalR: Joining group "${groupId}"...`);
+//     await hub.invoke('JoinGroup', groupId);
+//     console.log(`✅ SignalR: Đã join group "${groupId}"`);
+
+//     await Promise.all([
+//         loadHistory(groupId),
+//         loadMembers(groupId)
+//     ]);
+// }
+
 export async function joinGroup(groupId: string, token: string) {
-    // ✅ Nếu đã có hub cũ → stop trước khi tạo mới, tránh duplicate
+    console.log('🔵 joinGroup called | groupId:', groupId, '| type:', typeof groupId, '| token len:', token?.length);
+    setToken(token);
     if (hub) {
-        hub.off('ReceiveMessage'); // gỡ listener cũ
-        await hub.stop();
+        console.log('🔁 Hub cũ tồn tại, state:', hub.state, '| stopping...');
+        hub.off('ReceiveMessage');
+        try {
+            await hub.stop();
+            console.log('✅ Hub cũ đã stop');
+        } catch (e) {
+            console.warn('⚠️ Stop hub cũ lỗi:', e);
+        }
         hub = null;
     }
-    hub = createConnection(token);
+
+    hub = createConnection();
+    console.log('🔨 Hub mới tạo xong');
 
     hub.onreconnecting((err) => {
         console.warn('🟡 SignalR: Đang reconnect...', err);
@@ -80,9 +145,6 @@ export async function joinGroup(groupId: string, token: string) {
     });
 
     hub.on('ReceiveMessage', (message: Message) => {
-        console.log('📨 ReceiveMessage:', message);
-
-        // ✅ Tránh duplicate message (nếu server echo lại tin của mình)
         const exists = chatState.messages.some(m => m.messageId === message.messageId);
         if (!exists) {
             chatState.messages = [...chatState.messages, message];
@@ -90,20 +152,48 @@ export async function joinGroup(groupId: string, token: string) {
         }
     });
 
-    console.log('⏳ SignalR: Đang kết nối...');
+    // Trong joinGroup, sửa phần hub.start():
+    console.log('⏳ hub.start()...');
     try {
         await hub.start();
-        console.log('✅ SignalR: Kết nối thành công! State:', hub.state, '| ID:', hub.connectionId);
+        console.log('✅ hub.start() OK | state:', hub.state, '| connectionId:', hub.connectionId);
         chatState.isConnected = true;
-    } catch (err) {
-        console.error('❌ SignalR: Kết nối thất bại!', err);
+    } catch (err: any) {
+        const is401 = err?.message?.includes('401') || err?.message?.includes('Unauthorized');
+
+        if (is401) {
+            console.log('🔄 Token expired at start, refreshing...');
+            const res = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                setToken(data.accessToken);
+                // Retry joinGroup với token mới — chỉ retry 1 lần
+                await joinGroup(groupId, data.accessToken);
+                return; // quan trọng: return để không chạy tiếp code bên dưới
+            } else {
+                window.location.href = '/login';
+                return;
+            }
+        }
+
+        console.error('❌ hub.start() FAILED:', err);
         chatState.isConnected = false;
         return;
     }
 
-    console.log(`🚪 SignalR: Joining group "${groupId}"...`);
-    await hub.invoke('JoinGroup', groupId);
-    console.log(`✅ SignalR: Đã join group "${groupId}"`);
+    console.log(`🚪 Invoking JoinGroup with groupId="${groupId}" (${typeof groupId})...`);
+    try {
+        await hub.invoke('JoinGroup', Number(groupId));
+        console.log(`✅ JoinGroup "${groupId}" thành công`);
+    } catch (err) {
+        console.error(`❌ JoinGroup "${groupId}" FAILED:`, err);
+        // Log thêm chi tiết nếu là HubException
+        if (err instanceof Error) {
+            console.error('   message:', err.message);
+            console.error('   stack:', err.stack);
+        }
+        return; // dừng, không loadHistory nếu join fail
+    }
 
     await Promise.all([
         loadHistory(groupId),
@@ -187,7 +277,7 @@ export async function sendMessage(groupId: string, content: string, attachments:
     onNewMessage?.();
 
     try {
-        await hub.invoke('SendMessage', groupId, content, attachments);
+        await hub.invoke('SendMessage', Number(groupId), content, attachments);
     } catch (err: any) {
         console.error('❌ SendMessage lỗi:', err?.message ?? err);
         // ✅ Rollback nếu gửi thất bại

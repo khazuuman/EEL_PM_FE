@@ -10,7 +10,7 @@ export const load: PageServerLoad = async (event) => {
     //class ID
     const { user } = await parent();
     const classId = user.student.classId;
-    const groupRes = await getGroupsByClass(event, classId);
+    const groupRes: any = await getGroupsByClass(event, classId);
     console.log("group Res:", groupRes);
 
     return {
@@ -49,7 +49,7 @@ export const actions: Actions = {
             return fail(400, { message: "Group ID is required" });
         }
 
-        const joinRequestRes = await joinRequest(event, groupId, {message});
+        const joinRequestRes = await joinRequest(event, groupId, { message });
 
         if (!joinRequestRes || joinRequestRes.status !== 200) {
             return fail(400, { message: joinRequestRes?.data?.message ?? "Failed to create join request" });

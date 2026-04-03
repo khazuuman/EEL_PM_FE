@@ -5,7 +5,6 @@ import type { Actions } from "@sveltejs/kit";
 import { fail } from "@sveltejs/kit";
 import { allocateGroup, publicGroup } from "$lib/server/classes";
 import type { AllocateGroup } from "$lib/types/group";
-import { getMentors } from "$lib/server/mentor";
 
 export const load: PageServerLoad = async (event) => {
     const { depends, url, parent } = event;
@@ -16,12 +15,12 @@ export const load: PageServerLoad = async (event) => {
     const { classDetails } = await parent();
 
     const groupRes = await getGroupsByClass(event, classDetails.classId);
-    console.log('groupsRes: ', groupRes?.data?.data?.data);
+    console.log('groupsRes: ', groupRes?.data?.data);
 
     return {
         groups: groupRes?.data?.data?.data ?? [],
-        pageSize: groupRes?.data?.data?.pagination?.limit ?? 0,
-        totalCount: groupRes?.data?.data?.pagination?.totalItems ?? 0,
+        pageSize: groupRes?.data?.data?.paging?.limit ?? 0,
+        totalCount: groupRes?.data?.data?.paging?.totalItems ?? 0,
         classId: classDetails.classId
     };
 };

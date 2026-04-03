@@ -90,10 +90,10 @@
     }
 </script>
 
-<div class="min-h-screen bg-white pt-16 font-sans">
+<div class="min-h-screen bg-white pt-5 font-sans">
     <!-- ── Sticky Top Bar ───────────────────────────────────────── -->
     <div
-        class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-gray-200 bg-white/95 px-6 py-3 shadow-sm backdrop-blur-sm"
+        class="sticky top-0 z-10 flex items-center justify-between gap-3 px-6 py-3"
     >
         <Button
             variant="ghost"
@@ -101,12 +101,12 @@
             class="flex items-center gap-2 rounded-xl px-3 py-2 text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
         >
             <ArrowLeftIcon class="h-4 w-4" />
-            <span class="text-sm font-semibold">Back to Dashboard</span>
+            <span class="text-sm font-semibold">Back to Home</span>
         </Button>
     </div>
 
     <!-- ── Main Content ─────────────────────────────────────────── -->
-    <div class="px-6 py-8 space-y-8 max-w-[1600px] mx-auto">
+    <div class="px-6 py-5 space-y-8 max-w-[1600px] mx-auto">
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>

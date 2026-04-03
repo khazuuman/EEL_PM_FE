@@ -210,6 +210,10 @@
     }
 
     if (user.roles.includes("Mentor")) {
+        throw error(404, "Not Found!");
+    }
+
+    if (user.roles.includes("Mentor")) {
         roleLabel.push("Mentor");
         finalNavGroups.push(mentorGroupNav);
         finalNavGroups.push(mentorProjectNav);
