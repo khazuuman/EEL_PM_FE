@@ -37,9 +37,18 @@
 <div
     class="flex h-screen w-screen flex-col items-center justify-center bg-stone-100 pt-12"
 >
-    <form method="POST" action="/app/academic-staff/manage-academic-data/${data?.student?.studentId}?/updateStudent" use:enhance={handleSubmit}>
+    <form
+        method="POST"
+        action="/app/academic-staff/manage-academic-data/${data?.student
+            ?.studentId}?/updateStudent"
+        use:enhance={handleSubmit}
+    >
         <!-- Hidden inputs for Select values -->
-        <input type="hidden" name="studentId" value={data?.student?.studentId} />
+        <input
+            type="hidden"
+            name="studentId"
+            value={data?.student?.studentId}
+        />
         <input type="hidden" name="gender" value={selectedGender} />
         <input type="hidden" name="campusId" value={selectedCampusId} />
         <input type="hidden" name="majorId" value={selectedMajorId} />

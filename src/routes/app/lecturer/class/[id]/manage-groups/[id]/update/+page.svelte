@@ -262,9 +262,9 @@
                     type="button"
                     variant="outline"
                     class="cursor-pointer border-stone-300 text-stone-600"
-                    onclick={() =>
-                        goto(`/app/lecturer/class/${classId}/manage-groups`)}
+                    onclick={() => history.back()}
                 >
+                <!-- goto(`/app/lecturer/class/${classId}/manage-groups`)} -->
                     Cancel
                 </Button>
                 <Button

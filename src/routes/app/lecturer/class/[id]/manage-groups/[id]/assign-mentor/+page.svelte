@@ -106,7 +106,7 @@
     <input type="hidden" name="mentorId" value={targetMentorId} />
 </form>
 
-<div class="min-h-screen bg-white pt-20">
+<div class="min-h-screen bg-white pt-5">
     <!-- ── Top Bar ─────────────────────────────────────── -->
     <div
         class="sticky top-0 z-10 border-b border-zinc-200 bg-white/95 backdrop-blur-sm px-6 py-3"
@@ -118,7 +118,7 @@
                 class="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 transition"
             >
                 <ArrowLeftIcon class="h-4 w-4" />
-                Back to Group
+                Back
             </button>
 
             {#if group}

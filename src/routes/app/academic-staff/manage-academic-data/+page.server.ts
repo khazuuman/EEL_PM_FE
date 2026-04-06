@@ -8,6 +8,7 @@ import { importAcademicData } from "$lib/server/import";
 import type { Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { fail } from "@sveltejs/kit";
+import { dataSynchronization } from "$lib/server/synchronization";
 
 export const load: PageServerLoad = async (event) => {
     const { depends, url } = event;
@@ -85,6 +86,24 @@ export const actions: Actions = {
         return {
             success: true,
             message: importRes?.data?.message ?? null,
+        };
+    },
+    syncData: async (event) => {
+        const formData = await event.request.formData();
+        const exe1Code = formData.get("exe1Code");
+        const exe2Code = formData.get("exe2Code");
+
+        const syncRes = await dataSynchronization(event, { exe1Code, exe2Code });
+        console.log("syncRes: ", syncRes);
+        if (!syncRes || syncRes.status !== 200) {
+            return fail(400, {
+                message: syncRes?.data?.message ?? "Failed to sync data",
+            });
+        }
+
+        return {
+            success: true,
+            message: syncRes?.data?.message ?? null,
         };
     },
 };

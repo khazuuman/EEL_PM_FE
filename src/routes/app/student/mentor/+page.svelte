@@ -100,7 +100,7 @@
             </h2>
             <p class="text-stone-500 max-w-md">
                 Your group hasn't been assigned a mentor yet. Please contact the
-                department or wait for the administration to assign one.
+                lecturer or wait for the lecturer to assign one.
             </p>
         </div>
     {:else}

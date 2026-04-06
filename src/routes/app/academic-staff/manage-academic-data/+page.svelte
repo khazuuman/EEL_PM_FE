@@ -1,19 +1,18 @@
 <script lang="ts">
     import DataTable from "$lib/components/ui/data-table/data-table.svelte";
-    import { ArrowLeftIcon } from "lucide-svelte";
-    import ImportStudentDialog from "../components/ImportStudentDialog.svelte";
+    import { ArrowLeftIcon, RefreshCwIcon } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
+    import SyncDataDialog from "../components/SyncDataDialog.svelte";
 
     const { data } = $props();
     let students = $derived(data?.students || []);
     let majors = $derived(data?.majors || []);
     let campuses = $derived(data?.campuses || []);
     let classes = $derived(data?.classes || []);
-    let semesters = $derived(data?.semesters || []);
     let totalCount = $derived(data?.totalCount || 0);
     const cacheKeyName = "staff-student-management";
 
-    let importOpen = $state(false);
+    let syncOpen = $state(false);
 
     let filters = $derived([
         { title: "Majors", key: "majorId", data: majors },
@@ -45,12 +44,11 @@
         class="flex gap-2 w-fit items-center text-xl hover:bg-amber-200 rounded-2xl px-2 py-1 transition-all duration-200 mb-5"
         href="/app"
     >
-        <ArrowLeftIcon />Back to Dashboard
+        <ArrowLeftIcon />Back to Home
     </a>
 
     <DataTable
         showAction={true}
-        showView={false}
         statuses={[]}
         keyId={"studentId"}
         {cacheKeyName}
@@ -64,16 +62,18 @@
         matchSearchColumns={["studentName", "studentCode"]}
         {filters}
     >
-        {#snippet actions()}
-            <Button class="gap-2 px-3 py-4 rounded-sm" onclick={() => (importOpen = true)}>
-                Import student
+        {#snippet headerActions()}
+            <Button
+                class="gap-2 px-3 py-4 rounded-sm"
+                onclick={() => (syncOpen = true)}
+            >
+                <RefreshCwIcon size={16} />
+                Sync Students
             </Button>
 
-            <ImportStudentDialog
-                open={importOpen}
-                onOpenChange={(v) => (importOpen = v)}
-                {semesters}
-                {campuses}
+            <SyncDataDialog
+                open={syncOpen}
+                onOpenChange={(v: any) => (syncOpen = v)}
             />
         {/snippet}
     </DataTable>

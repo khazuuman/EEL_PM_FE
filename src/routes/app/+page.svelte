@@ -72,6 +72,10 @@
                 url: "/app/student/group-invitations",
             },
             { name: "View My Group", url: "/app/student/my-group" },
+            {
+                name: "My Join Requests",
+                url: "/app/student/my-join-requests",
+            },
         ],
     };
 

@@ -235,3 +235,16 @@ export const reviewJoinRequest = async (event: RequestEvent, requestId: any, bod
         data: data
     };
 }
+
+export const getMyJoinRequests = async (event: RequestEvent) => {
+    const response = await fetcher({
+        event,
+        url: `/users/me/join-requests`,
+        method: 'GET'
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+}

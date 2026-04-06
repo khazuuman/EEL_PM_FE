@@ -1,22 +1,18 @@
 <script lang="ts">
     import { Badge } from "$lib/components/ui/badge";
-    import {
-        Avatar,
-        AvatarFallback,
-        AvatarImage,
-    } from "$lib/components/ui/avatar";
     import { Button } from "$lib/components/ui/button";
     import {
         ClockIcon,
-        MailIcon,
         InboxIcon,
         ArrowLeftIcon,
-        IdCardIcon,
         SendIcon,
         RefreshCwIcon,
         ChevronDownIcon,
         ChevronUpIcon,
         MessageSquareIcon,
+        UsersIcon,
+        CheckCircleIcon,
+        XCircleIcon,
     } from "lucide-svelte";
     import { toast } from "svelte-sonner";
     import { invalidateAll } from "$app/navigation";
@@ -27,7 +23,6 @@
     let refreshing = $state(false);
     let resolvedExpanded = $state(false);
 
-    // Phân nhóm + sort theo thời gian mới nhất
     let pendingList = $derived(
         [...invitations]
             .filter((inv) => inv.status === "Pending")
@@ -64,15 +59,6 @@
         }).format(new Date(dateStr));
     }
 
-    function getInitials(name: string) {
-        return name
-            .split(" ")
-            .slice(-2)
-            .map((n) => n[0])
-            .join("")
-            .toUpperCase();
-    }
-
     const statusConfig: Record<string, { label: string; class: string }> = {
         Pending: {
             label: "Pending",
@@ -92,14 +78,14 @@
         },
     };
 
-    async function handleCancelRequest(requestId: string) {
+    async function handleCancelRequest(requestId: number) {
         setActions({
             active: true,
             description:
-                "Are you sure you want to cancel this invitation? This action cannot be undone.",
+                "Are you sure you want to cancel this join request? This action cannot be undone.",
             cb: async () => {
                 const formData = new FormData();
-                formData.set("reqId", requestId);
+                formData.set("reqId", String(requestId));
                 formData.set("status", "Cancelled");
 
                 const res = await fetch("?/ReviewJoinRequest", {
@@ -111,12 +97,12 @@
 
                 if (!res.ok || result?.type === "failure") {
                     toast.error(
-                        result?.data?.message ?? "Failed to cancel invitation.",
+                        result?.data?.message ?? "Failed to cancel request.",
                     );
                     return;
                 }
 
-                toast.success("Invitation cancelled successfully.");
+                toast.success("Join request cancelled successfully.");
                 await invalidateAll();
             },
         });
@@ -142,10 +128,10 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-extrabold tracking-tight text-gray-900">
-                    My Sent Invitations
+                    My Join Requests
                 </h1>
                 <p class="mt-1 text-base text-gray-500">
-                    Track the status of invitations you have sent to other students.
+                    Track the status of your group join requests.
                 </p>
             </div>
             <div class="flex items-center gap-3">
@@ -173,13 +159,12 @@
                 <div class="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
                     <InboxIcon class="h-8 w-8 text-gray-400" />
                 </div>
-                <p class="text-lg font-bold text-gray-900">No invitations sent yet</p>
-                <p class="mt-1 text-base text-gray-500">Invite students to join your group.</p>
+                <p class="text-lg font-bold text-gray-900">No join requests sent yet</p>
+                <p class="mt-1 text-base text-gray-500">Find a group and send a join request to get started.</p>
             </div>
         {:else}
             <!-- ── PENDING SECTION ──────────────────────────────── -->
             <div class="space-y-3">
-                <!-- Section Label -->
                 <div class="flex items-center gap-3">
                     <h2 class="text-sm font-bold uppercase tracking-widest text-gray-400">
                         Awaiting Response
@@ -192,38 +177,32 @@
                 {#if pendingList.length === 0}
                     <div class="flex items-center gap-3 rounded-xl border border-dashed border-gray-200 bg-gray-50/50 px-5 py-4 text-sm text-gray-400">
                         <InboxIcon class="h-4 w-4 shrink-0" />
-                        No pending invitations
+                        No pending requests
                     </div>
                 {:else}
-                    <!-- Table -->
                     <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                         <!-- Table Header -->
                         <div class="grid grid-cols-[2fr_1.5fr_1fr_1fr_auto] gap-4 border-b border-gray-100 bg-gray-50 px-5 py-3 text-xs font-bold uppercase tracking-widest text-gray-400">
-                            <span>Student</span>
-                            <span>Message</span>
+                            <span>Group</span>
+                            <span>Your Message</span>
                             <span>Sent At</span>
                             <span>Status</span>
                             <span class="w-32 text-right">Action</span>
                         </div>
 
-                        <!-- Rows -->
                         {#each pendingList as inv (inv.requestId)}
                             <div class="grid grid-cols-[2fr_1.5fr_1fr_1fr_auto] gap-4 items-center border-b border-gray-50 px-5 py-4 last:border-0 hover:bg-amber-50/30 transition-colors">
-                                <!-- Student -->
+                                <!-- Group -->
                                 <div class="flex items-center gap-3 min-w-0">
-                                    <Avatar class="h-9 w-9 shrink-0 border border-gray-100">
-                                        <AvatarImage src={inv.student.avatarUrl ?? ""} />
-                                        <AvatarFallback class="bg-orange-100 text-sm font-bold text-orange-800">
-                                            {getInitials(inv.student.fullName)}
-                                        </AvatarFallback>
-                                    </Avatar>
+                                    <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-orange-100 bg-orange-50">
+                                        <UsersIcon class="h-4 w-4 text-orange-500" />
+                                    </div>
                                     <div class="min-w-0">
                                         <p class="truncate text-sm font-semibold text-gray-900">
-                                            {inv.student.fullName}
+                                            {inv.groupName}
                                         </p>
-                                        <p class="flex items-center gap-1 font-mono text-xs text-gray-400 mt-0.5">
-                                            <IdCardIcon class="h-3 w-3" />
-                                            {inv.student.studentCode}
+                                        <p class="text-xs text-gray-400 mt-0.5">
+                                            Group ID: {inv.groupId}
                                         </p>
                                     </div>
                                 </div>
@@ -274,7 +253,6 @@
             <!-- ── RESOLVED SECTION ────────────────────────────── -->
             {#if resolvedList.length > 0}
                 <div class="space-y-3">
-                    <!-- Section Label + Toggle -->
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3">
                             <h2 class="text-sm font-bold uppercase tracking-widest text-gray-400">
@@ -303,7 +281,7 @@
                         <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                             <!-- Table Header -->
                             <div class="grid grid-cols-[2fr_1.5fr_1fr_1fr_1.5fr] gap-4 border-b border-gray-100 bg-gray-50 px-5 py-3 text-xs font-bold uppercase tracking-widest text-gray-400">
-                                <span>Student</span>
+                                <span>Group</span>
                                 <span>Your Message</span>
                                 <span>Sent At</span>
                                 <span>Status</span>
@@ -312,21 +290,21 @@
 
                             {#each resolvedList as inv (inv.requestId)}
                                 <div class="grid grid-cols-[2fr_1.5fr_1fr_1fr_1.5fr] gap-4 items-center border-b border-gray-50 px-5 py-4 last:border-0 hover:bg-gray-50/60 transition-colors opacity-80">
-                                    <!-- Student -->
+                                    <!-- Group -->
                                     <div class="flex items-center gap-3 min-w-0">
-                                        <Avatar class="h-9 w-9 shrink-0 border border-gray-100">
-                                            <AvatarImage src={inv.student.avatarUrl ?? ""} />
-                                            <AvatarFallback class="bg-gray-100 text-sm font-bold text-gray-500">
-                                                {getInitials(inv.student.fullName)}
-                                            </AvatarFallback>
-                                        </Avatar>
+                                        <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-gray-100 bg-gray-50">
+                                            {#if inv.status === "Accepted"}
+                                                <CheckCircleIcon class="h-4 w-4 text-green-500" />
+                                            {:else}
+                                                <XCircleIcon class="h-4 w-4 text-gray-400" />
+                                            {/if}
+                                        </div>
                                         <div class="min-w-0">
                                             <p class="truncate text-sm font-semibold text-gray-700">
-                                                {inv.student.fullName}
+                                                {inv.groupName}
                                             </p>
-                                            <p class="flex items-center gap-1 font-mono text-xs text-gray-400 mt-0.5">
-                                                <IdCardIcon class="h-3 w-3" />
-                                                {inv.student.studentCode}
+                                            <p class="text-xs text-gray-400 mt-0.5">
+                                                Group ID: {inv.groupId}
                                             </p>
                                         </div>
                                     </div>
@@ -374,19 +352,16 @@
                             {/each}
                         </div>
                     {:else}
-                        <!-- Collapsed preview — hiển thị 2 row đầu mờ dần -->
+                        <!-- Collapsed preview -->
                         <div class="relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
                             {#each resolvedList.slice(0, 2) as inv (inv.requestId)}
                                 <div class="grid grid-cols-[2fr_1.5fr_1fr_1fr] gap-4 items-center border-b border-gray-50 px-5 py-3.5 last:border-0 opacity-50">
                                     <div class="flex items-center gap-3 min-w-0">
-                                        <Avatar class="h-8 w-8 shrink-0">
-                                            <AvatarImage src={inv.student.avatarUrl ?? ""} />
-                                            <AvatarFallback class="bg-gray-100 text-xs font-bold text-gray-500">
-                                                {getInitials(inv.student.fullName)}
-                                            </AvatarFallback>
-                                        </Avatar>
+                                        <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gray-100">
+                                            <UsersIcon class="h-4 w-4 text-gray-400" />
+                                        </div>
                                         <p class="truncate text-sm font-semibold text-gray-600">
-                                            {inv.student.fullName}
+                                            {inv.groupName}
                                         </p>
                                     </div>
                                     <div></div>
@@ -398,7 +373,6 @@
                                     </Badge>
                                 </div>
                             {/each}
-                            <!-- Fade overlay -->
                             <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
                         </div>
                     {/if}

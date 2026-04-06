@@ -19,8 +19,8 @@ export const load: PageServerLoad = async (event) => {
 
     return {
         groups: groupRes?.data?.data?.data ?? [],
-        pageSize: groupRes?.data?.data?.paging?.limit ?? 0,
-        totalCount: groupRes?.data?.data?.paging?.totalItems ?? 0,
+        pageSize: groupRes?.data?.data?.pagination?.limit ?? 0,
+        totalCount: groupRes?.data?.data?.pagination?.totalItems ?? 0,
         classId: classDetails.classId
     };
 };

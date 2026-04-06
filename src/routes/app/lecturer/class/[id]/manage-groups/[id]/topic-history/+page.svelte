@@ -11,7 +11,7 @@
         Flag,
         CheckCircle2,
         XCircle,
-        RefreshCwIcon
+        RefreshCwIcon,
     } from "lucide-svelte";
     import { ArrowLeftIcon } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
@@ -83,7 +83,7 @@
     }
 </script>
 
-<div class="min-h-screen bg-white pt-16 font-sans">
+<div class="min-h-screen bg-white pt-5 font-sans">
     <!-- ── Sticky Top Bar ───────────────────────────────────────── -->
     <div
         class="sticky top-0 z-10 flex items-center justify-between gap-3 px-6 py-3 backdrop-blur-sm"
@@ -165,215 +165,243 @@
 
         <!-- TIMELINE -->
         <div class="pb-10 max-w-6xl mx-auto">
-            {#each topics as topic, index}
-                {@const statusCfg = getStatusConfig(topic.status)}
-                {@const isLast = index === topics.length - 1}
-                {@const dateInfo = formatDate(topic.submittedAt)}
-
-                <!-- Grid Layout Timeline -->
-                <div class="grid grid-cols-[120px_60px_1fr] gap-0">
-                    <!-- Left: Date & Time -->
-                    <div class="text-right pt-6 pr-4">
-                        <div class="text-base font-bold text-gray-900">
-                            {dateInfo.date}
-                        </div>
-                        <div class="text-sm font-medium text-gray-500 mt-1">
-                            {dateInfo.time}
-                        </div>
+            {#if topics.length === 0}
+                <!-- ── Empty State ───────────────────────────────────────── -->
+                <div
+                    class="flex flex-col items-center justify-center py-24 text-center"
+                >
+                    <div
+                        class="h-20 w-20 rounded-2xl bg-gray-100 flex items-center justify-center mb-5"
+                    >
+                        <History class="h-10 w-10 text-gray-300" />
                     </div>
+                    <h3 class="text-lg font-bold text-gray-700 mb-2">
+                        No topic history yet
+                    </h3>
+                    <p class="text-sm text-gray-400 max-w-xs leading-relaxed">
+                        This group hasn't submitted any topics yet. Once a topic
+                        is submitted, the full history will appear here.
+                    </p>
+                </div>
+            {:else}
+                {#each topics as topic, index}
+                    {@const statusCfg = getStatusConfig(topic.status)}
+                    {@const isLast = index === topics.length - 1}
+                    {@const dateInfo = formatDate(topic.submittedAt)}
 
-                    <!-- Middle: Timeline Line & Dot -->
-                    <div class="relative flex justify-center">
-                        <div
-                            class="absolute w-[2px] bg-gray-200 {isLast
-                                ? 'top-0 bottom-auto h-full'
-                                : 'inset-y-0'}"
-                        ></div>
-                        <div
-                            class="relative z-10 mt-7 h-4 w-4 rounded-full {statusCfg.dotClass} ring-4 shadow-sm"
-                        ></div>
-                    </div>
+                    <!-- Grid Layout Timeline -->
+                    <div class="grid grid-cols-[120px_60px_1fr] gap-0">
+                        <!-- Left: Date & Time -->
+                        <div class="text-right pt-6 pr-4">
+                            <div class="text-base font-bold text-gray-900">
+                                {dateInfo.date}
+                            </div>
+                            <div class="text-sm font-medium text-gray-500 mt-1">
+                                {dateInfo.time}
+                            </div>
+                        </div>
 
-                    <!-- Right: Card Content -->
-                    <div class="pb-10">
-                        <Card.Root
-                            class="border-gray-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-orange-300 rounded-2xl overflow-hidden"
-                        >
-                            <Card.Content class="p-8">
-                                <!-- Header: Logo, Title, Badge -->
-                                <div class="flex items-start gap-6 mb-6">
-                                    {#if topic.logoUrl}
-                                        <img
-                                            src={topic.logoUrl}
-                                            alt="Logo"
-                                            class="h-20 w-20 rounded-xl object-cover border border-gray-200 shadow-sm shrink-0"
-                                            onerror={(e) =>
-                                                ((
-                                                    e.currentTarget as HTMLImageElement
-                                                ).style.display = "none")}
-                                        />
-                                    {:else}
-                                        <div
-                                            class="h-20 w-20 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center shrink-0"
-                                        >
-                                            <BookOpen
-                                                class="h-8 w-8 text-gray-400"
+                        <!-- Middle: Timeline Line & Dot -->
+                        <div class="relative flex justify-center">
+                            <div
+                                class="absolute w-[2px] bg-gray-200 {isLast
+                                    ? 'top-0 bottom-auto h-full'
+                                    : 'inset-y-0'}"
+                            ></div>
+                            <div
+                                class="relative z-10 mt-7 h-4 w-4 rounded-full {statusCfg.dotClass} ring-4 shadow-sm"
+                            ></div>
+                        </div>
+
+                        <!-- Right: Card Content -->
+                        <div class="pb-10">
+                            <Card.Root
+                                class="border-gray-200 bg-white shadow-sm transition-all hover:shadow-md hover:border-orange-300 rounded-2xl overflow-hidden"
+                            >
+                                <Card.Content class="p-8">
+                                    <!-- Header: Logo, Title, Badge -->
+                                    <div class="flex items-start gap-6 mb-6">
+                                        {#if topic.logoUrl}
+                                            <img
+                                                src={topic.logoUrl}
+                                                alt="Logo"
+                                                class="h-20 w-20 rounded-xl object-cover border border-gray-200 shadow-sm shrink-0"
+                                                onerror={(e) =>
+                                                    ((
+                                                        e.currentTarget as HTMLImageElement
+                                                    ).style.display = "none")}
                                             />
-                                        </div>
-                                    {/if}
-
-                                    <div class="flex-1 min-w-0">
-                                        <div
-                                            class="flex items-center flex-wrap gap-3 mb-2"
-                                        >
-                                            <span
-                                                class="text-xs font-bold text-gray-400 tracking-widest uppercase"
+                                        {:else}
+                                            <div
+                                                class="h-20 w-20 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center shrink-0"
                                             >
-                                                Version {topic.versionNumber}
-                                            </span>
-                                            <span class="text-gray-300">•</span>
-                                            <span
-                                                class="text-xs font-bold text-gray-400 tracking-widest uppercase"
-                                            >
-                                                ID: {topic.topicId}
-                                            </span>
-                                            
-                                            <!-- TYPE BADGE: Change Request vs Initial -->
-                                            {#if topic.isChangeRequest}
-                                                <Badge class="ml-2 bg-blue-100 text-blue-700 border-blue-300 gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest pointer-events-none">
-                                                    <RefreshCwIcon class="w-3 h-3" />
-                                                    Change Request
-                                                </Badge>
-                                            {:else}
-                                                <Badge class="ml-2 bg-gray-100 text-gray-600 border-gray-200 gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest pointer-events-none">
-                                                    Initial Submission
-                                                </Badge>
-                                            {/if}
-
-                                            <!-- STATUS BADGE -->
-                                            <Badge
-                                                class={`ml-auto gap-1.5 px-3 py-1 border rounded-full text-xs font-bold tracking-wide uppercase ${statusCfg.badgeClass}`}
-                                            >
-                                                <svelte:component
-                                                    this={statusCfg.icon}
-                                                    class="h-3.5 w-3.5"
+                                                <BookOpen
+                                                    class="h-8 w-8 text-gray-400"
                                                 />
-                                                {topic.status}
-                                            </Badge>
-                                        </div>
-                                        <h3
-                                            class="text-2xl font-extrabold text-gray-900 leading-tight"
-                                        >
-                                            {topic.title}
-                                        </h3>
-                                    </div>
-                                </div>
+                                            </div>
+                                        {/if}
 
-                                <!-- Body: Description & Objectives -->
-                                <div
-                                    class="grid grid-cols-1 xl:grid-cols-2 gap-6"
-                                >
-                                    <div>
-                                        <h4
-                                            class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3"
-                                        >
-                                            Description
-                                        </h4>
-                                        <div
-                                            class="bg-gray-50 border border-gray-100 rounded-xl p-5 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap min-h-[100px]"
-                                        >
-                                            {topic.description ||
-                                                "No description provided."}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <h4
-                                            class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3"
-                                        >
-                                            Objectives
-                                        </h4>
-                                        <div
-                                            class="bg-gray-50 border border-gray-100 rounded-xl p-5 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap min-h-[100px]"
-                                        >
-                                            {topic.objectives ||
-                                                "No objectives provided."}
-                                        </div>
-                                    </div>
-                                </div>
+                                        <div class="flex-1 min-w-0">
+                                            <div
+                                                class="flex items-center flex-wrap gap-3 mb-2"
+                                            >
+                                                <span
+                                                    class="text-xs font-bold text-gray-400 tracking-widest uppercase"
+                                                >
+                                                    Version {topic.versionNumber}
+                                                </span>
+                                                <span class="text-gray-300"
+                                                    >•</span
+                                                >
+                                                <span
+                                                    class="text-xs font-bold text-gray-400 tracking-widest uppercase"
+                                                >
+                                                    ID: {topic.topicId}
+                                                </span>
 
-                                <!-- Footer: Submitter & Feedback -->
-                                <Separator class="my-6 bg-gray-100" />
-                                <div
-                                    class="flex flex-col xl:flex-row xl:items-start justify-between gap-6"
-                                >
-                                    <div class="flex items-center gap-4">
-                                        <div
-                                            class="h-10 w-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold shrink-0"
-                                        >
-                                            {getInitials(
-                                                topic.submittedBy.fullName,
-                                            )}
+                                                <!-- TYPE BADGE: Change Request vs Initial -->
+                                                {#if topic.isChangeRequest}
+                                                    <Badge
+                                                        class="ml-2 bg-blue-100 text-blue-700 border-blue-300 gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest pointer-events-none"
+                                                    >
+                                                        <RefreshCwIcon
+                                                            class="w-3 h-3"
+                                                        />
+                                                        Change Request
+                                                    </Badge>
+                                                {:else}
+                                                    <Badge
+                                                        class="ml-2 bg-gray-100 text-gray-600 border-gray-200 gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest pointer-events-none"
+                                                    >
+                                                        Initial Submission
+                                                    </Badge>
+                                                {/if}
+
+                                                <!-- STATUS BADGE -->
+                                                <Badge
+                                                    class={`ml-auto gap-1.5 px-3 py-1 border rounded-full text-xs font-bold tracking-wide uppercase ${statusCfg.badgeClass}`}
+                                                >
+                                                    <svelte:component
+                                                        this={statusCfg.icon}
+                                                        class="h-3.5 w-3.5"
+                                                    />
+                                                    {topic.status}
+                                                </Badge>
+                                            </div>
+                                            <h3
+                                                class="text-2xl font-extrabold text-gray-900 leading-tight"
+                                            >
+                                                {topic.title}
+                                            </h3>
+                                        </div>
+                                    </div>
+
+                                    <!-- Body: Description & Objectives -->
+                                    <div
+                                        class="grid grid-cols-1 xl:grid-cols-2 gap-6"
+                                    >
+                                        <div>
+                                            <h4
+                                                class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3"
+                                            >
+                                                Description
+                                            </h4>
+                                            <div
+                                                class="bg-gray-50 border border-gray-100 rounded-xl p-5 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap min-h-[100px]"
+                                            >
+                                                {topic.description ||
+                                                    "No description provided."}
+                                            </div>
                                         </div>
                                         <div>
-                                            <p
-                                                class="text-xs text-gray-500 mb-0.5"
+                                            <h4
+                                                class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3"
                                             >
-                                                Submitted by
-                                            </p>
-                                            <p
-                                                class="text-sm font-semibold text-gray-900"
+                                                Objectives
+                                            </h4>
+                                            <div
+                                                class="bg-gray-50 border border-gray-100 rounded-xl p-5 text-sm text-gray-700 leading-relaxed whitespace-pre-wrap min-h-[100px]"
                                             >
-                                                {topic.submittedBy.fullName}
-                                                <span
-                                                    class="ml-1.5 text-xs font-normal text-gray-500 font-mono"
-                                                >
-                                                    {topic.submittedBy
-                                                        .studentCode}
-                                                </span>
-                                            </p>
+                                                {topic.objectives ||
+                                                    "No objectives provided."}
+                                            </div>
                                         </div>
                                     </div>
 
-                                    {#if topic.reviewFeedback}
-                                        <div
-                                            class="xl:w-1/2 bg-red-50/50 border border-red-100 rounded-lg p-4"
-                                        >
-                                            <p
-                                                class="text-xs font-bold text-red-600 uppercase tracking-widest mb-1.5"
+                                    <!-- Footer: Submitter & Feedback -->
+                                    <Separator class="my-6 bg-gray-100" />
+                                    <div
+                                        class="flex flex-col xl:flex-row xl:items-start justify-between gap-6"
+                                    >
+                                        <div class="flex items-center gap-4">
+                                            <div
+                                                class="h-10 w-10 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-sm font-bold shrink-0"
                                             >
-                                                Review Feedback
-                                            </p>
-                                            <p
-                                                class="text-sm text-red-800 leading-relaxed"
-                                            >
-                                                {topic.reviewFeedback}
-                                            </p>
+                                                {getInitials(
+                                                    topic.submittedBy.fullName,
+                                                )}
+                                            </div>
+                                            <div>
+                                                <p
+                                                    class="text-xs text-gray-500 mb-0.5"
+                                                >
+                                                    Submitted by
+                                                </p>
+                                                <p
+                                                    class="text-sm font-semibold text-gray-900"
+                                                >
+                                                    {topic.submittedBy.fullName}
+                                                    <span
+                                                        class="ml-1.5 text-xs font-normal text-gray-500 font-mono"
+                                                    >
+                                                        {topic.submittedBy
+                                                            .studentCode}
+                                                    </span>
+                                                </p>
+                                            </div>
                                         </div>
-                                    {/if}
-                                </div>
-                            </Card.Content>
-                        </Card.Root>
-                    </div>
-                </div>
-            {/each}
 
-            <!-- End of History Node -->
-            {#if topics.length > 0}
-                <div class="grid grid-cols-[120px_60px_1fr] gap-0">
-                    <div></div>
-                    <div class="relative flex justify-center pt-2">
-                        <div
-                            class="h-10 w-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center shadow-sm z-10"
-                        >
-                            <Flag class="h-4 w-4 text-gray-400" />
+                                        {#if topic.reviewFeedback}
+                                            <div
+                                                class="xl:w-1/2 bg-red-50/50 border border-red-100 rounded-lg p-4"
+                                            >
+                                                <p
+                                                    class="text-xs font-bold text-red-600 uppercase tracking-widest mb-1.5"
+                                                >
+                                                    Review Feedback
+                                                </p>
+                                                <p
+                                                    class="text-sm text-red-800 leading-relaxed"
+                                                >
+                                                    {topic.reviewFeedback}
+                                                </p>
+                                            </div>
+                                        {/if}
+                                    </div>
+                                </Card.Content>
+                            </Card.Root>
                         </div>
                     </div>
-                    <div class="pt-4 pl-4">
-                        <span class="text-base font-semibold text-gray-400">
-                            End of history
-                        </span>
+                {/each}
+
+                <!-- End of History Node -->
+                {#if topics.length > 0}
+                    <div class="grid grid-cols-[120px_60px_1fr] gap-0">
+                        <div></div>
+                        <div class="relative flex justify-center pt-2">
+                            <div
+                                class="h-10 w-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center shadow-sm z-10"
+                            >
+                                <Flag class="h-4 w-4 text-gray-400" />
+                            </div>
+                        </div>
+                        <div class="pt-4 pl-4">
+                            <span class="text-base font-semibold text-gray-400">
+                                End of history
+                            </span>
+                        </div>
                     </div>
-                </div>
+                {/if}
             {/if}
         </div>
     </div>

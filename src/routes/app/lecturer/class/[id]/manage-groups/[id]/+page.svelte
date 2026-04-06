@@ -37,7 +37,7 @@
     const mentor = $derived(g.mentor ?? null);
 
     const statusColor: Record<string, string> = {
-        Active: "bg-green-100 text-green-700 border-green-200",
+        Approved: "bg-green-100 text-green-700 border-green-200",
         Rejected: "bg-red-100 text-red-700 border-red-200",
         Pending: "bg-amber-100 text-amber-700 border-amber-200",
         Inactive: "bg-gray-100 text-gray-500 border-gray-200",
@@ -100,7 +100,7 @@
     aria-hidden="true"
 ></form>
 
-<div class="min-h-screen bg-white pt-16 font-sans">
+<div class="min-h-screen bg-white pt-5 font-sans">
     <!-- ─── Sticky Top Bar ─────────────────────────────────────────────── -->
     <div class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-gray-200 bg-white/95 px-6 py-3 shadow-sm backdrop-blur-sm">
         <Button
