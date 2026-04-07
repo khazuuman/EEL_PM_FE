@@ -30,6 +30,10 @@
                 name: "View Student List",
                 url: `/app/lecturer/class/${classId}/student-list`,
             },
+            {
+                name: "View Unassign Student List",
+                url: `/app/lecturer/class/${classId}/view-unassign-student`,
+            },
         ],
     };
     const lecturerProjectManage: NavigationGroup = {

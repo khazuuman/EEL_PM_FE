@@ -73,17 +73,18 @@
     const dates = [4, 5, 6, 7, 8, 9, 10];
 </script>
 
-<div class="min-h-screen bg-stone-50/50 p-6 md:p-8 mx-auto space-y-8">
-    <!-- Back button -->
-    <div class="w-full flex items-center">
-        <Button
-            variant="ghost"
-            onclick={() => goto(`/app`)}
-            class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl px-4 py-6 transition-all cursor-pointer"
-        >
-            <ArrowLeftIcon class="w-5 h-5" />
-            <span class="text-base font-semibold">Back to Home</span>
-        </Button>
+<div class="min-h-screen bg-stone-50/50 p-6 mx-auto">
+    <div class="mx-auto px-4 sm:px-6 mb-2">
+        <div class="flex items-center h-12">
+            <Button
+                variant="ghost"
+                onclick={() => goto(`/app`)}
+                class="flex items-center gap-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-50 rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer -ml-3"
+            >
+                <ArrowLeftIcon class="w-4 h-4" />
+                Back to Home
+            </Button>
+        </div>
     </div>
     {#if !mentor}
         <!-- Trạng thái chưa có mentor -->
@@ -108,7 +109,7 @@
         <Card.Root
             class="border-stone-100 shadow-sm bg-white overflow-hidden rounded-2xl"
         >
-            <Card.Content class="p-8">
+            <Card.Content class="p-5">
                 <div class="flex flex-col lg:flex-row gap-8 justify-between">
                     <!-- Left: Avatar & Basic Info -->
                     <div class="flex gap-6 items-center lg:w-1/3">

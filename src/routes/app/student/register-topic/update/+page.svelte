@@ -73,7 +73,7 @@
                 disabled={isUploading}
                 class="bg-orange-600 px-6 text-white hover:bg-orange-700 disabled:opacity-50 cursor-pointer shadow-sm"
             >
-                Save Changes
+                Save
             </Button>
         </div>
 

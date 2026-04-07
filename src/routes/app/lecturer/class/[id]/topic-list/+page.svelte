@@ -123,7 +123,7 @@
 <div class="min-h-screen bg-white pt-5 font-sans">
     <!-- ── Sticky Top Bar ──────────────────────────────────────── -->
     <div
-        class="sticky top-0 z-10 px-6 py-3 flex items-center"
+        class="sticky top-0 z-10 px-6 flex items-center"
     >
         <Button
             variant="ghost"

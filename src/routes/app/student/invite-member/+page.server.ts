@@ -1,4 +1,4 @@
-import { getStudentsAvailableByClass } from "$lib/server/students";
+import { getStudentsAvailableByClass, getStudentsAvailableByClassWithoutFilter } from "$lib/server/students";
 import type { Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { fail } from "@sveltejs/kit";
@@ -10,10 +10,10 @@ export const load: PageServerLoad = async (event) => {
     const { user } = await parent();
     const classId = user.student.classId;
 
-    const studentsRes = await getStudentsAvailableByClass(event, classId);
+    const studentsRes = await getStudentsAvailableByClassWithoutFilter(event, classId);
     console.log("studentsRes: ", studentsRes);
     return {
-        students: studentsRes?.data?.data ?? [],
+        students: studentsRes?.data?.data?.data ?? [],
         user
     };
 };

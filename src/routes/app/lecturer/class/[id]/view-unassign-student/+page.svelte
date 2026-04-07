@@ -62,7 +62,7 @@
 				<h1
 					class="text-2xl font-extrabold text-stone-900 leading-tight"
 				>
-					Student List
+					Unassign Student List
 				</h1>
 			</div>
 		</div>

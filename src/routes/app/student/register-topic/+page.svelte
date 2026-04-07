@@ -55,7 +55,7 @@
     }
 </script>
 
-<div class="min-h-screen bg-white pt-10 font-sans">
+<div class="min-h-screen bg-white pt-5 font-sans">
     <!-- ══════════════════════════════════════════════════════════════════════════
         GUARD: No group
     ═══════════════════════════════════════════════════════════════════════════ -->
@@ -220,7 +220,7 @@
             <!-- ── VIEW TOPIC ─────────────────────────────────────────────────── -->
             <!-- Top bar -->
             <div
-                class="sticky top-0 z-10 flex items-center justify-between gap-3 px-6 py-3 backdrop-blur-sm"
+                class="sticky top-0 z-10 flex items-center justify-between gap-3 px-6 backdrop-blur-sm"
             >
                 <Button
                     variant="ghost"
@@ -251,7 +251,7 @@
             </div>
 
             <!-- Content -->
-            <div class="px-6 py-8 space-y-6 max-w-[1600px] mx-auto">
+            <div class="px-6 py-2 space-y-6 max-w-400 mx-auto">
                 <div
                     class="flex items-start gap-4 rounded-xl border border-orange-200 bg-orange-50 p-5 shadow-sm"
                 >

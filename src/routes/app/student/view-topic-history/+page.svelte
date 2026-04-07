@@ -86,7 +86,7 @@
 <div class="min-h-screen bg-white pt-5 font-sans">
     <!-- ── Sticky Top Bar ───────────────────────────────────────── -->
     <div
-        class="sticky top-0 z-10 flex items-center justify-between gap-3 px-6 py-3 backdrop-blur-sm"
+        class="sticky top-0 z-10 flex items-center justify-between gap-3 px-6 backdrop-blur-sm"
     >
         <Button
             variant="ghost"
@@ -99,7 +99,7 @@
     </div>
 
     <!-- ── Main Content ─────────────────────────────────────────── -->
-    <div class="px-6 py-5 space-y-10 max-w-[1600px] mx-auto">
+    <div class="px-6 py-2 space-y-10 max-w-400 mx-auto">
         <!-- HEADER -->
         <Card.Root
             class="border-gray-200 shadow-sm bg-white overflow-hidden rounded-2xl"

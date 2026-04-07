@@ -64,11 +64,11 @@
     >
         {#snippet headerActions()}
             <Button
-                class="gap-2 px-3 py-4 rounded-sm"
+                class="gap-2 px-3 py-4 rounded-sm cursor-pointer"
                 onclick={() => (syncOpen = true)}
             >
                 <RefreshCwIcon size={16} />
-                Sync Students
+                Sync Data
             </Button>
 
             <SyncDataDialog

@@ -13,18 +13,14 @@ export const load: PageServerLoad = async (event) => {
     const semesterResult = await getSemesters(event);
     const semesters = semesterResult?.data?.data?.data ?? [];
 
-    // Tìm semester có startDate lớn nhất
-    const latestSemester = semesters.reduce(
-        (latest: any, current: any) =>
-            new Date(current.startDate) > new Date(latest.startDate)
-                ? current
-                : latest,
-        semesters[0] ?? null
-    );
+    // Tìm semester có isCurrent = true
+    const currentSemester = semesters.find(
+        (semester: any) => semester.isCurrent === true
+    ) ?? null;
 
-    if (!url.searchParams.get("semesterId") && latestSemester?.semesterId) {
+    if (!url.searchParams.get("semesterId") && currentSemester?.semesterId) {
         const newUrl = new URL(url);
-        newUrl.searchParams.set("semesterId", String(latestSemester.semesterId));
+        newUrl.searchParams.set("semesterId", String(currentSemester.semesterId));
         redirect(302, newUrl.pathname + "?" + newUrl.searchParams.toString());
     }
 
@@ -34,8 +30,8 @@ export const load: PageServerLoad = async (event) => {
         user: user,
         semesters: semesters,
         groups: groupsResult?.data?.data?.data ?? [],
-        pageSize: groupsResult?.data?.pageSize ?? 0,
-        totalCount: groupsResult?.data?.totalCount ?? 0,
-        defaultSemesterId: latestSemester?.semesterId ?? null
+        pageSize: groupsResult?.data?.data?.pagination?.limit ?? 0,
+        totalCount: groupsResult?.data?.data?.pagination?.totalItems ?? 0,
+        defaultSemesterId: currentSemester?.semesterId ?? null
     };
 };

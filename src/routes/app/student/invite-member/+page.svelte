@@ -4,6 +4,7 @@
     import { toast } from "svelte-sonner";
     import type { PageData } from "../$types";
     import { ArrowLeftIcon, SearchIcon, UserPlusIcon } from "lucide-svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
 
     let { data } = $props<{ data: PageData }>();
 
@@ -14,7 +15,7 @@
     const filtered = $derived(
         data.students.filter(
             (s: any) =>
-                s.name.toLowerCase().includes(search.toLowerCase()) ||
+                s.fullName.toLowerCase().includes(search.toLowerCase()) ||
                 s.studentCode.toLowerCase().includes(search.toLowerCase()) ||
                 s.major.toLowerCase().includes(search.toLowerCase()),
         ),
@@ -29,22 +30,20 @@
     }
 </script>
 
-<div class="min-h-screen bg-white pt-10">
+<div class="min-h-screen bg-white pt-5">
     <!-- Top Bar -->
-    <div
-        class="sticky top-0 z-10 backdrop-blur-sm px-6"
-    >
-        <button
-            type="button"
-            onclick={() => goto("/app")}
-            class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 transition cursor-pointer"
+    <div class="sticky top-0 z-10 pl-3 mb-2 pt-2">
+        <Button
+            variant="ghost"
+            onclick={() => history.back()}
+            class="flex items-center gap-1.5 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg px-3 py-2 transition-all cursor-pointer"
         >
-            <ArrowLeftIcon class="h-4 w-4" />
-            Back to Home
-        </button>
+            <ArrowLeftIcon class="w-4 h-4" />
+            <span class="text-sm font-semibold">Back to Home</span>
+        </Button>
     </div>
 
-    <div class="px-6 py-8">
+    <div class="px-6 py-4">
         <div
             class="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 items-start"
         >
@@ -107,7 +106,7 @@
                                 <div
                                     class="h-10 w-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold shrink-0"
                                 >
-                                    {student.name.charAt(0)}
+                                    {student.fullName.charAt(0)}
                                 </div>
 
                                 <!-- Info -->
@@ -115,7 +114,7 @@
                                     <p
                                         class="text-sm font-semibold text-zinc-900 truncate"
                                     >
-                                        {student.name}
+                                        {student.fullName}
                                     </p>
                                     <p
                                         class="text-xs text-zinc-400 truncate mt-0.5 font-mono"

@@ -128,7 +128,7 @@
 
 <div class="min-h-screen bg-white px-8">
     <!-- Page Header -->
-    <div class="bg-white sticky top-14 z-40">
+    <div class="bg-white py-5 z-40">
         <div class="mx-auto px-4 sm:px-6">
             <div class="flex items-center h-12">
                 <Button
@@ -143,7 +143,7 @@
         </div>
     </div>
 
-    <div class="mx-auto px-4 sm:px-6 py-8">
+    <div class="mx-auto px-4 sm:px-6">
         <!-- Title Row -->
         <div
             class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8"

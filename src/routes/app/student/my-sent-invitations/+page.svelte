@@ -137,7 +137,7 @@
     </div>
 
     <!-- ── Main Content ─────────────────────────────────────────── -->
-    <div class="px-6 py-5 space-y-8 max-w-[1400px] mx-auto">
+    <div class="px-6 py-5 space-y-8 max-w-400 mx-auto">
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>

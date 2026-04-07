@@ -3,13 +3,13 @@ import type { CreateGroup } from "$lib/types/group";
 import type { Actions } from "@sveltejs/kit";
 import { fail } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
-import { getStudentsAvailableByClass } from "$lib/server/students";
+import { getStudentsAvailableByClass, getStudentsAvailableByClassWithoutFilter } from "$lib/server/students";
 
 export const load: PageServerLoad = async (event) => {
     const { parent } = event;
     const { classDetails } = await parent();
 
-    const res = await getStudentsAvailableByClass(event, classDetails.classId);
+    const res = await getStudentsAvailableByClassWithoutFilter(event, classDetails.classId);
     console.log("student res: ", res.data?.data);
 
     if (!res || res.status !== 200) {
@@ -19,9 +19,9 @@ export const load: PageServerLoad = async (event) => {
     }
 
     return {
-        students: (res.data?.data ?? []).map((s: any) => ({
+        students: (res.data?.data?.data ?? []).map((s: any) => ({
             id: s.studentId,
-            name: s.name,
+            name: s.fullName,
             studentCode: s.studentCode,
         })),
         classId: classDetails.classId

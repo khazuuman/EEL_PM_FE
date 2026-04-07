@@ -28,9 +28,9 @@ export const load: PageServerLoad = async (event) => {
     // console.log("group res: ", groupRes?.data?.data);
     // console.log("student res: ", studentRes);
     return {
-        students: (studentRes.data?.data ?? []).map((s: any) => ({
+        students: (studentRes.data?.data?.data ?? []).map((s: any) => ({
             id: s.studentId,
-            name: s.name,
+            name: s.fullName,
             studentCode: s.studentCode,
         })),
         group: groupRes?.data?.data,

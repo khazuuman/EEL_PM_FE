@@ -203,9 +203,9 @@
     </div>
 {/snippet}
 
-<div class="min-h-screen bg-white pt-10">
+<div class="min-h-screen bg-white pt-5">
     <!-- Top Bar -->
-    <div class="sticky top-0 z-10 pl-3">
+    <div class="sticky top-0 z-10 pl-3 mb-2">
         <Button
             variant="ghost"
             onclick={() => history.back()}
@@ -216,7 +216,7 @@
         </Button>
     </div>
 
-    <div class="px-6 py-6 space-y-5">
+    <div class="px-6 space-y-5">
         <div class="mb-6">
             <h1 class="text-2xl font-extrabold text-zinc-900">My Group</h1>
             <p class="mt-1 text-sm text-zinc-400">
