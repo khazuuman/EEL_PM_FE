@@ -2,9 +2,9 @@
     import { goto } from "$app/navigation";
     import { enhance } from "$app/forms";
     import { toast } from "svelte-sonner";
-    import type { PageData } from "../$types";
     import { ArrowLeftIcon, SearchIcon, UserPlusIcon } from "lucide-svelte";
     import Button from "$lib/components/ui/button/button.svelte";
+    import type { PageData } from "./$types";
 
     let { data } = $props<{ data: PageData }>();
 
@@ -17,7 +17,7 @@
             (s: any) =>
                 s.fullName.toLowerCase().includes(search.toLowerCase()) ||
                 s.studentCode.toLowerCase().includes(search.toLowerCase()) ||
-                s.major.toLowerCase().includes(search.toLowerCase()),
+                s.majorName.toLowerCase().includes(search.toLowerCase()),
         ),
     );
 
@@ -125,7 +125,7 @@
                                             >·</span
                                         >
                                         <span class="font-sans"
-                                            >{student.major}</span
+                                            >{student.majorName}</span
                                         >
                                     </p>
                                 </div>
@@ -212,13 +212,13 @@
                                                 <div
                                                     class="h-7 w-7 rounded-full bg-amber-200 text-amber-700 flex items-center justify-center text-xs font-bold shrink-0"
                                                 >
-                                                    {student.name.charAt(0)}
+                                                    {student.fullName.charAt(0)}
                                                 </div>
                                                 <div class="min-w-0">
                                                     <p
                                                         class="text-xs font-semibold text-zinc-800 truncate"
                                                     >
-                                                        {student.name}
+                                                        {student.fullName}
                                                     </p>
                                                     <p
                                                         class="text-[10px] text-zinc-400 font-mono"

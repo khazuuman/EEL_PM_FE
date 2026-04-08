@@ -119,24 +119,24 @@
     };
 
     // ___________________Staff__________________________
-    const staffClassNav: NavigationGroup = {
-        groupLabel: "Class",
-        items: [
-            {
-                name: "Class Grouping",
-                url: "/app/academic-staff/auto-allocate-groups",
-            },
-        ],
-    };
-    const staffGroupNav: NavigationGroup = {
-        groupLabel: "Group",
-        items: [
-            {
-                name: "Manage Groups",
-                url: "/app/academic-staff/manage-groups",
-            },
-        ],
-    };
+    // const staffClassNav: NavigationGroup = {
+    //     groupLabel: "Class",
+    //     items: [
+    //         {
+    //             name: "Class Grouping",
+    //             url: "/app/academic-staff/auto-allocate-groups",
+    //         },
+    //     ],
+    // };
+    // const staffGroupNav: NavigationGroup = {
+    //     groupLabel: "Group",
+    //     items: [
+    //         {
+    //             name: "Manage Groups",
+    //             url: "/app/academic-staff/manage-groups",
+    //         },
+    //     ],
+    // };
     const staffAcademicDataNav: NavigationGroup = {
         groupLabel: "Academic Data",
         items: [
@@ -154,23 +154,32 @@
             },
         ],
     };
-    const staffOtherNav: NavigationGroup = {
-        groupLabel: "Others",
+        const staffAnnouncementNav: NavigationGroup = {
+        groupLabel: "Announcement",
         items: [
             {
-                name: "Manage Semesters",
-                url: "/app/academic-staff/manage-semester",
-            },
-            {
-                name: "Manage Courses",
-                url: "/app/academic-staff/manage-courses",
-            },
-            {
-                name: "Manage Campuses",
-                url: "/app/academic-staff/manage-campuses",
+                name: "Manage Annoucement",
+                url: "/app/academic-staff/manage-announcement",
             },
         ],
     };
+    // const staffOtherNav: NavigationGroup = {
+    //     groupLabel: "Others",
+    //     items: [
+    //         {
+    //             name: "Manage Semesters",
+    //             url: "/app/academic-staff/manage-semester",
+    //         },
+    //         {
+    //             name: "Manage Courses",
+    //             url: "/app/academic-staff/manage-courses",
+    //         },
+    //         {
+    //             name: "Manage Campuses",
+    //             url: "/app/academic-staff/manage-campuses",
+    //         },
+    //     ],
+    // };
 
     // ___________________Admin__________________________
     const adminSystemNav: NavigationGroup = {
@@ -227,8 +236,9 @@
     if (user.roles.includes("AcademicStaff")) {
         roleLabel.push("Academic Staff");
         // finalNavGroups.push(staffClassNav);
-        finalNavGroups.push(staffGroupNav);
+        // finalNavGroups.push(staffGroupNav);
         finalNavGroups.push(staffAcademicDataNav);
+        finalNavGroups.push(staffAnnouncementNav);
         // finalNavGroups.push(staffOtherNav);
     }
 

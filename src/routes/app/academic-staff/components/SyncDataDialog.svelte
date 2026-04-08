@@ -22,7 +22,7 @@
 <Dialog.Root {open} {onOpenChange}>
     <Dialog.Content class="sm:max-w-md">
         <Dialog.Header>
-            <Dialog.Title>Sync Student Data</Dialog.Title>
+            <Dialog.Title>Sync Academic Data</Dialog.Title>
             <Dialog.Description>
                 Enter the subject codes to synchronize student data from the
                 external API. This process may take <strong>1–2 minutes</strong>

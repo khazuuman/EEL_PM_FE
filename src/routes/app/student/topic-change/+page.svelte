@@ -199,14 +199,14 @@
                         <PencilIcon class="mr-2 h-4 w-4" />
                         Update Topic
                     </Button>
-                {:else if topic.status === "Rejected"}
+                {:else if topic?.status === "Approved" || topic?.status === "Rejected"}
                     <Button
                         type="button"
                         onclick={enterChange}
                         class="bg-orange-600 px-6 text-white hover:bg-orange-700 cursor-pointer shadow-sm"
                     >
                         <RefreshCwIcon class="mr-2 h-4 w-4" />
-                        Create New Topic Change Request
+                        Create Topic Change Request
                     </Button>
                 {/if}
                 <!-- NOTE: Khi Approved sẽ không xuất hiện button nào ở đây -->

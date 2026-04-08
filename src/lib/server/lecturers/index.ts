@@ -15,3 +15,18 @@ export const getAllLecturers = async (
         data: data
     };
 };
+
+export const getLecturers = async (
+    event: RequestEvent,
+) => {
+    const { url } = event;
+    const response = await fetcher({
+        event,
+        url: `/lecturers?${url.searchParams.toString()}`
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};

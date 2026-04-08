@@ -139,6 +139,11 @@
                         class="bg-zinc-100 text-zinc-600 rounded px-2 py-0.5 font-medium"
                         >{o.classCode}</span
                     >
+                    <span class="text-zinc-300">·</span>
+                    <span
+                        class="bg-amber-50 text-amber-700 rounded px-2 py-0.5 font-medium text-xs"
+                        >{o.majorName}</span
+                    >
                 </div>
             </div>
         </div>

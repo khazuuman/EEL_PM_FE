@@ -11,7 +11,7 @@ export const load: PageServerLoad = async (event) => {
     const classId = user.student.classId;
 
     const studentsRes = await getStudentsAvailableByClassWithoutFilter(event, classId);
-    console.log("studentsRes: ", studentsRes);
+    console.log("studentsRes: ", studentsRes?.data?.data?.data);
     return {
         students: studentsRes?.data?.data?.data ?? [],
         user
@@ -45,7 +45,7 @@ export const actions: Actions = {
 
         return {
             success: true,
-            group: inviteMemberRes?.data?.data ?? null,
+            group: inviteMemberRes?.data?.data?.data ?? null,
         };
     },
 };

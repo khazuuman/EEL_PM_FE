@@ -78,8 +78,8 @@
             label: "Pending",
             class: "bg-amber-100 text-amber-700 border-amber-300",
         },
-        Accepted: {
-            label: "Accepted",
+        Approved: {
+            label: "Approved",
             class: "bg-green-100 text-green-700 border-green-300",
         },
         Rejected: {
