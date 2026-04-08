@@ -84,7 +84,9 @@
     </div>
     <DataTable
         showAction={true}
+        showAddButton={false}
         statuses={[]}
+        actions={['view']}
         keyId={"studentId"}
         {cacheKeyName}
         {headerValues}

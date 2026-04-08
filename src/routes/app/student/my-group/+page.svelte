@@ -208,7 +208,7 @@
     </div>
 {/snippet}
 
-<div class="min-h-screen bg-white pt-5">
+<div class="min-h-screen bg-white py-5">
     <!-- Top Bar -->
     <div class="sticky top-0 z-10 pl-3 mb-2">
         <Button

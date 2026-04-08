@@ -110,7 +110,7 @@
             class="flex items-center gap-2 rounded-xl px-3 py-2 text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
         >
             <ArrowLeftIcon class="w-4 h-4" />
-            <span class="text-sm font-semibold">Back to Groups</span>
+            <span class="text-sm font-semibold">Back to Group List</span>
         </Button>
 
         <div class="flex items-center gap-2">

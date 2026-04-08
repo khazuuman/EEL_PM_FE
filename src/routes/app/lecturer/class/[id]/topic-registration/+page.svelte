@@ -28,40 +28,40 @@
             color: "text-orange-600",
             bg: "bg-orange-100",
         },
-        {
-            label: "Pending Review",
-            icon: Clock,
-            color: "text-blue-600",
-            bg: "bg-blue-100",
-        },
-        {
-            label: "Approved",
-            icon: CheckCircle2,
-            color: "text-green-600",
-            bg: "bg-green-100",
-        },
-        {
-            label: "Rejected",
-            icon: XCircle,
-            color: "text-red-600",
-            bg: "bg-red-100",
-        },
+        // {
+        //     label: "Pending Review",
+        //     icon: Clock,
+        //     color: "text-blue-600",
+        //     bg: "bg-blue-100",
+        // },
+        // {
+        //     label: "Approved",
+        //     icon: CheckCircle2,
+        //     color: "text-green-600",
+        //     bg: "bg-green-100",
+        // },
+        // {
+        //     label: "Rejected",
+        //     icon: XCircle,
+        //     color: "text-red-600",
+        //     bg: "bg-red-100",
+        // },
     ] as const;
 
     let topics = $derived(data.topics);
 
     let stats = $derived({
         total: topics.length,
-        pending: topics.filter((t: any) => t.status === "Pending").length,
-        approved: topics.filter((t: any) => t.status === "Approved").length,
-        rejected: topics.filter((t: any) => t.status === "Rejected").length,
+        // pending: topics.filter((t: any) => t.status === "Pending").length,
+        // approved: topics.filter((t: any) => t.status === "Approved").length,
+        // rejected: topics.filter((t: any) => t.status === "Rejected").length,
     });
 
     let statValues = $derived([
         stats.total,
-        stats.pending,
-        stats.approved,
-        stats.rejected,
+        // stats.pending,
+        // stats.approved,
+        // stats.rejected,
     ]);
 
     // Dialog state
@@ -120,7 +120,7 @@
         <div class="flex flex-wrap gap-4">
             {#each statCards as stat, i}
                 <div
-                    class="flex flex-1 min-w-[200px] items-center gap-4 px-5 py-4 rounded-xl bg-white border border-gray-200 shadow-sm"
+                    class="flex flex-1 max-w-[200px] items-center gap-4 px-5 py-4 rounded-xl bg-white border border-gray-200 shadow-sm"
                 >
                     <div
                         class="rounded-full p-2.5 flex items-center justify-center shrink-0 {stat.bg}"

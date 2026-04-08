@@ -24,8 +24,8 @@
         <Dialog.Header>
             <Dialog.Title>Sync Academic Data</Dialog.Title>
             <Dialog.Description>
-                Enter the subject codes to synchronize student data from the
-                external API. This process may take <strong>1–2 minutes</strong>
+                Enter the subject codes to synchronize all data from the
+                external API. This process may take <strong>30s – 1 minutes</strong>
                 — please do not close this page.
             </Dialog.Description>
         </Dialog.Header>

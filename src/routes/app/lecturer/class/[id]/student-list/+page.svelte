@@ -22,14 +22,14 @@
 		"studentCode",
 		"fullName",
 		"email",
-		"groupName",
+		// "groupName",
 		"majorName",
 	]);
 	let headerValues = $state({
 		studentCode: "Student Code",
 		fullName: "Full Name",
 		email: "Email",
-		groupName: "Group",
+		// groupName: "Group",
 		majorName: "Major",
 	});
 </script>

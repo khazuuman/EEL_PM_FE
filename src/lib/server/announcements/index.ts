@@ -17,3 +17,4 @@ export const getAnnouncements = async (
         data: data
     };
 };
+

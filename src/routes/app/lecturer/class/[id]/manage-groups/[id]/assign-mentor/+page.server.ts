@@ -18,6 +18,12 @@ export const load: PageServerLoad = async (event) => {
 
     // groupId
     const groupId = params.id;
+
+    // const page = url.searchParams.get("page") ?? "1";
+    const limit = url.searchParams.get("limit") ?? "10";
+
+    // url.searchParams.set("page", page);
+    url.searchParams.set("limit", limit);
     const [mentorRes, groupRes, topicRes] = await Promise.all([
         getMentors(event),
         getGroupDetail(event, groupId),

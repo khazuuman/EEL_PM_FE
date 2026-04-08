@@ -313,6 +313,7 @@
             <div class="py-4">
                 <Textarea
                     name="feedback"
+                    required={approvalAction === "approve" ? false : true}
                     placeholder={approvalAction === "approve"
                         ? "Optional feedback..."
                         : "Reason for rejection..."}

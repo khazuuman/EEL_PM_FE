@@ -53,7 +53,7 @@
         </div>
     </div>
 {:else}
-    <div class="min-h-screen bg-white pt-16 font-sans">
+    <div class="min-h-screen bg-white pt-4 font-sans">
         <!-- Sticky Top Bar -->
         <div
             class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-gray-200 bg-white/95 px-6 py-3 shadow-sm backdrop-blur-sm"

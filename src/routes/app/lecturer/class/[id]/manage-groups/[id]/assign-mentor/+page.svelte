@@ -41,7 +41,7 @@
     let pagination = $derived(
         data.mentors?.pagination || {
             page: 1,
-            limit: 20,
+            limit: 10,
             totalItems: 0,
             totalPages: 1,
         },
@@ -114,11 +114,11 @@
         <div class="flex items-center justify-between">
             <button
                 type="button"
-                onclick={() => history.back()}
+                onclick={() => goto(`/app/lecturer/class/${data.classId}/manage-groups`)}
                 class="flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 transition"
             >
                 <ArrowLeftIcon class="h-4 w-4" />
-                Back
+                Back to Group List
             </button>
 
             {#if group}

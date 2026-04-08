@@ -214,7 +214,7 @@
         </div>
 
         <!-- ── Content ──────────────────────────────────────────────────────── -->
-        <div class="px-6 py-8 space-y-6 max-w-[1600px] mx-auto">
+        <div class="px-6 pb-5 space-y-6 max-w-[1600px] mx-auto">
             <!-- Page header -->
             <div>
                 <h1
@@ -371,145 +371,141 @@
                 </div>
 
                 <!-- Current topic preview -->
+                <!-- Current topic preview -->
                 {#if topic}
+                    <!-- Row 1: Current Topic + Project Logo -->
                     <div class="grid grid-cols-1 gap-6 2xl:grid-cols-12">
-                        <!-- Left: Topic Detail -->
-                        <div class="2xl:col-span-8 flex flex-col gap-6">
+                        <!-- Topic Detail -->
+                        <div
+                            class="2xl:col-span-8 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+                        >
                             <div
-                                class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+                                class="border-b border-gray-100 bg-gray-50/60 px-6 py-4 flex items-center justify-between"
+                            >
+                                <p
+                                    class="text-xs font-bold uppercase tracking-widest text-gray-400"
+                                >
+                                    Current Topic
+                                </p>
+                                <span
+                                    class={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide
+                    ${
+                        topic.status === "Pending"
+                            ? "bg-orange-100 text-orange-700 border border-orange-200"
+                            : topic.status === "Approved"
+                              ? "bg-green-100 text-green-700 border border-green-200"
+                              : topic.status === "Rejected"
+                                ? "bg-red-100 text-red-700 border border-red-200"
+                                : "bg-gray-100 text-gray-700 border border-gray-200"
+                    }`}
+                                >
+                                    {topic.status}
+                                </span>
+                            </div>
+                            <div class="p-0">
+                                {#each [{ label: "Title", value: topic.title }, { label: "Description", value: topic.description }, { label: "Objectives", value: topic.objectives }, { label: "Submitted At", value: formatIfDate(topic.submittedAt) }] as field, i}
+                                    <div
+                                        class="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-[180px_1fr]"
+                                    >
+                                        <span
+                                            class="text-sm font-medium text-gray-500"
+                                            >{field.label}</span
+                                        >
+                                        {#if field.value}
+                                            <span
+                                                class="text-sm font-medium leading-relaxed text-gray-900"
+                                                >{field.value}</span
+                                            >
+                                        {:else}
+                                            <span
+                                                class="text-sm italic text-gray-400"
+                                                >Not specified</span
+                                            >
+                                        {/if}
+                                    </div>
+                                    {#if i < 3}
+                                        <Separator class="bg-gray-100" />
+                                    {/if}
+                                {/each}
+                            </div>
+                            {#if topic.status === "Rejected" && topic.reviewComment}
+                                <Separator class="bg-gray-100" />
+                                <div
+                                    class="grid grid-cols-1 gap-2 px-6 py-5 sm:grid-cols-[180px_1fr] bg-red-50/50"
+                                >
+                                    <span class="text-sm font-bold text-red-600"
+                                        >Rejection Reason</span
+                                    >
+                                    <span
+                                        class="text-sm font-medium leading-relaxed text-red-700"
+                                        >{topic.reviewComment}</span
+                                    >
+                                </div>
+                            {/if}
+                        </div>
+
+                        <!-- Project Logo -->
+                        {#if topic.logoUrl}
+                            <div
+                                class="2xl:col-span-4 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
                             >
                                 <div
-                                    class="border-b border-gray-100 bg-gray-50/60 px-6 py-4 flex items-center justify-between"
+                                    class="border-b border-gray-100 bg-gray-50/60 px-6 py-4"
                                 >
                                     <p
                                         class="text-xs font-bold uppercase tracking-widest text-gray-400"
                                     >
-                                        Current Topic
+                                        Project Logo
                                     </p>
-                                    <span
-                                        class={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide
-                                        ${
-                                            topic.status === "Pending"
-                                                ? "bg-orange-100 text-orange-700 border border-orange-200"
-                                                : topic.status === "Approved"
-                                                  ? "bg-green-100 text-green-700 border border-green-200"
-                                                  : topic.status === "Rejected"
-                                                    ? "bg-red-100 text-red-700 border border-red-200"
-                                                    : "bg-gray-100 text-gray-700 border border-gray-200"
-                                        }`}
-                                    >
-                                        {topic.status}
-                                    </span>
                                 </div>
-                                <div class="p-0">
-                                    {#each [{ label: "Title", value: topic.title }, { label: "Description", value: topic.description }, { label: "Objectives", value: topic.objectives }, { label: "Submitted At", value: formatIfDate(topic.submittedAt) }] as field, i}
-                                        <div
-                                            class="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-[180px_1fr]"
-                                        >
-                                            <span
-                                                class="text-sm font-medium text-gray-500"
+                                <div
+                                    class="flex flex-col items-center gap-4 px-6 py-8"
+                                >
+                                    <img
+                                        src={topic.logoUrl}
+                                        alt="Project logo"
+                                        class="h-32 w-32 rounded-2xl border border-gray-200 object-cover shadow-sm"
+                                    />
+                                </div>
+                            </div>
+                        {/if}
+                    </div>
+
+                    <!-- Row 2: Submitted By + Group -->
+                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                        {#each [{ heading: "Submitted By", rows: [{ label: "Full Name", value: topic.submittedBy?.fullName }, { label: "Student Code", value: topic.submittedBy?.studentCode }, { label: "Email", value: topic.submittedBy?.email }] }, { heading: "Group", rows: [{ label: "Group Name", value: topic.group?.groupName }, { label: "Class Code", value: topic.group?.classCode }, { label: "Members", value: topic.group?.memberCount != null ? `${topic.group.memberCount} members` : undefined }] }] as section}
+                            <div
+                                class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
+                            >
+                                <div
+                                    class="border-b border-gray-100 bg-gray-50/60 px-6 py-4"
+                                >
+                                    <p
+                                        class="text-xs font-bold uppercase tracking-widest text-gray-400"
+                                    >
+                                        {section.heading}
+                                    </p>
+                                </div>
+                                <div
+                                    class="flex flex-col divide-y divide-gray-100"
+                                >
+                                    {#each section.rows as row}
+                                        <div class="px-6 py-4">
+                                            <p
+                                                class="mb-1 text-sm text-gray-500"
                                             >
-                                                {field.label}
-                                            </span>
-                                            {#if field.value}
-                                                <span
-                                                    class="text-sm font-medium leading-relaxed text-gray-900"
-                                                >
-                                                    {field.value}
-                                                </span>
-                                            {:else}
-                                                <span
-                                                    class="text-sm italic text-gray-400"
-                                                >
-                                                    Not specified
-                                                </span>
-                                            {/if}
+                                                {row.label}
+                                            </p>
+                                            <p
+                                                class="text-sm font-medium text-gray-900 break-all"
+                                            >
+                                                {row.value ?? "—"}
+                                            </p>
                                         </div>
-                                        {#if i < 3}
-                                            <Separator class="bg-gray-100" />
-                                        {/if}
                                     {/each}
                                 </div>
-                                {#if topic.status === "Rejected" && topic.reviewComment}
-                                    <Separator class="bg-gray-100" />
-                                    <div
-                                        class="grid grid-cols-1 gap-2 px-6 py-5 sm:grid-cols-[180px_1fr] bg-red-50/50"
-                                    >
-                                        <span
-                                            class="text-sm font-bold text-red-600"
-                                            >Rejection Reason</span
-                                        >
-                                        <span
-                                            class="text-sm font-medium leading-relaxed text-red-700"
-                                        >
-                                            {topic.reviewComment}
-                                        </span>
-                                    </div>
-                                {/if}
                             </div>
-                        </div>
-
-                        <!-- Right Sidebar: Logo, Submitted By, Group -->
-                        <div class="2xl:col-span-4 flex flex-col gap-6">
-                            {#if topic.logoUrl}
-                                <div
-                                    class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
-                                >
-                                    <div
-                                        class="border-b border-gray-100 bg-gray-50/60 px-6 py-4"
-                                    >
-                                        <p
-                                            class="text-xs font-bold uppercase tracking-widest text-gray-400"
-                                        >
-                                            Project Logo
-                                        </p>
-                                    </div>
-                                    <div
-                                        class="flex flex-col items-center gap-4 px-6 py-8"
-                                    >
-                                        <img
-                                            src={topic.logoUrl}
-                                            alt="Project logo"
-                                            class="h-32 w-32 rounded-2xl border border-gray-200 object-cover shadow-sm"
-                                        />
-                                    </div>
-                                </div>
-                            {/if}
-
-                            {#each [{ heading: "Submitted By", rows: [{ label: "Full Name", value: topic.submittedBy?.fullName }, { label: "Student Code", value: topic.submittedBy?.studentCode }, { label: "Email", value: topic.submittedBy?.email }] }, { heading: "Group", rows: [{ label: "Group Name", value: topic.group?.groupName }, { label: "Class Code", value: topic.group?.classCode }, { label: "Members", value: topic.group?.memberCount != null ? `${topic.group.memberCount} members` : undefined }] }] as section}
-                                <div
-                                    class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
-                                >
-                                    <div
-                                        class="border-b border-gray-100 bg-gray-50/60 px-6 py-4"
-                                    >
-                                        <p
-                                            class="text-xs font-bold uppercase tracking-widest text-gray-400"
-                                        >
-                                            {section.heading}
-                                        </p>
-                                    </div>
-                                    <div
-                                        class="flex flex-col divide-y divide-gray-100"
-                                    >
-                                        {#each section.rows as row}
-                                            <div class="px-6 py-4">
-                                                <p
-                                                    class="mb-1 text-sm text-gray-500"
-                                                >
-                                                    {row.label}
-                                                </p>
-                                                <p
-                                                    class="text-sm font-medium text-gray-900 break-all"
-                                                >
-                                                    {row.value ?? "—"}
-                                                </p>
-                                            </div>
-                                        {/each}
-                                    </div>
-                                </div>
-                            {/each}
-                        </div>
+                        {/each}
                     </div>
                 {/if}
             {/if}
