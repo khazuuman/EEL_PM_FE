@@ -3,20 +3,9 @@
     import { Badge } from "$lib/components/ui/badge";
     import { Button } from "$lib/components/ui/button";
     import {
-        User,
-        Mail,
-        Phone,
-        Calendar,
-        GraduationCap,
-        Building,
-        Laptop,
-        RefreshCw,
-        CalendarDays,
-        IdCard,
-        VenusAndMars,
-        ArrowLeft,
+        User, Mail, GraduationCap, Building,
+        Laptop, RefreshCw, IdCard, VenusAndMars, ArrowLeft,
     } from "lucide-svelte";
-    import { goto } from "$app/navigation";
 
     let { data } = $props();
     let student = data.student;
@@ -25,260 +14,122 @@
         if (!name) return "";
         const parts = name.trim().split(" ");
         if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-        return (
-            parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
-        ).toUpperCase();
+        return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
     };
-
-    // const handleBack = () => {
-    //     goto(`app/lecturer/class/${classId}/student-list`);
-    // };
 </script>
 
-<!-- Giao diện full-screen với nền trắng hoàn toàn (bg-white) -->
-<div class="min-h-screen w-full bg-white relative flex flex-col">
-    <!-- Top Header: Back Button -->
-    <div class="w-full pt-6 lg:pt-10 px-6 lg:px-12 xl:px-16 flex items-center">
+<div class="w-full bg-white flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <div class="flex-none px-6 pt-4 pb-3 border-b border-slate-100">
         <Button
             variant="ghost"
             onclick={() => history.back()}
-            class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl px-4 py-6 transition-all cursor-pointer"
+            class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg px-3 py-2 cursor-pointer"
         >
-            <ArrowLeft class="w-5 h-5" />
-            <span class="text-base font-semibold">Back to Student List</span>
+            <ArrowLeft class="w-4 h-4" />
+            <span class="text-sm font-semibold">Back to Student List</span>
         </Button>
     </div>
 
-    <!-- Main Content Area -->
-    <div
-        class="w-full px-6 lg:px-12 xl:px-16 pb-12 xl:pb-16 pt-8 flex flex-col xl:flex-row gap-12 xl:gap-20 flex-1"
-    >
-        <!-- CỘT TRÁI: Profile Summary -->
-        <div
-            class="w-full xl:w-[25%] xl:min-w-[320px] flex flex-col items-center xl:items-start text-center xl:text-left gap-6 xl:sticky xl:top-10 h-fit"
-        >
-            <Avatar
-                class="h-40 w-40 xl:h-48 xl:w-48 ring-4 ring-offset-4 ring-orange-500 ring-offset-white shadow-xl"
-            >
-                <AvatarFallback
-                    class="text-5xl font-bold text-slate-400 bg-slate-50"
-                >
+    <!-- Body -->
+    <div class="flex flex-1 overflow-hidden">
+
+        <!-- LEFT: Avatar + Name -->
+        <div class="w-72 flex-none flex flex-col items-center justify-center gap-5 px-8 border-r border-slate-100 bg-slate-50/50">
+            <Avatar class="h-32 w-32 ring-4 ring-offset-2 ring-orange-500 ring-offset-white shadow-md">
+                <AvatarFallback class="text-4xl font-bold text-slate-400 bg-slate-100">
                     {getInitials(student.fullName)}
                 </AvatarFallback>
             </Avatar>
 
-            <div
-                class="flex flex-col items-center xl:items-start gap-4 w-full mt-4"
-            >
-                <h1
-                    class="text-4xl xl:text-5xl font-black tracking-tight text-slate-900 leading-tight"
-                >
+            <div class="flex flex-col items-center gap-2 text-center">
+                <h1 class="text-2xl font-black text-slate-900 leading-tight">
                     {student.fullName}
                 </h1>
-
-                <Badge
-                    class="bg-orange-500 text-white hover:bg-orange-600 border-0 flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-bold shadow-md w-fit"
-                >
-                    <IdCard class="w-4 h-4" />
+                <Badge class="bg-orange-500 text-white border-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold">
+                    <IdCard class="w-3.5 h-3.5" />
                     {student.studentCode}
                 </Badge>
+            </div>
 
-                <div
-                    class="w-16 h-1 bg-orange-500 rounded-full my-4 xl:my-6"
-                ></div>
+            <div class="w-12 h-0.5 bg-orange-500 rounded-full"></div>
 
-                <p class="text-slate-600 font-semibold text-lg xl:text-xl">
-                    {student.majorName}
-                </p>
-                <p class="text-slate-500 text-base flex items-center gap-2">
-                    <Building class="w-5 h-5" />
+            <div class="flex flex-col items-center gap-1.5 text-center">
+                <p class="text-slate-700 font-semibold text-base">{student.majorName}</p>
+                <p class="text-slate-400 text-sm flex items-center gap-1.5">
+                    <Building class="w-4 h-4" />
                     {student.campusName}
                 </p>
             </div>
         </div>
 
-        <!-- CỘT PHẢI: Detailed Information -->
-        <div
-            class="w-full xl:w-[75%] grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16"
-        >
-            <!-- Personal Information Column -->
-            <div class="flex flex-col gap-8 w-full">
-                <div
-                    class="flex items-center gap-3 pb-4 border-b-2 border-slate-100"
-                >
-                    <User class="w-8 h-8 text-orange-500" />
-                    <h2 class="text-2xl font-bold text-slate-900">
-                        Personal Information
-                    </h2>
+        <!-- RIGHT: Info Grid -->
+        <div class="flex-1 overflow-hidden px-10 py-8 flex flex-col gap-8">
+
+            <!-- Personal -->
+            <div>
+                <div class="flex items-center gap-2 mb-5 pb-3 border-b border-slate-100">
+                    <User class="w-6 h-6 text-orange-500" />
+                    <h2 class="text-lg font-bold text-slate-800">Personal Information</h2>
                 </div>
-
-                <div class="flex flex-col gap-10">
-                    <div class="group">
-                        <p
-                            class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3"
-                        >
-                            Email Address
-                        </p>
-                        <div
-                            class="flex items-center gap-4 text-lg xl:text-xl font-medium text-slate-800 transition-transform group-hover:translate-x-2 duration-300"
-                        >
-                            <Mail class="w-6 h-6 text-slate-300" />
-                            {student.email}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50">
+                        <Mail class="w-6 h-6 text-slate-400 flex-none" />
+                        <div>
+                            <p class="text-sm font-bold text-slate-400 uppercase tracking-wide mb-0.5">Email</p>
+                            <p class="text-base font-semibold text-slate-800">{student.email}</p>
                         </div>
                     </div>
-
-                    <div class="group">
-                        <p
-                            class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3"
-                        >
-                            Gender
-                        </p>
-                        <div
-                            class="flex items-center gap-4 text-lg xl:text-xl text-slate-400 font-medium {student.gender
-                                ? 'text-slate-800 not-italic'
-                                : 'italic'} transition-transform group-hover:translate-x-2 duration-300"
-                        >
-                            <VenusAndMars class="w-6 h-6 text-slate-300" />
-                            {student.gender ?? "Not provided"}
-                        </div>
-                    </div>
-
-                    <div class="group">
-                        <p
-                            class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3"
-                        >
-                            Date of Birth
-                        </p>
-                        <div
-                            class="flex items-center gap-4 text-lg xl:text-xl text-slate-400 font-medium {student.dateOfBirth
-                                ? 'text-slate-800 not-italic'
-                                : 'italic'} transition-transform group-hover:translate-x-2 duration-300"
-                        >
-                            <Calendar class="w-6 h-6 text-slate-300" />
-                            {student.dateOfBirth ?? "Not provided"}
-                        </div>
-                    </div>
-
-                    <div class="group">
-                        <p
-                            class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-3"
-                        >
-                            Phone Number
-                        </p>
-                        <div
-                            class="flex items-center gap-4 text-lg xl:text-xl text-slate-400 font-medium {student.phoneNumber
-                                ? 'text-slate-800 not-italic'
-                                : 'italic'} transition-transform group-hover:translate-x-2 duration-300"
-                        >
-                            <Phone class="w-6 h-6 text-slate-300" />
-                            {student.phoneNumber ?? "Not provided"}
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50">
+                        <VenusAndMars class="w-6 h-6 text-slate-400 flex-none" />
+                        <div>
+                            <p class="text-sm font-bold text-slate-400 uppercase tracking-wide mb-0.5">Gender</p>
+                            <p class="text-base font-semibold {student.gender ? 'text-slate-800' : 'text-slate-400 italic'}">
+                                {student.gender ?? "Not provided"}
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Academic Information Column -->
-            <div class="flex flex-col gap-8 w-full">
-                <div
-                    class="flex items-center justify-between pb-4 border-b-2 border-slate-100"
-                >
-                    <div class="flex items-center gap-3">
-                        <GraduationCap class="w-8 h-8 text-orange-500" />
-                        <h2 class="text-2xl font-bold text-slate-900">
-                            Academic Information
-                        </h2>
-                    </div>
+            <!-- Academic -->
+            <div>
+                <div class="flex items-center gap-2 mb-5 pb-3 border-b border-slate-100">
+                    <GraduationCap class="w-6 h-6 text-orange-500" />
+                    <h2 class="text-lg font-bold text-slate-800">Academic Information</h2>
                 </div>
-
-                <div class="flex flex-col gap-8">
-                    <div class="flex items-start gap-5 group">
-                        <div
-                            class="p-4 bg-orange-50 rounded-2xl transition-colors group-hover:bg-orange-100"
-                        >
-                            <Building class="w-7 h-7 text-orange-500" />
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50">
+                        <div class="p-2.5 bg-orange-50 rounded-lg flex-none">
+                            <Building class="w-6 h-6 text-orange-500" />
                         </div>
-                        <div class="pt-1">
-                            <p
-                                class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1.5"
-                            >
-                                Campus
-                            </p>
-                            <p
-                                class="text-lg xl:text-xl font-bold text-slate-800"
-                            >
-                                {student.campusName}
-                            </p>
+                        <div>
+                            <p class="text-sm font-bold text-slate-400 uppercase tracking-wide mb-0.5">Campus</p>
+                            <p class="text-base font-bold text-slate-800">{student.campusName}</p>
                         </div>
                     </div>
-
-                    <div class="flex items-start gap-5 group">
-                        <div
-                            class="p-4 bg-slate-50 rounded-2xl transition-colors group-hover:bg-slate-100"
-                        >
-                            <Laptop class="w-7 h-7 text-slate-600" />
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50">
+                        <div class="p-2.5 bg-slate-100 rounded-lg flex-none">
+                            <Laptop class="w-6 h-6 text-slate-600" />
                         </div>
-                        <div class="pt-1">
-                            <p
-                                class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1.5"
-                            >
-                                Major
-                            </p>
-                            <p
-                                class="text-lg xl:text-xl font-bold text-slate-800"
-                            >
-                                {student.majorName}
-                            </p>
+                        <div>
+                            <p class="text-sm font-bold text-slate-400 uppercase tracking-wide mb-0.5">Major</p>
+                            <p class="text-base font-bold text-slate-800">{student.majorName}</p>
                         </div>
                     </div>
-
-                    <div class="flex items-start gap-5 group">
-                        <div
-                            class="p-4 bg-slate-50 rounded-2xl transition-colors group-hover:bg-slate-100"
-                        >
-                            <RefreshCw class="w-7 h-7 text-slate-600" />
+                    <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-50">
+                        <div class="p-2.5 bg-slate-100 rounded-lg flex-none">
+                            <RefreshCw class="w-6 h-6 text-slate-600" />
                         </div>
-                        <div class="pt-1">
-                            <p
-                                class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1.5"
-                            >
-                                Class
-                            </p>
-                            <p
-                                class="text-lg xl:text-xl font-bold text-slate-800"
-                            >
-                                {student.className}
-                            </p>
+                        <div>
+                            <p class="text-sm font-bold text-slate-400 uppercase tracking-wide mb-0.5">Class</p>
+                            <p class="text-base font-bold text-slate-800">{student.className}</p>
                         </div>
                     </div>
-
-                    <div class="flex items-start gap-5 group">
-                        <div
-                            class="p-4 bg-slate-50 rounded-2xl transition-colors group-hover:bg-slate-100"
-                        >
-                            <CalendarDays class="w-7 h-7 text-slate-600" />
-                        </div>
-                        <div class="pt-1">
-                            <p
-                                class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1.5"
-                            >
-                                Enrollment Year
-                            </p>
-                            <p
-                                class="text-lg xl:text-xl font-bold text-slate-800"
-                            >
-                                {student.enrollmentYear}
-                            </p>
-                        </div>
-                    </div>
-
-                    <a
-                        href="#transcript"
-                        class="text-base font-bold text-orange-500 hover:text-orange-600 hover:underline transition-all block sm:hidden mt-4"
-                    >
-                        View Transcript
-                    </a>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

@@ -96,7 +96,7 @@
     </Button>
 </div>
 <h1 class="w-full text-center pt-10 text-3xl font-bold text-amber-900">
-    Lecturer Home Page
+    Class Management
 </h1>
 
 <div class="w-full p-20 flex flex-col gap-10">

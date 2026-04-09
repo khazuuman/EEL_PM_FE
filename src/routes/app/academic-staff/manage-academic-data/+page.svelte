@@ -8,7 +8,7 @@
     const { data } = $props();
     let students = $derived(data?.students || []);
     let majors = $derived(data?.majors || []);
-    let campuses = $derived(data?.campuses || []);
+    // let campuses = $derived(data?.campuses || []);
     let classes = $derived(data?.classes || []);
     let totalCount = $derived(data?.totalCount || 0);
     const cacheKeyName = "staff-student-management";
@@ -17,7 +17,7 @@
 
     let filters = $derived([
         { title: "Majors", key: "majorId", data: majors },
-        { title: "Campuses", key: "campusId", data: campuses },
+        // { title: "Campuses", key: "campusId", data: campuses },
         { title: "Classes", key: "classId", data: classes },
     ]);
     let defaultHeaders = $state([
@@ -26,7 +26,7 @@
         "email",
         "majorCode",
         "classCode",
-        "campusName",
+        // "campusName",
     ]);
     let headerValues = $state({
         studentCode: "Student Code",
@@ -34,12 +34,12 @@
         email: "Email",
         majorCode: "Major Code",
         classCode: "Class Code",
-        campusName: "Campus Name",
+        // campusName: "Campus Name",
     });
 </script>
 
 <div
-    class="bg-white w-full px-10 rounded-md pt-5 min-h-screen overflow-x-hidden pb-10 z-10"
+    class="bg-white w-full px-10 rounded-md pt-5 overflow-x-hidden pb-10 z-10"
 >
     <div class="flex items-center h-12">
         <Button

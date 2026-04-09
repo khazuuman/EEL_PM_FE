@@ -36,7 +36,7 @@
 		{statuses?.[curStatusIndex]?.label}
 	</Badge>
 {:else}
-	<div class="flex items-center justify-center gap-3" title={value}>
+	<div class="flex items-center justify-start gap-3" title={value}>
 		<!-- {#if value && typeof value === 'string'}
 			{@render renderIcon(value.toLowerCase())}
 		{/if} -->

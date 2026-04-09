@@ -163,23 +163,23 @@
             },
         ],
     };
-    // const staffOtherNav: NavigationGroup = {
-    //     groupLabel: "Others",
-    //     items: [
-    //         {
-    //             name: "Manage Semesters",
-    //             url: "/app/academic-staff/manage-semester",
-    //         },
-    //         {
-    //             name: "Manage Courses",
-    //             url: "/app/academic-staff/manage-courses",
-    //         },
-    //         {
-    //             name: "Manage Campuses",
-    //             url: "/app/academic-staff/manage-campuses",
-    //         },
-    //     ],
-    // };
+    const staffOtherNav: NavigationGroup = {
+        groupLabel: "Others",
+        items: [
+            // {
+            //     name: "Manage Semesters",
+            //     url: "/app/academic-staff/manage-semester",
+            // },
+            {
+                name: "Manage Courses",
+                url: "/app/academic-staff/manage-courses",
+            },
+            // {
+            //     name: "Manage Campuses",
+            //     url: "/app/academic-staff/manage-campuses",
+            // },
+        ],
+    };
 
     // ___________________Admin__________________________
     const adminSystemNav: NavigationGroup = {
@@ -239,7 +239,7 @@
         // finalNavGroups.push(staffGroupNav);
         finalNavGroups.push(staffAcademicDataNav);
         finalNavGroups.push(staffAnnouncementNav);
-        // finalNavGroups.push(staffOtherNav);
+        finalNavGroups.push(staffOtherNav);
     }
 
     if (user.roles.includes("Admin")) {
@@ -251,7 +251,7 @@
         roleLabel.length > 1 ? roleLabel.join(" & ") : (roleLabel[0] ?? "");
 </script>
 
-<div class="pt-10 bg-white z-100 min-h-screen">
+<div class="pt-10 bg-white z-100">
     <h1 class="w-full text-center pt-10 text-3xl font-bold text-amber-900">
         {displayLabel} Home Page
     </h1>

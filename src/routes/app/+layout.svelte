@@ -93,10 +93,10 @@
 </header>
 
 <!-- Spacer to offset fixed header -->
-<div class="h-14"></div>
+<div class="h-16"></div>
 
 <Tooltip.Provider>
-    <div class="w-full min-h-screen bg-stone-100 overflow-x-hidden">
+    <div class="w-full bg-stone-100 overflow-hidden">
         {@render children()}
     </div>
     {#if user}

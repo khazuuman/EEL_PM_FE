@@ -43,5 +43,7 @@
 	<!-- Your existing app code -->
 	<Toaster position="top-right" richColors duration={3000} closeButton />
 	<ConfirmDialog />
-	{@render children()}
+	<div class="overflow-hidden">
+		{@render children()}
+	</div>
 {/if}

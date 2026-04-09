@@ -17,8 +17,8 @@
         "email",
         "phoneNumber",
         "fieldOfWork",
-        "biography",
-        "isActive",
+        // "biography",
+        // "isActive",
     ]);
     let headerValues = $state({
         mentorCode: "Mentor Code",
@@ -26,8 +26,8 @@
         email: "Email",
         phoneNumber: "Phone Number",
         fieldOfWork: "Field Of Work",
-        biography: "Biography",
-        isActive: "Status",
+        // biography: "Biography",
+        // isActive: "Status",
     });
 
     let importOpen = $state(false);

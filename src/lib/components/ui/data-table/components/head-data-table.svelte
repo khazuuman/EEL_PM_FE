@@ -53,13 +53,13 @@
 	<Icon class="h-4 w-4" />
 {/snippet}
 
-<div class="flex h-full w-full items-center justify-center">
+<div class="flex h-full w-full items-center justify-start">
 	<DropdownMenu.Root>
 		<DropdownMenu.Trigger tabindex={-1} class="z-10 h-full flex-1 px-2 py-4">
 			<button
 				class={`${
 					header === 'id' ? 'uppercase' : 'first-letter:capitalize'
-				} flex h-full w-full items-center justify-center gap-2 focus:outline-none`}
+				} flex h-full w-full items-center justify-start gap-2 focus:outline-none`}
 				tabindex={-1}
 			>
 				{headerValues[header]}

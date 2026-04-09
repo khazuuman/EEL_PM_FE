@@ -65,7 +65,7 @@
         class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl px-4 py-6 transition-all cursor-pointer"
     >
         <ArrowLeftIcon class="w-5 h-5" />
-        <span class="text-base font-semibold">Groups</span>
+        <span class="text-base font-semibold">Back to Group List</span>
     </Button>
 </div>
 <h1 class="w-full text-center pt-10 text-3xl font-bold text-amber-900">

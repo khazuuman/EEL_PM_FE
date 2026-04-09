@@ -323,7 +323,7 @@
 							{#each activeHeaders as header (header)}
 								<Table.Head
 									class={[
-										"cursor-move px-0! py-0! text-center font-semibold transition-colors select-none",
+										"cursor-move px-0! py-0! text-start font-semibold transition-colors select-none",
 										dragOverColumn === header
 											? "bg-primary/10"
 											: "",
