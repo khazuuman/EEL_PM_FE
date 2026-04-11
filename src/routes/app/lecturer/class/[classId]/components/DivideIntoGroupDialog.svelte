@@ -10,10 +10,16 @@
     type Props = {
         open: boolean;
         classId: string;
+        totalStudent: number;
         onClose: () => void;
     };
 
-    let { open = $bindable(), classId, onClose }: Props = $props();
+    let {
+        open = $bindable(),
+        classId,
+        totalStudent,
+        onClose,
+    }: Props = $props();
 
     let groupCount = $state<number | "">("");
 
@@ -72,6 +78,16 @@
             <div class="grid gap-4 py-4">
                 <input type="hidden" value={classId} name="classId" />
 
+                <!-- Total Students info -->
+                <div
+                    class="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-4 py-3"
+                >
+                    <span class="text-sm text-gray-500">Total Students</span>
+                    <span class="text-sm font-bold text-gray-900"
+                        >{totalStudent}</span
+                    >
+                </div>
+
                 <div class="grid gap-2">
                     <Label for="groupCount">Number of Groups</Label>
                     <Input
@@ -84,6 +100,13 @@
                         class="border-zinc-300"
                         required
                     />
+                    <!-- Gợi ý số người mỗi nhóm -->
+                    <!-- {#if totalStudent > 0}
+                        <p class="text-xs text-gray-400">
+                            ~{Math.ceil(totalStudent / Number(groupCount))} students
+                            per group
+                        </p>
+                    {/if} -->
                 </div>
             </div>
 

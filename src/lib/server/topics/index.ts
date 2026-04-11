@@ -136,6 +136,7 @@ export const changeTopic = async (event: RequestEvent, groupId: any, body: Chang
         method: "POST",
         data: body
     });
+    console.log("change topic body: ", body);
     const data = await safeJsonParse(response);
     return {
         status: response.status,

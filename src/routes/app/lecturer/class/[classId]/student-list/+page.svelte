@@ -42,7 +42,7 @@
             class="flex items-center gap-2 text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-xl px-3 py-4 transition-all cursor-pointer"
         >
             <ArrowLeftIcon class="w-4 h-4" />
-            <span class="text-sm font-semibold">Back to Home</span>
+            <span class="text-sm font-semibold">Back</span>
         </Button>
 	</div>
 	<!-- Page Title -->

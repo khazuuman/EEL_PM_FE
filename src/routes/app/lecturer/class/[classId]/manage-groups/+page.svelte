@@ -10,7 +10,7 @@
     } from "lucide-svelte";
     import { GroupStatusTable } from "$lib/enums/group.js";
     import { Button } from "$lib/components/ui/button";
-    import AutoAllocateDialog from "./components/auto-allocate-dialog.svelte";
+    import AutoAllocateDialog from "../components/DivideIntoGroupDialog.svelte";
     import { setActions } from "$lib/stores/actions.js";
     import { toast } from "svelte-sonner";
     import { goto, invalidateAll } from "$app/navigation";

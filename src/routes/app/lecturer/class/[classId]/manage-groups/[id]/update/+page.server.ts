@@ -13,7 +13,6 @@ export const load: PageServerLoad = async (event) => {
     const classIndex = segments.indexOf("class");
     const classId = segments[classIndex + 1];
 
-    // groupId
     const groupId = params.id;
     const [studentRes, groupRes] = await Promise.all([
         getStudentsAvailableByClassWithoutFilter(event, classId),
@@ -25,8 +24,6 @@ export const load: PageServerLoad = async (event) => {
             message: 'Not found group!'
         });
     }
-    // console.log("group res: ", groupRes?.data?.data);
-    // console.log("student res: ", studentRes);
     return {
         students: (studentRes.data?.data?.data ?? []).map((s: any) => ({
             id: s.studentId,

@@ -10,33 +10,48 @@ export const load: PageServerLoad = async (event) => {
 
     depends(APP_CLASSES_LECTURER);
 
-    //lecturer ID
     const lecturerId = user.lecturer.lecturerId;
 
-    //semesters
     const semesterResult = await getSemesters(event);
     const semesters = semesterResult?.data?.data?.data ?? [];
-    console.log("semesters: ", semesterResult?.data?.data?.data);
 
-    // Tìm semester có isCurrent = true
     const currentSemester = semesters.find(
         (semester: any) => semester.isCurrent === true
     ) ?? null;
 
-    if (!url.searchParams.get("semesterId") && currentSemester?.semesterId) {
+    const hasSemesterId = url.searchParams.get("semesterId");
+    const hasPage = url.searchParams.get("page");
+    const hasLimit = url.searchParams.get("limit");
+
+    // Redirect một lần duy nhất nếu thiếu bất kỳ param mặc định nào
+    if (!hasSemesterId || !hasPage || !hasLimit) {
         const newUrl = new URL(url);
-        newUrl.searchParams.set("semesterId", String(currentSemester.semesterId));
+        if (!hasSemesterId && currentSemester?.semesterId) {
+            newUrl.searchParams.set("semesterId", String(currentSemester.semesterId));
+        }
+        if (!hasPage) {
+            newUrl.searchParams.set("page", "1");
+        }
+        if (!hasLimit) {
+            newUrl.searchParams.set("limit", "10");
+        }
         redirect(302, newUrl.pathname + "?" + newUrl.searchParams.toString());
     }
 
+    const pageIndex = Number(url.searchParams.get("page"));
+    const limit = Number(url.searchParams.get("limit"));
+
     const classResult = await getClassesForLecturer(event, lecturerId);
-    console.log("class: ", classResult?.data?.data?.data);
+    const classData = classResult?.data?.data;
+
     return {
-        user: user,
-        semesters: semesters,
-        classes: classResult?.data?.data?.data ?? [],
-        pageSize: classResult?.data?.pageSize ?? 0,
-        totalCount: classResult?.data?.totalCount ?? 0,
-        defaultSemesterId: currentSemester?.semesterId ?? null
+        user,
+        semesters,
+        classes: classData?.data ?? [],
+        pageIndex,
+        limit,
+        totalCount: classData?.pagination?.totalItems ?? 0,
+        totalPages: classData?.pagination?.totalPages ?? 1,
+        defaultSemesterId: currentSemester?.semesterId ?? null,
     };
 };

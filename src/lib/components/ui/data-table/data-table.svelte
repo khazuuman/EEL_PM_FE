@@ -139,6 +139,15 @@
 		selectedRows.size > 0 && selectedRows.size < sortedData.length,
 	);
 
+	// State for index
+	const currentPage = $derived(
+		Number(page.url.searchParams.get("page")) || 1,
+	);
+	const pageLimit = $derived(
+		Number(page.url.searchParams.get("limit")) || 10,
+	);
+	const startIndex = $derived((currentPage - 1) * pageLimit + 1);
+
 	// Handler functions for drag and drop
 	function onDragStart(header: string) {
 		draggedColumn = handleDragStart(header);
@@ -309,17 +318,22 @@
 				<Table.Root>
 					<Table.Header class="bg-muted/50">
 						<Table.Row>
-						{#if checkboxSelection}
+							{#if checkboxSelection}
 								<Table.Head class="w-12 px-2">
-								<Checkbox
-									tabindex={-1}
-									class="m-auto size-5"
-									checked={isAllSelected}
-									indeterminate={isIndeterminate}
-									onCheckedChange={handleSelectAll}
-								/>
+									<Checkbox
+										tabindex={-1}
+										class="m-auto size-5"
+										checked={isAllSelected}
+										indeterminate={isIndeterminate}
+										onCheckedChange={handleSelectAll}
+									/>
+								</Table.Head>
+							{/if}
+							<Table.Head
+								class="w-12 px-4 text-center font-semibold select-none"
+							>
+								#
 							</Table.Head>
-						{/if}
 							{#each activeHeaders as header (header)}
 								<Table.Head
 									class={[
@@ -351,19 +365,24 @@
 					<Table.Body>
 						{#each sortedData as d, rowIndex (d.id)}
 							<Table.Row class="border-b">
-							{#if  checkboxSelection}
+								{#if checkboxSelection}
 									<Table.Cell class="w-12 px-2">
-									<Checkbox
-										class="m-auto size-5"
-										checked={selectedRows.has(d.id)}
-										tabindex={-1}
-										onclick={(e) => {
-											e.preventDefault();
-											rowSelect(d.id, rowIndex, e);
-										}}
-									/>
+										<Checkbox
+											class="m-auto size-5"
+											checked={selectedRows.has(d.id)}
+											tabindex={-1}
+											onclick={(e) => {
+												e.preventDefault();
+												rowSelect(d.id, rowIndex, e);
+											}}
+										/>
+									</Table.Cell>
+								{/if}
+								<Table.Cell
+									class="w-12 px-4 text-center text-sm text-muted-foreground tabular-nums"
+								>
+									{startIndex + rowIndex}
 								</Table.Cell>
-							{/if}
 								{#each activeHeaders as header, colIndex (header)}
 									<Table.Cell
 										class={[
