@@ -11,6 +11,7 @@
         PencilIcon,
         Trash2Icon,
         PlusIcon,
+        GitPullRequestIcon,
     } from "lucide-svelte";
     import type { PageData } from "../$types";
     import type { NavigationGroup } from "../../../+page.svelte";
@@ -451,10 +452,38 @@
                                         <div
                                             class="flex items-center justify-center gap-1"
                                         >
+                                            {#if group.isChangeTopic}
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    class="relative w-8 h-8 text-white bg-orange-500 hover:bg-orange-600 cursor-pointer rounded-md shadow-md
+                                                            animate-pulse"
+                                                    onclick={() =>
+                                                        goto(
+                                                            `/app/lecturer/class/${classId}/group/${group.id}/topic/review-change-request`,
+                                                        )}
+                                                    title="Review Topic Change Request"
+                                                >
+                                                    <GitPullRequestIcon
+                                                        class="w-4 h-4"
+                                                    />
+                                                    <!-- Badge chấm đỏ nhấp nháy -->
+                                                    <span
+                                                        class="absolute -top-1 -right-1 flex h-2.5 w-2.5"
+                                                    >
+                                                        <span
+                                                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
+                                                        ></span>
+                                                        <span
+                                                            class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"
+                                                        ></span>
+                                                    </span>
+                                                </Button>
+                                            {/if}
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                class="w-8 h-8 text-stone-400 hover:text-blue-600 hover:bg-blue-50"
+                                                class="w-8 h-8 text-stone-400 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
                                                 onclick={() =>
                                                     goto(
                                                         `/app/lecturer/class/${classId}/manage-groups/${group.id}/assign-mentor`,
@@ -468,7 +497,7 @@
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                class="w-8 h-8 text-stone-400 hover:text-violet-600 hover:bg-violet-50"
+                                                class="w-8 h-8 text-stone-400 hover:text-violet-600 hover:bg-violet-50 cursor-pointer"
                                                 onclick={() =>
                                                     goto(
                                                         `/app/lecturer/class/${classId}/group/${group.id}/topic/history`,
@@ -482,7 +511,7 @@
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                class="w-8 h-8 text-stone-400 hover:text-red-600 hover:bg-red-50"
+                                                class="w-8 h-8 text-stone-400 hover:text-red-600 hover:bg-red-50 cursor-pointer"
                                                 onclick={() =>
                                                     handleDeleteGroup(
                                                         group.name,
