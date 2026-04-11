@@ -1,17 +1,22 @@
-import { APP_STAFF_MANAGE_CAMPUS } from "$lib/constants/depend";
-import { getCampuses } from "$lib/server/campuses";
+import { APP_STAFF_MANAGE_ANNOUNCEMENT } from "$lib/constants/depend";
+import { deleteAnnouncement, getAnnouncements } from "$lib/server/announcements";
+import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {
     const { depends } = event;
-    depends(APP_STAFF_MANAGE_CAMPUS);
+    depends(APP_STAFF_MANAGE_ANNOUNCEMENT);
 
-    const campusRes = await getCampuses(event);
-    console.log('campusRes: ', campusRes?.data?.data?.data);
+    const announcementRes = await getAnnouncements(event);
+    console.log('announcementRes: ', announcementRes?.data?.data?.data);
 
     return {
-        campuses: campusRes?.data?.data?.data ?? [],
-        pageSize: campusRes?.data?.data?.pagination?.limit ?? 0,
-        totalCount: campusRes?.data?.data?.pagination?.totalItems ?? 0
+        announcements: announcementRes?.data?.data?.data ?? [],
+        pageSize: announcementRes?.data?.data?.pagination?.limit ?? 0,
+        totalCount: announcementRes?.data?.data?.pagination?.totalItems ?? 0
     };
+};
+
+export const actions: Actions = {
+
 };

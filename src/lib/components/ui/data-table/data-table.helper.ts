@@ -1,5 +1,6 @@
 import { getLocalStorageItem, setLocalStorageItem } from '$lib/utils.js';
 import { EyeIcon, RefreshCcwIcon, Trash2Icon } from '@lucide/svelte';
+import { SquarePenIcon } from 'lucide-svelte';
 
 export const ACTIONS = {
 	VIEW_DETAILS: {},
@@ -18,7 +19,7 @@ export const getAction = (action: string) => {
 		case 'update': {
 			return {
 				label: 'Update',
-				icon: RefreshCcwIcon
+				icon: SquarePenIcon
 			};
 		}
 

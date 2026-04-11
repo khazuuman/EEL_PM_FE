@@ -1,15 +1,5 @@
 <script lang="ts">
 	import { getAction } from "../data-table.helper";
-	import {
-		DropdownMenu,
-		DropdownMenuLabel,
-		DropdownMenuSeparator,
-		DropdownMenuContent,
-		DropdownMenuTrigger,
-		DropdownMenuItem,
-	} from "$lib/components/ui/dropdown-menu/index.js";
-	import { Button } from "$lib/components/ui/button/index.js";
-	import { MoreHorizontalIcon } from "@lucide/svelte";
 	import { getDataTableCTX } from "../ctx/data-table.ctx";
 	import { setActions } from "$lib/stores/actions";
 	import { page } from "$app/state";
@@ -58,64 +48,52 @@
 	};
 </script>
 
-<DropdownMenu>
-	<DropdownMenuTrigger>
-		<Button tabindex={-1} variant="ghost" class="h-8 w-8 p-0">
-			<MoreHorizontalIcon />
-		</Button>
-	</DropdownMenuTrigger>
-	<DropdownMenuContent align="end">
-		<DropdownMenuLabel>{"Actions"}</DropdownMenuLabel>
-		<DropdownMenuSeparator />
-		{#if extraActions}
-			{@render extraActions({ id })}
+<div class="flex items-center gap-1">
+	{#if extraActions}
+		{@render extraActions({ id })}
+	{/if}
+
+	{#each actions as action (action)}
+		{@const actionConfig = getAction(action)}
+		{@const Icon = actionConfig?.icon}
+
+		{#if action === "delete"}
+			<button
+				disabled={isSubmiting}
+				type="button"
+				title={actionConfig?.label}
+				onclick={() =>
+					setActions({
+						active: true,
+						description:
+							"This action cannot be undone. This will permanently delete and remove this student account from our servers.",
+						cb: () => {
+							if (deleteFormEl) {
+								deleteFormEl.requestSubmit();
+							}
+						},
+					})}
+				class="inline-flex cursor-pointer h-8 w-8 items-center justify-center rounded-md text-destructive transition-colors hover:bg-destructive hover:text-white disabled:opacity-50"
+			>
+				{#if Icon}
+					<Icon class="h-4 w-4" />
+				{/if}
+				<span class="sr-only">{actionConfig?.label}</span>
+			</button>
+		{:else}
+			<a
+				href={`${pageUrl}/${action === "update" ? `${id}/update` : id}?redirectTo=${encodeURIComponent(`${pageUrl}?${page.url.searchParams.toString()}`)}`}
+				title={actionConfig?.label}
+				class="inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors hover:bg-muted"
+			>
+				{#if Icon}
+					<Icon class="h-4 w-4" />
+				{/if}
+				<span class="sr-only">{actionConfig?.label}</span>
+			</a>
 		{/if}
-		{#each actions as action (action)}
-			{@const actionConfig = getAction(action)}
-			{@const Icon = actionConfig?.icon}
-			{#if action === "delete"}
-				<DropdownMenuSeparator />
-				<DropdownMenuItem
-					class="bg-destructive data-highlighted:bg-destructive/80 cursor-pointer text-white data-highlighted:text-white"
-				>
-					<button
-						disabled={isSubmiting}
-						type="button"
-						onclick={() =>
-							setActions({
-								active: true,
-								description:
-									"This action cannot be undone. This will permanently delete and remove this student account from our servers.",
-								cb: () => {
-									if (deleteFormEl) {
-										deleteFormEl.requestSubmit();
-									}
-								},
-							})}
-						class="flex items-center gap-2"
-					>
-						{#if Icon}
-							<Icon class="h-4 w-4 text-white" />
-						{/if}
-						{actionConfig?.label}
-					</button>
-				</DropdownMenuItem>
-			{:else}
-				<DropdownMenuItem>
-					<a
-						href={`${pageUrl}/${action === "update" ? `${id}/update` : id}?redirectTo=${encodeURIComponent(`${pageUrl}?${page.url.searchParams.toString()}`)}`}
-						class="flex items-center gap-2"
-					>
-						{#if Icon}
-							<Icon class="h-4 w-4" />
-						{/if}
-						{actionConfig?.label}
-					</a>
-				</DropdownMenuItem>
-			{/if}
-		{/each}
-	</DropdownMenuContent>
-</DropdownMenu>
+	{/each}
+</div>
 
 {#if actions.includes("delete")}
 	<form
