@@ -12,6 +12,7 @@
         Trash2Icon,
         PlusIcon,
         GitPullRequestIcon,
+        RefreshCwIcon,
     } from "lucide-svelte";
     import type { PageData } from "../$types";
     import type { NavigationGroup } from "../../../+page.svelte";
@@ -258,6 +259,14 @@
 
             <!-- Toolbar -->
             <div class="flex items-center gap-2">
+                <Button
+                    variant="outline"
+                    class="gap-2 h-9 border-stone-200 text-stone-500 hover:bg-stone-50 hover:text-stone-700 cursor-pointer"
+                    onclick={() => invalidateAll()}
+                >
+                    <RefreshCwIcon class="w-4 h-4" />
+                    Refresh
+                </Button>
                 <Button
                     variant="outline"
                     class="gap-2 h-9 border-amber-300 text-amber-600 hover:bg-amber-50 hover:text-amber-700 cursor-pointer"

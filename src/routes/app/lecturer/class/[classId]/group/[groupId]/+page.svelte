@@ -34,6 +34,7 @@
     import StudentDetailsDialog from "../../components/StudentDetailsDialog.svelte";
     import UpdateGroupDialog from "../../components/UpdateGroupDialog.svelte";
     import ReviewDialog from "../../components/ReviewDialog.svelte";
+    import AssignMentorDialog from "../../components/AssignMentorDialog.svelte";
 
     let { data }: { data: PageData } = $props();
     const g = $derived(data.groupDetails as any);
@@ -41,6 +42,8 @@
     const members = $derived(g.members ?? []);
     const pageUrl = $derived(page.url.pathname);
     const mentor = $derived(g.mentor ?? null);
+
+    let assignMentorOpen = $state(false);
 
     const statusColor: Record<string, string> = {
         Approved: "bg-green-100 text-green-700 border-green-200",
@@ -495,7 +498,7 @@
                     variant="outline"
                     size="sm"
                     class="h-8 text-sm bg-white text-gray-700 border-gray-200 hover:bg-gray-50 cursor-pointer"
-                    href="{pageUrl}/assign-mentor"
+                    onclick={() => (assignMentorOpen = true)}
                 >
                     {mentor ? "Change Mentor" : "Assign Mentor"}
                 </Button>
@@ -624,4 +627,11 @@
     onSuccess={() => {
         invalidateAll();
     }}
+/>
+
+<AssignMentorDialog
+    bind:open={assignMentorOpen}
+    currentMentorId={g.mentor?.mentorId ?? null}
+    groupId={g.groupId}
+    groupName={g.groupName ?? ""}
 />

@@ -28,7 +28,7 @@
             class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg px-3 py-2 cursor-pointer"
         >
             <ArrowLeft class="w-4 h-4" />
-            <span class="text-sm font-semibold">Back to Student List</span>
+            <span class="text-sm font-semibold">Back</span>
         </Button>
     </div>
 

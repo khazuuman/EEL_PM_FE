@@ -8,14 +8,21 @@
         BookOpenIcon,
         CheckIcon,
         UserIcon,
+        UserRoundSearchIcon,
         UsersIcon,
         XIcon,
     } from "lucide-svelte";
     import { goto, invalidateAll } from "$app/navigation";
     import ReviewDialog from "../../../../components/ReviewDialog.svelte";
+    import AssignMentorDialog from "../../../../components/AssignMentorDialog.svelte";
 
     let { data }: { data: PageData } = $props();
     const topic = data.topicDetail;
+
+    // state
+    let assignMentorOpen = $state(false);
+    let arDialogOpen = $state(false);
+    let arAction = $state<"approve" | "reject">("approve");
 
     function formatDate(dateStr: string | null): string {
         if (!dateStr) return "Not reviewed yet";
@@ -34,9 +41,6 @@
         Approved: "bg-green-100 text-green-700 border-green-200",
         Rejected: "bg-red-100 text-red-700 border-red-200",
     };
-
-    let arDialogOpen = $state(false);
-    let arAction = $state<"approve" | "reject">("approve");
 
     const openDialog = (action: "approve" | "reject") => {
         arAction = action;
@@ -59,6 +63,20 @@
         </Button>
 
         <div class="flex items-center gap-2">
+            {#if topic.status === "Approved"}
+                <Button
+                    variant="outline"
+                    size="sm"
+                    class="h-9 px-4 text-sm border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 cursor-pointer"
+                    onclick={() => (assignMentorOpen = true)}
+                >
+                    <UserRoundSearchIcon class="h-4 w-4 mr-1.5" />
+                    {topic.mentor === null ? "Assign Mentor" : "Change Mentor"}
+                </Button>
+            {/if}
+
+            <Separator />
+
             <Badge
                 class={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-widest ${statusColor[topic.status] ?? "bg-gray-100 text-gray-500 border-gray-200"}`}
             >
@@ -290,6 +308,124 @@
                 </div>
             </div>
         </section>
+
+        <!-- § Mentor Information -->
+        <section class="space-y-4">
+            <h2 class="flex items-center gap-2 text-lg font-bold text-gray-900">
+                <UserRoundSearchIcon class="h-5 w-5 text-amber-500" />
+                Mentor Information
+            </h2>
+
+            {#if topic.mentor}
+                <div
+                    class="rounded-xl border border-gray-200 bg-gray-50/60 px-6 py-5"
+                >
+                    <div class="flex items-start gap-4">
+                        <!-- Avatar -->
+                        <div
+                            class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700 text-xl"
+                        >
+                            {topic.mentor.fullName?.charAt(0) ?? "?"}
+                        </div>
+
+                        <!-- Info -->
+                        <div
+                            class="flex-1 grid grid-cols-1 gap-4 sm:grid-cols-2"
+                        >
+                            <div>
+                                <p
+                                    class="mb-0.5 text-xs font-bold uppercase tracking-widest text-gray-500"
+                                >
+                                    Full Name
+                                </p>
+                                <p
+                                    class="text-base font-semibold text-gray-900"
+                                >
+                                    {topic.mentor.fullName ?? "—"}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p
+                                    class="mb-0.5 text-xs font-bold uppercase tracking-widest text-gray-500"
+                                >
+                                    Mentor Code
+                                </p>
+                                <p
+                                    class="font-mono text-base font-semibold text-gray-900"
+                                >
+                                    {topic.mentor.mentorCode ?? "—"}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p
+                                    class="mb-0.5 text-xs font-bold uppercase tracking-widest text-gray-500"
+                                >
+                                    Email
+                                </p>
+                                <p class="text-sm text-gray-700 break-all">
+                                    {topic.mentor.email ?? "—"}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p
+                                    class="mb-0.5 text-xs font-bold uppercase tracking-widest text-gray-500"
+                                >
+                                    Field of Work
+                                </p>
+                                <p class="text-base text-gray-700">
+                                    {topic.mentor.fieldOfWork ?? "—"}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p
+                                    class="mb-0.5 text-xs font-bold uppercase tracking-widest text-gray-500"
+                                >
+                                    Current Position
+                                </p>
+                                <p class="text-base text-gray-700">
+                                    {topic.mentor.currentPosition ?? "—"}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p
+                                    class="mb-0.5 text-xs font-bold uppercase tracking-widest text-gray-500"
+                                >
+                                    Current Company
+                                </p>
+                                <p class="text-base text-gray-700">
+                                    {topic.mentor.currentCompany ?? "—"}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {:else}
+                <div
+                    class="rounded-xl border border-dashed border-gray-300 bg-gray-50/40 px-6 py-10 flex flex-col items-center justify-center gap-3 text-center"
+                >
+                    <UserRoundSearchIcon class="h-8 w-8 text-gray-300" />
+                    <p class="text-sm font-medium text-gray-400">
+                        No mentor has been assigned yet.
+                    </p>
+                    {#if topic.status === "Approved"}
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            class="mt-1 h-9 px-4 text-sm border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 cursor-pointer"
+                            onclick={() => (assignMentorOpen = true)}
+                        >
+                            <UserRoundSearchIcon class="h-4 w-4 mr-1.5" />
+                            Assign Mentor
+                        </Button>
+                    {/if}
+                </div>
+            {/if}
+        </section>
     </div>
 </div>
 
@@ -302,4 +438,11 @@
     onSuccess={async () => {
         await invalidateAll();
     }}
+/>
+
+<AssignMentorDialog
+    currentMentorId={topic.mentor?.mentorId}
+    bind:open={assignMentorOpen}
+    groupId={topic.group?.id}
+    groupName={topic.group?.groupName ?? ""}
 />
