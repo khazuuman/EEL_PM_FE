@@ -13,6 +13,8 @@
         PlusIcon,
         GitPullRequestIcon,
         RefreshCwIcon,
+        CalendarClockIcon,
+        CalendarDaysIcon,
     } from "lucide-svelte";
     import type { PageData } from "../$types";
     import type { NavigationGroup } from "../../../+page.svelte";
@@ -29,6 +31,7 @@
     import DivideIntoGroupDialog from "./components/DivideIntoGroupDialog.svelte";
     import CreateGroupDialog from "./components/CreateGroupDialog.svelte";
     import { enhance } from "$app/forms";
+    import SetDeadlineDialog from "./components/SetDeadlineDialog.svelte";
 
     let { data } = $props<{ data: PageData }>();
     const classId = data.classDetails?.classId;
@@ -43,7 +46,7 @@
 
     // --- Navigation groups ---
     const lecturerStudentManage: NavigationGroup = {
-        groupLabel: "Student Management",
+        groupLabel: "Others",
         items: [
             {
                 name: "View Student List",
@@ -52,6 +55,10 @@
             {
                 name: "View Unassign Student List",
                 url: `/app/lecturer/class/${classId}/view-unassign-student`,
+            },
+            {
+                name: "Manage Deadline",
+                url: `/app/lecturer/class/${classId}/manage-deadline`,
             },
         ],
     };
@@ -86,14 +93,15 @@
         ],
     };
     const finalNavGroups = [
+        lecturerAssignmentManage,
         lecturerStudentManage,
         // lecturerProjectManage,
-        lecturerAssignmentManage,
     ];
 
     // --- Group table ---
     let groups = $derived(data?.groups || []);
     let totalCount = $derived(data?.totalCount || 0);
+    let deadlines = $derived(data?.deadlines || null);
 
     let currentPage = $state(Number(page.url.searchParams.get("page") ?? 1));
     let limit = $state(Number(page.url.searchParams.get("limit") ?? 10));
@@ -215,6 +223,30 @@
             createDialogOpen = true;
         };
     };
+
+    // --- Deadline ---
+    let deadlineGroupOpen = $state(false);
+    let deadlineTopicOpen = $state(false);
+
+    const groupDeadline = $derived(data?.deadlines?.groupFormationEndDate ?? null); // Date string | null
+    const topicDeadline = $derived(data?.deadlines?.topicRegistrationEndDate ?? null); // Date string | null
+
+    function formatDeadline(dateStr: string | null): string {
+        if (!dateStr) return "Not set";
+        return new Intl.DateTimeFormat("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+        }).format(new Date(dateStr));
+    }
+
+    function isExpired(dateStr: string | null): boolean {
+        if (!dateStr) return false;
+        return new Date(dateStr) < new Date();
+    }
 </script>
 
 <div class="h-[calc(100vh-4rem)] flex flex-col bg-white overflow-hidden">
@@ -308,6 +340,98 @@
 
     <!-- Scrollable body -->
     <div class="flex-1 overflow-y-auto px-8 py-6 flex flex-col gap-10">
+        <!-- ─── Deadline Cards ──────────────────────────────────────────── -->
+        <div class="flex flex-col sm:flex-row gap-3">
+            <!-- Group Formation Deadline -->
+            <div
+                class="flex-1 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-4 flex items-center justify-between gap-4"
+            >
+                <div class="flex items-center gap-3 min-w-0">
+                    <div
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-100 border border-amber-200"
+                    >
+                        <CalendarClockIcon class="w-4 h-4 text-amber-600" />
+                    </div>
+                    <div class="min-w-0">
+                        <p
+                            class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
+                        >
+                            Group Formation Deadline
+                        </p>
+                        <p
+                            class="text-sm font-semibold truncate
+                    {groupDeadline === null
+                                ? 'text-stone-400 italic'
+                                : isExpired(groupDeadline)
+                                  ? 'text-red-500'
+                                  : 'text-stone-800'}"
+                        >
+                            {#if groupDeadline === null}
+                                Not set
+                            {:else if isExpired(groupDeadline)}
+                                ⚠ Expired · {formatDeadline(groupDeadline)}
+                            {:else}
+                                {formatDeadline(groupDeadline)}
+                            {/if}
+                        </p>
+                    </div>
+                </div>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    class="h-8 px-3 text-xs border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100 shrink-0 cursor-pointer"
+                    onclick={() => (deadlineGroupOpen = true)}
+                >
+                    <CalendarClockIcon class="w-3.5 h-3.5 mr-1" />
+                    {groupDeadline ? "Update" : "Set Deadline"}
+                </Button>
+            </div>
+
+            <!-- Topic Registration Deadline -->
+            <div
+                class="flex-1 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-4 flex items-center justify-between gap-4"
+            >
+                <div class="flex items-center gap-3 min-w-0">
+                    <div
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100 border border-blue-200"
+                    >
+                        <CalendarDaysIcon class="w-4 h-4 text-blue-600" />
+                    </div>
+                    <div class="min-w-0">
+                        <p
+                            class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
+                        >
+                            Topic Registration Deadline
+                        </p>
+                        <p
+                            class="text-sm font-semibold truncate
+                    {topicDeadline === null
+                                ? 'text-stone-400 italic'
+                                : isExpired(topicDeadline)
+                                  ? 'text-red-500'
+                                  : 'text-stone-800'}"
+                        >
+                            {#if topicDeadline === null}
+                                Not set
+                            {:else if isExpired(topicDeadline)}
+                                ⚠ Expired · {formatDeadline(topicDeadline)}
+                            {:else}
+                                {formatDeadline(topicDeadline)}
+                            {/if}
+                        </p>
+                    </div>
+                </div>
+                <Button
+                    variant="outline"
+                    size="sm"
+                    class="h-8 px-3 text-xs border-blue-200 text-blue-700 bg-blue-50 hover:bg-blue-100 shrink-0 cursor-pointer"
+                    onclick={() => (deadlineTopicOpen = true)}
+                >
+                    <CalendarDaysIcon class="w-3.5 h-3.5 mr-1" />
+                    {topicDeadline ? "Update" : "Set Deadline"}
+                </Button>
+            </div>
+        </div>
         <!-- Group Table -->
         <div>
             <div class="rounded-xl border border-stone-200 overflow-hidden">
@@ -704,4 +828,20 @@
     bind:open={createDialogOpen}
     students={availableStudents}
     {classId}
+/>
+
+<SetDeadlineDialog
+    bind:open={deadlineGroupOpen}
+    type="group"
+    {classId}
+    currentDeadline={groupDeadline}
+    onSuccess={async () => await invalidateAll()}
+/>
+
+<SetDeadlineDialog
+    bind:open={deadlineTopicOpen}
+    type="topic"
+    {classId}
+    currentDeadline={topicDeadline}
+    onSuccess={async () => await invalidateAll()}
 />

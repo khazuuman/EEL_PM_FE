@@ -9,6 +9,8 @@ import { getStudentsAvailableByClassWithoutFilter } from "$lib/server/students";
 import { createGroup, deleteGroup } from "$lib/server/groups";
 import type { CreateGroup } from "$lib/types/group";
 import { redirect } from "@sveltejs/kit";
+import { getDeadlines, updateGroupFormationDeadline, updateTopicRegistrationDeadline } from "$lib/server/deadline";
+import type { SetGroupFormationDeadline, SetTopicRegistrationDeadline } from "$lib/types/deadline";
 
 export const load: PageServerLoad = async (event) => {
     const { depends, url, parent } = event;
@@ -18,11 +20,13 @@ export const load: PageServerLoad = async (event) => {
 
     const { classDetails } = await parent();
 
-    const groupRes = await getGroupsByClass(event, classDetails.classId);
-    console.log('groupsRes: ', groupRes?.data?.data);
+    const [deadlineRes, groupRes] = await Promise.all([getDeadlines(event, classDetails.classId), getGroupsByClass(event, classDetails.classId)])
 
+    console.log('groupsRes: ', groupRes?.data?.data);
+    console.log('deadlineRes: ', deadlineRes);
     return {
         groups: groupRes?.data?.data?.data ?? [],
+        deadlines: deadlineRes.data?.data ?? null,
         limit: groupRes?.data?.data?.pagination?.limit ?? 0,
         totalCount: groupRes?.data?.data?.pagination?.totalItems ?? 0,
         totalStudent: groupRes?.data?.data?.totalStudent,
@@ -103,12 +107,37 @@ export const actions: Actions = {
     },
     deleteGroup: async (event) => {
         const formData = await event.request.formData();
-        const groupId = Number(formData.get("groupId")); 
+        const groupId = Number(formData.get("groupId"));
 
         const deleteGroupRes = await deleteGroup(event, groupId);
         if (!deleteGroupRes || deleteGroupRes.status !== 200) {
             return fail(400, {
                 message: deleteGroupRes?.data?.message ?? "Failed to delete group",
+            });
+        }
+    },
+    setGroupDeadline: async (event) => {
+        const formData = await event.request.formData();
+        const classId = Number(formData.get("classId"));
+        const groupFormationEndDate = formData.get("groupDeadline");
+        console.log("groupFormationEndDate from body: ", groupFormationEndDate);
+
+        const updateGroupFormationDeadlineRes = await updateGroupFormationDeadline(event, { groupFormationEndDate } as SetGroupFormationDeadline, classId);
+        if (!updateGroupFormationDeadlineRes || updateGroupFormationDeadlineRes.status !== 200) {
+            return fail(400, {
+                message: updateGroupFormationDeadlineRes?.data?.message ?? "Failed to set group formation deadline",
+            });
+        }
+    },
+    setTopicDeadline: async (event) => {
+        const formData = await event.request.formData();
+        const classId = Number(formData.get("classId"));
+        const topicRegistrationEndDate = formData.get("topicDeadline");
+
+        const updateTopicRegistrationDeadlineRes = await updateTopicRegistrationDeadline(event, { topicRegistrationEndDate } as SetTopicRegistrationDeadline, classId);
+        if (!updateTopicRegistrationDeadlineRes || updateTopicRegistrationDeadlineRes.status !== 200) {
+            return fail(400, {
+                message: updateTopicRegistrationDeadlineRes?.data?.message ?? "Failed to set topic registration deadline",
             });
         }
     },
