@@ -609,7 +609,7 @@
                                                     </span>
                                                 </Button>
                                             {/if}
-                                            <Button
+                                            <!-- <Button
                                                 variant="ghost"
                                                 size="icon"
                                                 class="w-8 h-8 text-stone-400 hover:text-blue-600 hover:bg-blue-50 cursor-pointer"
@@ -622,7 +622,7 @@
                                                 <UserRoundSearchIcon
                                                     class="w-4 h-4"
                                                 />
-                                            </Button>
+                                            </Button> -->
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
