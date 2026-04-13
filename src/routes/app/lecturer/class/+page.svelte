@@ -5,6 +5,7 @@
         BookUserIcon,
         ChevronLeftIcon,
         ChevronRightIcon,
+        BellIcon,
     } from "lucide-svelte";
     import SemesterDropDown from "./components/SemesterDropDown.svelte";
     import * as Table from "$lib/components/ui/table/index.js";
@@ -16,14 +17,15 @@
     import type { Semester } from "$lib/types/semester";
     import { page } from "$app/state";
     import { goto } from "$app/navigation";
+    import { slide } from "svelte/transition";
 
     let { data } = $props<{ data: PageData }>();
-    let searchQuery = $state(
-        page.url.searchParams.get("searchTerm") ?? "",
-    );
+    let searchQuery = $state(page.url.searchParams.get("searchTerm") ?? "");
 
     const semesters = $derived(data.semesters as Semester[]);
     const classes = $derived(data.classes as ClassDetail[]);
+
+    let announcementsCollapsed = $state(false);
 
     let selectedSemesterId = $state(
         page.url.searchParams.get("semesterId") ??
@@ -99,6 +101,55 @@
 </script>
 
 <div class="h-[calc(100vh-4rem)] flex flex-col bg-white">
+    {#if data.announcements?.length > 0}
+        <div class="rounded-lg border border-red-200 bg-red-50 mx-8 mt-8">
+            <!-- Header -->
+            <button
+                type="button"
+                class="w-full flex items-center gap-2 px-4 py-3 cursor-pointer hover:bg-red-100/50 transition-colors rounded-lg"
+                onclick={() =>
+                    (announcementsCollapsed = !announcementsCollapsed)}
+            >
+                <BellIcon class="w-4 h-4 text-red-500 shrink-0" />
+                <p class="text-sm font-semibold text-red-600">Announcements</p>
+                <span
+                    class="text-xs font-medium text-red-400 bg-red-100 border border-red-200 rounded-full px-2 py-0.5"
+                >
+                    {data.announcements.length}
+                </span>
+                <span
+                    class="ml-auto text-xs text-red-400 transition-transform duration-200 {announcementsCollapsed
+                        ? 'rotate-0'
+                        : 'rotate-180'}"
+                >
+                    ▼
+                </span>
+            </button>
+
+            <!-- List -->
+            {#if !announcementsCollapsed}
+                <div
+                    transition:slide={{ duration: 200 }}
+                    class="border-t border-red-200 overflow-y-auto max-h-48 px-4 py-3"
+                >
+                    <ul
+                        class="flex flex-col gap-1.5 pl-6 list-disc marker:text-red-300"
+                    >
+                        {#each data.announcements as announcement}
+                            <li>
+                                <span class="text-sm font-medium text-red-600"
+                                    >{announcement.title}</span
+                                >
+                                <span class="text-sm text-red-400 ml-1.5"
+                                    >— {announcement.content}</span
+                                >
+                            </li>
+                        {/each}
+                    </ul>
+                </div>
+            {/if}
+        </div>
+    {/if}
     <!-- Page Header -->
     <div class="flex-none px-8 pt-8 pb-6 border-b border-stone-100">
         <div
@@ -182,8 +233,7 @@
                     </Table.Header>
                     <Table.Body>
                         {#each classes as classItem, i}
-                            {@const rowNum =
-                                (currentPage - 1) * limit + i + 1}
+                            {@const rowNum = (currentPage - 1) * limit + i + 1}
                             <Table.Row
                                 class="hover:bg-amber-50/50 transition-colors group"
                             >
@@ -212,9 +262,7 @@
                                     </code>
                                 </Table.Cell>
                                 <Table.Cell>
-                                    <span
-                                        class="font-semibold text-stone-900"
-                                    >
+                                    <span class="font-semibold text-stone-900">
                                         {classItem.currentStudentCount}
                                     </span>
                                 </Table.Cell>

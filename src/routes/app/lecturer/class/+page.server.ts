@@ -3,6 +3,8 @@ import { getClassesForLecturer } from "$lib/server/classes";
 import { getSemesters } from "$lib/server/semesters";
 import { redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
+import ROLE from "$lib/enums/role";
+import { getAnnouncementByRole } from "$lib/server/announcements";
 
 export const load: PageServerLoad = async (event) => {
     const { depends, locals, url } = event;
@@ -44,6 +46,10 @@ export const load: PageServerLoad = async (event) => {
     const classResult = await getClassesForLecturer(event, lecturerId);
     const classData = classResult?.data?.data;
 
+    const announcementRes = await getAnnouncementByRole(event, ROLE.LECTURER, user.lecturer?.campusId);
+    console.log("announcements: ", announcementRes);
+    console.log("user.lecturer?.campusId",user.lecturer?.campusId)
+
     return {
         user,
         semesters,
@@ -52,6 +58,7 @@ export const load: PageServerLoad = async (event) => {
         limit,
         totalCount: classData?.pagination?.totalItems ?? 0,
         totalPages: classData?.pagination?.totalPages ?? 1,
+        announcements: announcementRes.data?.data?.data || [],
         defaultSemesterId: currentSemester?.semesterId ?? null,
     };
 };
