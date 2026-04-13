@@ -56,10 +56,6 @@
                 name: "View Unassign Student List",
                 url: `/app/lecturer/class/${classId}/view-unassign-student`,
             },
-            {
-                name: "Manage Deadline",
-                url: `/app/lecturer/class/${classId}/manage-deadline`,
-            },
         ],
     };
     // const lecturerProjectManage: NavigationGroup = {

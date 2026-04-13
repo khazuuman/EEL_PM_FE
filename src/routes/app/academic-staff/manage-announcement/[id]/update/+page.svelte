@@ -1,29 +1,44 @@
 <script lang="ts">
     import { enhance } from "$app/forms";
     import { goto } from "$app/navigation";
-    import { page } from "$app/state";
     import Button from "$lib/components/ui/button/button.svelte";
     import * as Field from "$lib/components/ui/field/index";
     import Input from "$lib/components/ui/input/input.svelte";
+    import ROLE from "$lib/enums/role";
+    import { BellIcon } from "lucide-svelte";
     import { toast } from "svelte-sonner";
 
     let { data } = $props();
-    const courseId = page.params.id;
-    const course = data.courseDetails;
+    const announcement = data.announcement;
 
     let isSubmitting = $state(false);
+
+    const roleOptions = [
+        { label: "Student", value: ROLE.STUDENT },
+        { label: "Lecturer", value: ROLE.LECTURER },
+        { label: "Mentor", value: ROLE.MENTOR },
+    ];
+
+    // Pre-check roles từ targets (targets có thể là object hoặc array)
+    const initialRoles: string[] = Array.isArray(announcement.targets)
+        ? announcement.targets.map((t: any) => t.roleName)
+        : announcement.targets
+          ? [announcement.targets.roleName]
+          : [];
 
     const handleSubmit: import("@sveltejs/kit").SubmitFunction = () => {
         isSubmitting = true;
         return async ({ result, update }) => {
+            console.log(result);
             isSubmitting = false;
             if (result.type === "failure") {
                 toast.error(
-                    (result.data as any)?.message ?? "Failed to update course",
+                    (result.data as any)?.message ??
+                        "Failed to update announcement",
                 );
             } else if (result.type === "success") {
-                toast.success("Course updated successfully!");
-                await goto("/app/academic-staff/manage-courses");
+                toast.success("Announcement updated successfully!");
+                await goto("/app/academic-staff/manage-announcement");
             }
             await update();
         };
@@ -33,102 +48,116 @@
 <div
     class="flex h-screen w-screen flex-col items-center justify-center bg-stone-100"
 >
-    <form method="POST" action={`/app/academic-staff/manage-courses/${courseId}?/updateCourse`} use:enhance={handleSubmit}>
+    <form
+        method="POST"
+        action={`/app/academic-staff/manage-announcement/${announcement.announcementId}?/UpdateAnnouncement`}
+        use:enhance={handleSubmit}
+    >
+        <!-- Hidden id -->
+        <input
+            type="hidden"
+            name="announcementId"
+            value={announcement.announcementId}
+        />
+
         <!-- Form body -->
         <div
-            class="w-[800px] rounded-t-md border border-stone-300 bg-white p-8"
+            class="w-[640px] rounded-t-md border border-stone-300 bg-white p-8"
         >
             <!-- Title -->
-            <div class="flex w-full items-center gap-3">
-                <span class="whitespace-nowrap font-semibold text-stone-800"
-                    >Update Course</span
+            <div class="flex w-full items-center gap-3 mb-8">
+                <div
+                    class="w-9 h-9 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0"
+                >
+                    <BellIcon class="w-4 h-4 text-amber-500" />
+                </div>
+                <span class="font-semibold text-stone-800"
+                    >Update Announcement</span
                 >
                 <span class="block h-px flex-1 bg-stone-300"></span>
-                <span class="whitespace-nowrap font-mono text-sm text-stone-400">
-                    {course.courseCode}
-                </span>
             </div>
 
-            <!-- Row 1: Code + Name -->
-            <div class="mt-8 flex gap-5">
-                <Field.Field class="flex-1">
-                    <Field.Label for="courseCode">
-                        Course Code<span class="text-orange-500">*</span>
-                    </Field.Label>
-                    <Input
-                        id="courseCode"
-                        placeholder="e.g. CS101"
-                        class="font-mono"
-                        value={course.courseCode}
-                        disabled
-                    />
-                </Field.Field>
+            <!-- Title field -->
+            <Field.Field>
+                <Field.Label for="title">
+                    Title<span class="text-orange-500">*</span>
+                </Field.Label>
+                <Input
+                    name="title"
+                    id="title"
+                    value={announcement.title}
+                    placeholder="e.g. System Maintenance Notice"
+                    required
+                />
+            </Field.Field>
 
-                <Field.Field class="flex-1">
-                    <Field.Label for="courseName">
-                        Course Name<span class="text-orange-500">*</span>
-                    </Field.Label>
-                    <Input
-                        name="courseName"
-                        id="courseName"
-                        placeholder="e.g. Introduction to Computer Science"
-                        value={course.courseName}
-                        required
-                    />
-                </Field.Field>
-            </div>
-
-            <!-- Row 2: Credits + isActive -->
-            <div class="mt-6 flex gap-5">
-                <Field.Field class="flex-1">
-                    <Field.Label for="credits">
-                        Credits<span class="text-orange-500">*</span>
-                    </Field.Label>
-                    <Input
-                        type="number"
-                        name="credits"
-                        id="credits"
-                        placeholder="e.g. 3"
-                        min="1"
-                        max="10"
-                        value={course.credits}
-                        required
-                    />
-                </Field.Field>
-
-                <Field.Field class="flex-1">
-                    <Field.Label for="isActive">Status</Field.Label>
-                    <select
-                        id="isActive"
-                        name="isActive"
-                        class="border-input w-full rounded-md border bg-white px-3 py-2 text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none"
-                    >
-                        <option value="true" selected={course.isActive === true}>Active</option>
-                        <option value="false" selected={course.isActive === false}>Inactive</option>
-                    </select>
-                </Field.Field>
-            </div>
-
-            <!-- Row 3: Description -->
-            <div class="mt-6">
+            <!-- Content field -->
+            <div class="mt-5">
                 <Field.Field>
-                    <Field.Label for="courseDescription">
-                        Description
+                    <Field.Label for="content">
+                        Content<span class="text-orange-500">*</span>
                     </Field.Label>
                     <textarea
-                        name="courseDescription"
-                        id="courseDescription"
-                        placeholder="Enter course description..."
-                        rows={4}
-                        class="border-input w-full rounded-md border bg-white px-3 py-2 text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none resize-none"
-                    >{course.courseDescription ?? ""}</textarea>
+                        name="content"
+                        id="content"
+                        placeholder="Enter announcement content..."
+                        rows={5}
+                        required
+                        class="border-input w-full rounded-md border bg-white px-3 py-2 text-sm focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 focus:outline-none resize-none"
+                        >{announcement.content}</textarea
+                    >
+                </Field.Field>
+            </div>
+
+            <!-- Notify To -->
+            <div class="mt-5">
+                <Field.Field>
+                    <Field.Label>
+                        Notify To<span class="text-orange-500">*</span>
+                    </Field.Label>
+                    <div class="mt-2 grid grid-cols-2 gap-2">
+                        {#each roleOptions as role}
+                            <label
+                                class="flex items-center gap-2.5 rounded-md border border-stone-200 bg-stone-50 px-3 py-2.5 cursor-pointer hover:bg-amber-50 hover:border-amber-200 transition-colors has-[:checked]:bg-amber-50 has-[:checked]:border-amber-300"
+                            >
+                                <input
+                                    type="checkbox"
+                                    name="roleName"
+                                    value={role.value}
+                                    checked={initialRoles.includes(role.value)}
+                                    class="accent-amber-500 h-4 w-4"
+                                />
+                                <span class="text-sm text-stone-700"
+                                    >{role.label}</span
+                                >
+                            </label>
+                        {/each}
+                    </div>
+                </Field.Field>
+            </div>
+            <!-- Is Active -->
+            <div class="mt-5">
+                <Field.Field>
+                    <Field.Label>Status</Field.Label>
+                    <label
+                        class="mt-2 flex items-center gap-2.5 cursor-pointer w-fit"
+                    >
+                        <input
+                            type="checkbox"
+                            name="isActive"
+                            value="true"
+                            checked={announcement.isActive}
+                            class="accent-amber-500 h-4 w-4"
+                        />
+                        <span class="text-sm text-stone-700">Active</span>
+                    </label>
                 </Field.Field>
             </div>
         </div>
 
         <!-- Footer -->
         <div
-            class="flex w-[800px] items-center justify-between rounded-b-md border border-t-0 border-stone-300 bg-stone-50 px-8 py-5"
+            class="flex w-[640px] items-center justify-between rounded-b-md border border-t-0 border-stone-300 bg-stone-50 px-8 py-5"
         >
             <p class="text-xs text-stone-400">
                 <span class="text-orange-500">*</span> Required fields
@@ -138,7 +167,8 @@
                     type="button"
                     variant="outline"
                     class="cursor-pointer border-stone-300 text-stone-600"
-                    onclick={() => goto("/app/academic-staff/manage-courses")}
+                    onclick={() =>
+                        goto("/app/academic-staff/manage-announcement")}
                 >
                     Cancel
                 </Button>
@@ -153,7 +183,7 @@
                         ></span>
                         Updating...
                     {:else}
-                        Update Course
+                        Update Announcement
                     {/if}
                 </Button>
             </div>

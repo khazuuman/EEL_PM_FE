@@ -3,24 +3,12 @@
     import { Badge } from "$lib/components/ui/badge";
     import { UsersIcon, BookOpenIcon, HashIcon } from "lucide-svelte";
 
-    type Member = {
-        studentId: number;
-        studentCode: string;
-        fullName: string;
-        avatarUrl: string | null;
-        campusName: string;
-        majorCode: string;
-        majorName: string;
-        classCode: string;
-        isLeader: boolean;
-    };
-
     type GroupDetail = {
         groupId: number;
         groupName: string;
         groupDescription: string;
         status: string;
-        members: Member[];
+        members: any[];
         topic: { id: number; title: string } | null;
     };
 
@@ -61,7 +49,7 @@
 <Dialog.Root {open} {onOpenChange}>
     <Dialog.Content class="max-w-2xl p-0 overflow-hidden rounded-2xl">
         <div
-            class="bg-linear-to-br from-orange-300 to-amber-500 px-6 pt-6 pb-5"
+            class="bg-linear-to-br from-orange-200 to-amber-300 px-6 pt-6 pb-5"
         >
             <div class="flex items-start justify-between gap-4">
                 <div class="flex flex-col gap-1">
@@ -103,15 +91,6 @@
                         >
                     </div>
                 {/if}
-                <div
-                    class="flex items-center gap-2 rounded-xl bg-black/10 px-4 py-2"
-                >
-                    <HashIcon class="h-4 w-4 text-orange-900" />
-                    <span class="text-sm text-orange-900/70">ID</span>
-                    <span class="text-sm font-bold text-orange-950"
-                        >{group?.groupId}</span
-                    >
-                </div>
             </div>
         </div>
 
@@ -203,12 +182,14 @@
                                 <span
                                     class="rounded-md bg-stone-100 px-3 py-0.5 text-xs font-medium text-stone-700"
                                 >
-                                    {member.majorCode}
+                                    {member.majorName}
                                 </span>
-                                {#if member.classCode}
-                                    <span class="text-xs text-stone-400"
-                                        >{member.classCode}</span
+                                {#if member.gender}
+                                    <span
+                                        class={`text-xs ${member.gender === "Male" ? "text-blue-500" : "text-pink-500"}`}
                                     >
+                                        {member.gender}
+                                    </span>
                                 {/if}
                             </div>
                         </div>

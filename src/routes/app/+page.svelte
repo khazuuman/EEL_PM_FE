@@ -1,6 +1,7 @@
 <script lang="ts">
+    import ROLE from "$lib/enums/role";
     import type { LayoutData } from "../$types";
-    import { error } from "@sveltejs/kit";
+    import { error, redirect } from "@sveltejs/kit";
 
     export type NavigationItem = {
         name: string;
@@ -12,79 +13,79 @@
         items: NavigationItem[];
     };
 
-    const studentClassGroup: NavigationGroup = {
-        groupLabel: "Class",
-        items: [
-            { name: "View Groups In Class", url: "/app/student/groups" },
-            {
-                name: "Assignment / Checkpoint",
-                url: "/app/student/assignment-checkpoint",
-            },
-            { name: "View Students In Class", url: "/app/student/students" },
-            { name: "Mentor", url: "/app/student/mentor" },
-        ],
-    };
+    // const studentClassGroup: NavigationGroup = {
+    //     groupLabel: "Class",
+    //     items: [
+    //         { name: "View Groups In Class", url: "/app/student/groups" },
+    //         {
+    //             name: "Assignment / Checkpoint",
+    //             url: "/app/student/assignment-checkpoint",
+    //         },
+    //         { name: "View Students In Class", url: "/app/student/students" },
+    //         { name: "Mentor", url: "/app/student/mentor" },
+    //     ],
+    // };
 
-    const studentLeaderProjectGroup: NavigationGroup = {
-        groupLabel: "Project",
-        items: [
-            { name: "Manage Group Project", url: "/app/student/group-project" },
-            {
-                name: "Register Project Topic",
-                url: "/app/student/register-topic",
-            },
-            {
-                name: "Create Topic Change Request",
-                url: "/app/student/topic-change",
-            },
-            {
-                name: "View Topic History",
-                url: "/app/student/view-topic-history",
-            },
-        ],
-    };
+    // const studentLeaderProjectGroup: NavigationGroup = {
+    //     groupLabel: "Project",
+    //     items: [
+    //         { name: "Manage Group Project", url: "/app/student/group-project" },
+    //         {
+    //             name: "Register Project Topic",
+    //             url: "/app/student/register-topic",
+    //         },
+    //         {
+    //             name: "Create Topic Change Request",
+    //             url: "/app/student/topic-change",
+    //         },
+    //         {
+    //             name: "View Topic History",
+    //             url: "/app/student/view-topic-history",
+    //         },
+    //     ],
+    // };
 
-    const studentLeaderGroup: NavigationGroup = {
-        groupLabel: "Group (Leader)",
-        items: [
-            // {
-            //     name: "Edit My Group Information",
-            //     url: "/app/student/edit-my-group",
-            // },
-            { name: "Manage My Group", url: "/app/student/my-group" },
-            { name: "Invite Member", url: "/app/student/invite-member" },
-            {
-                name: "My Sent Invitations",
-                url: "/app/student/my-sent-invitations",
-            },
-            {
-                name: "Review Join Requests",
-                url: "/app/student/review-join-requests",
-            },
-        ],
-    };
+    // const studentLeaderGroup: NavigationGroup = {
+    //     groupLabel: "Group (Leader)",
+    //     items: [
+    //         // {
+    //         //     name: "Edit My Group Information",
+    //         //     url: "/app/student/edit-my-group",
+    //         // },
+    //         { name: "Manage My Group", url: "/app/student/my-group" },
+    //         { name: "Invite Member", url: "/app/student/invite-member" },
+    //         {
+    //             name: "My Sent Invitations",
+    //             url: "/app/student/my-sent-invitations",
+    //         },
+    //         {
+    //             name: "Review Join Requests",
+    //             url: "/app/student/review-join-requests",
+    //         },
+    //     ],
+    // };
 
-    const studentMemberGroup: NavigationGroup = {
-        groupLabel: "Group",
-        items: [
-            {
-                name: "Group Invitations",
-                url: "/app/student/group-invitations",
-            },
-            { name: "View My Group", url: "/app/student/my-group" },
-            {
-                name: "My Join Requests",
-                url: "/app/student/my-join-requests",
-            },
-        ],
-    };
+    // const studentMemberGroup: NavigationGroup = {
+    //     groupLabel: "Group",
+    //     items: [
+    //         {
+    //             name: "Group Invitations",
+    //             url: "/app/student/group-invitations",
+    //         },
+    //         { name: "View My Group", url: "/app/student/my-group" },
+    //         {
+    //             name: "My Join Requests",
+    //             url: "/app/student/my-join-requests",
+    //         },
+    //     ],
+    // };
 
-    const studentMemberProject: NavigationGroup = {
-        groupLabel: "Project",
-        items: [
-            { name: "View Group Project", url: "/app/student/group-project" },
-        ],
-    };
+    // const studentMemberProject: NavigationGroup = {
+    //     groupLabel: "Project",
+    //     items: [
+    //         { name: "View Group Project", url: "/app/student/group-project" },
+    //     ],
+    // };
 
     // ___________________Mentor__________________________
     const mentorGroupNav: NavigationGroup = {
@@ -154,7 +155,7 @@
             },
         ],
     };
-        const staffAnnouncementNav: NavigationGroup = {
+    const staffAnnouncementNav: NavigationGroup = {
         groupLabel: "Announcement",
         items: [
             {
@@ -206,25 +207,33 @@
 
     let finalNavGroups = [] as NavigationGroup[];
 
-    if (user.roles.includes("Student")) {
-        roleLabel.push("Student");
-        finalNavGroups.push(studentClassGroup);
-        if (user.student?.group?.isLeader === true) {
-            finalNavGroups.push(studentLeaderGroup);
-            finalNavGroups.push(studentLeaderProjectGroup);
-        } else {
-            finalNavGroups.push(studentMemberGroup);
-            finalNavGroups.push(studentMemberProject);
-        }
+    if (user.roles.includes(ROLE.STUDENT)) {
+        throw redirect(302, "/app/student");
     }
 
-    if (user.roles.includes("Lecturer")) {
+    if (user.roles.includes(ROLE.LECTURER)) {
+        throw redirect(302, "/app/lecturer/class");
+    }
+
+    if (
+        [ROLE.LECTURER, ROLE.MENTOR, ROLE.STUDENT].some((role) =>
+            user.roles.includes(role),
+        )
+    ) {
         throw error(404, "Not Found!");
     }
 
-    if (user.roles.includes("Mentor")) {
-        throw error(404, "Not Found!");
-    }
+    // if (user.roles.includes("Student")) {
+    //     roleLabel.push("Student");
+    //     finalNavGroups.push(studentClassGroup);
+    //     if (user.student?.group?.isLeader === true) {
+    //         finalNavGroups.push(studentLeaderGroup);
+    //         finalNavGroups.push(studentLeaderProjectGroup);
+    //     } else {
+    //         finalNavGroups.push(studentMemberGroup);
+    //         finalNavGroups.push(studentMemberProject);
+    //     }
+    // }
 
     if (user.roles.includes("Mentor")) {
         roleLabel.push("Mentor");

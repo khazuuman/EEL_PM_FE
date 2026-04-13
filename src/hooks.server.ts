@@ -27,6 +27,9 @@ export const handle: Handle = async ({ event, resolve }) => {
       if (locals.user.roles.includes(ROLE.MENTOR)) {
         throw redirect(302, "/app/mentor/groups");
       }
+      if (locals.user.roles.includes(ROLE.STUDENT)) {
+        throw redirect(302, "/app/student");
+      }
       throw redirect(302, "/app");
     }
   }

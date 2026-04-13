@@ -27,7 +27,7 @@
                 );
             } else if (result.type === "success") {
                 toast.success("Announcement created successfully!");
-                await goto("/app/campus-management/announcements");
+                await goto("/app/academic-staff/manage-announcement");
             }
             await update();
         };

@@ -32,16 +32,16 @@
     });
 </script>
 
-<div class="bg-white px-5 pt-10 pb-10 rounded-md min-h-screen">
+<div class="bg-white px-5 pt-5 pb-10 rounded-md min-h-screen">
     <!-- Back button -->
     <div class="w-full flex items-center">
         <Button
             variant="ghost"
-            onclick={() => goto(`/app`)}
+            onclick={() => goto(`/app/student`)}
             class="flex items-center gap-2 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-xl px-4 py-6 transition-all cursor-pointer"
         >
             <ArrowLeftIcon class="w-5 h-5" />
-            <span class="text-base font-semibold">Back to Home</span>
+            <span class="text-base font-semibold">Back</span>
         </Button>
     </div>
 

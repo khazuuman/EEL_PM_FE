@@ -58,14 +58,6 @@
         joinDialogOpen = true;
     }
 
-    const overviewData = $derived([
-        {
-            label: "Total Groups",
-            value: totalItems,
-            icon: Layers2Icon,
-        },
-    ]);
-
     const statusConfig: Record<string, { class: string; dot: string }> = {
         Draft: {
             class: "bg-stone-100 text-stone-500 border border-stone-200",
@@ -99,7 +91,7 @@
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
             const params = new URLSearchParams();
-            if (searchQuery) params.set("Keyword", searchQuery);
+            if (searchQuery) params.set("searchTerm", searchQuery);
             goto(`?${params.toString()}`, {
                 replaceState: true,
                 keepFocus: true,
@@ -128,16 +120,16 @@
 
 <div class="min-h-screen bg-white px-8">
     <!-- Page Header -->
-    <div class="bg-white py-5 z-40">
+    <div class="bg-white z-40">
         <div class="mx-auto px-4 sm:px-6">
             <div class="flex items-center h-12">
                 <Button
                     variant="ghost"
-                    onclick={() => goto(`/app`)}
+                    onclick={() => goto(`/app/student`)}
                     class="flex items-center gap-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-50 rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer -ml-3"
                 >
                     <ArrowLeftIcon class="w-4 h-4" />
-                    Back to Home
+                    Back
                 </Button>
             </div>
         </div>
@@ -178,75 +170,58 @@
             </div>
         </div>
 
-        <!-- Stats Row -->
-        <div class="flex flex-wrap gap-3 mb-8">
-            {#each overviewData as stat}
-                {@const Icon = stat.icon}
+        <!-- Groups Table -->
+        <div class="rounded-xl border border-stone-200 overflow-hidden">
+            <!-- Table Header -->
+            <div
+                class="grid grid-cols-4 gap-4 border-b border-stone-100 bg-stone-50 px-5 py-3 text-xs font-bold uppercase tracking-widest text-stone-400"
+            >
+                <span>Group</span>
+                <span>Leader</span>
+                <span>Members</span>
+                <span>Status</span>
+            </div>
+
+            <!-- Rows -->
+            {#if groups.length === 0}
                 <div
-                    class="flex items-center gap-3 px-5 py-3 rounded-xl bg-stone-50 border border-stone-100"
+                    class="flex flex-col items-center justify-center py-16 gap-2 text-stone-300"
                 >
-                    <div
-                        class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center shrink-0"
-                    >
-                        <Icon class="w-4 h-4 text-amber-600" />
-                    </div>
-                    <div>
-                        <p
-                            class="text-[10px] font-bold text-stone-400 uppercase tracking-wider leading-none mb-0.5"
-                        >
-                            {stat.label}
-                        </p>
-                        <p
-                            class="text-lg font-extrabold text-stone-800 leading-none"
-                        >
-                            {stat.value}
-                        </p>
-                    </div>
+                    <UsersIcon class="w-10 h-10" />
+                    <p class="text-md font-semibold text-stone-400">
+                        No groups found
+                    </p>
                 </div>
-            {/each}
-        </div>
+            {:else}
+                {#each groups as group}
+                    {@const cfg = statusConfig[group.status] ?? {
+                        class: "bg-stone-100 text-stone-500 border border-stone-200",
+                        dot: "bg-stone-400",
+                    }}
+                    {@const fillPct = Math.round(
+                        (group.memberCount / group.maxMember) * 100,
+                    )}
+                    {@const isFull = group.memberCount >= group.maxMember}
 
-        <!-- Groups Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {#each groups as group}
-                {@const cfg = statusConfig[group.status] ?? {
-                    class: "bg-stone-100 text-stone-500 border border-stone-200",
-                    dot: "bg-stone-400",
-                }}
-                {@const fillPct = Math.round(
-                    (group.memberCount / group.maxMember) * 100,
-                )}
-                {@const isFull = group.memberCount >= group.maxMember}
+                    <form
+                        method="POST"
+                        action="?/getGroupDetail"
+                        use:enhance={handleEnhance}
+                        class="grid grid-cols-4 gap-4 items-center border-b border-stone-50 px-5 py-4 last:border-0 hover:bg-amber-50/40 transition-colors group/row"
+                    >
+                        <input type="hidden" name="groupId" value={group.id} />
 
-                <div
-                    class="group/card relative flex flex-col bg-white border border-stone-200 rounded-2xl overflow-hidden hover:border-amber-300 hover:shadow-md transition-all duration-200"
-                >
-                    <!-- Card top accent stripe -->
-                    <div
-                        class="h-1 w-full bg-gradient-to-r from-amber-400 to-amber-300 opacity-0 group-hover/card:opacity-100 transition-opacity duration-200"
-                    ></div>
-
-                    <div class="p-5 flex flex-col flex-1">
-                        <!-- Header -->
-                        <div
-                            class="flex items-start justify-between gap-2 mb-4"
-                        >
-                            <h3
-                                class="font-bold text-stone-900 text-base leading-snug line-clamp-2"
+                        <!-- Group Name -->
+                        <button type="submit" class="min-w-0 text-left cursor-pointer">
+                            <p
+                                class="font-bold text-sm text-stone-900 truncate group-hover/row:text-amber-600 transition-colors underline-offset-2 group-hover/row:underline"
                             >
                                 {group.name}
-                            </h3>
-                            <span
-                                class="inline-flex items-center gap-1.5 shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold {cfg.class}"
-                            >
-                                <span class="w-1.5 h-1.5 rounded-full {cfg.dot}"
-                                ></span>
-                                {group.status}
-                            </span>
-                        </div>
+                            </p>
+                        </button>
 
                         <!-- Leader -->
-                        <div class="flex items-center gap-2 mb-3">
+                        <div class="flex items-center gap-2 min-w-0">
                             <div
                                 class="w-7 h-7 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center shrink-0"
                             >
@@ -254,34 +229,23 @@
                                     class="w-3.5 h-3.5 text-amber-600"
                                 />
                             </div>
-                            <div class="min-w-0">
-                                <p
-                                    class="text-xs text-stone-400 leading-none mb-0.5"
-                                >
-                                    Leader
-                                </p>
-                                <p
-                                    class="text-sm font-semibold text-stone-700 truncate"
-                                >
-                                    {group.leaderName}
-                                </p>
-                            </div>
+                            <p
+                                class="text-sm text-stone-700 font-medium truncate"
+                            >
+                                {group.leaderName}
+                            </p>
                         </div>
 
                         <!-- Members -->
-                        <div class="mt-auto pt-3 border-t border-stone-100">
-                            <div class="flex items-center justify-between mb-2">
-                                <div
-                                    class="flex items-center gap-1.5 text-xs text-stone-500"
+                        <div class="min-w-0">
+                            <div class="flex items-center justify-between mb-1">
+                                <span
+                                    class="text-sm text-stone-600 font-medium"
                                 >
-                                    <UsersIcon class="w-3.5 h-3.5" />
-                                    <span class="font-medium"
-                                        >{group.memberCount}<span
-                                            class="text-stone-300 mx-0.5"
-                                            >/</span
-                                        >{group.maxMember} members</span
-                                    >
-                                </div>
+                                    {group.memberCount}<span
+                                        class="text-stone-300 mx-0.5">/</span
+                                    >{group.maxMember}
+                                </span>
                                 <span
                                     class="text-xs font-bold {isFull
                                         ? 'text-red-500'
@@ -302,43 +266,40 @@
                             </div>
                         </div>
 
-                        <!-- Actions -->
-                        <form
-                            method="POST"
-                            action="?/getGroupDetail"
-                            use:enhance={handleEnhance}
-                            class="mt-4"
-                        >
-                            <input
-                                type="hidden"
-                                name="groupId"
-                                value={group.id}
-                            />
-                            <div class="flex gap-2">
+                        <!-- Status -->
+                        <div class="flex items-center justify-between">
+                            <span
+                                class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold {cfg.class}"
+                            >
+                                <span class="w-1.5 h-1.5 rounded-full {cfg.dot}"
+                                ></span>
+                                {group.status}
+                            </span>
+
+                            {#if !user?.student?.group && (group.status === "Rejected" || group.status === "Draft")}
                                 <Button
-                                    type="submit"
-                                    class="flex-1 h-9 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-lg cursor-pointer shadow-sm"
+                                    type="button"
+                                    variant="outline"
+                                    class="h-8 px-3 text-sm cursor-pointer border-stone-200 text-stone-600 hover:bg-stone-50 rounded-lg"
+                                    onclick={(e) => {
+                                        e.stopPropagation();
+                                        openJoinDialog(group);
+                                    }}
                                 >
-                                    <EyeIcon class="w-3.5 h-3.5 mr-1.5" />
-                                    View Detail
+                                    <UsersIcon class="w-3.5 h-3.5 mr-1.5" />
+                                    Join
                                 </Button>
-                                {#if !user?.student?.group && (group.status === "Rejected" || group.status === "Draft")}
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        class="flex-1 h-9 text-sm cursor-pointer border-stone-200 text-stone-600 hover:bg-stone-50 hover:border-stone-300 rounded-lg"
-                                        onclick={() => openJoinDialog(group)}
-                                    >
-                                        <UsersIcon class="w-3.5 h-3.5 mr-1.5" />
-                                        Join
-                                    </Button>
-                                {/if}
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            {/each}
+                            {/if}
+                        </div>
+                    </form>
+                {/each}
+            {/if}
         </div>
+
+        <!-- Footer count -->
+        <p class="text-md text-stone-400 text-right mt-2">
+            {groups.length} group{groups.length !== 1 ? "s" : ""} found
+        </p>
     </div>
 </div>
 

@@ -1,39 +1,37 @@
+import { updateAnnouncement } from "$lib/server/announcements";
 import { deleteAnnouncement } from "$lib/server/announcements";
 import { deleteCourse, updateCourse } from "$lib/server/course";
+import type { CreateAnnouncement, UpdateAnnouncement } from "$lib/types/announcement";
 import type { UpdateCourse } from "$lib/types/course";
 import type { Actions } from "@sveltejs/kit";
 import { fail, redirect } from "@sveltejs/kit";
 
 export const actions: Actions = {
-    updateCourse: async (event) => {
-        const { params } = event;
+    UpdateAnnouncement: async (event) => {
         const formData = await event.request.formData();
-        const courseName = formData.get("courseName") as string;
-        const credits = Number(formData.get("credits"));
-        const courseDescription = formData.get("courseDescription") as string;
+        const title = formData.get("title") as string;
+        const content = formData.get("content") as string;
+        const roleName = formData.getAll("roleName");
         const isActive = formData.get("isActive") === "true";
+        const announcementId = formData.get("announcementId");
 
-        const body: UpdateCourse = {
-            courseName,
-            courseDescription,
-            credits,
-            isActive
-        }
+        const updateAnnouncementRes = await updateAnnouncement(event, {
+            title,
+            content,
+            isActive,
+            roleName,
+        } as UpdateAnnouncement, announcementId);
+        console.log("updateAnnouncementRes:", updateAnnouncementRes);
 
-        console.log("update course body: ", body);
-
-        const updateCourseRes = await updateCourse(event, body, params.id as string);
-        console.log("update course:", updateCourseRes);
-
-        if (!updateCourseRes || updateCourseRes.status !== 200) {
+        if (!updateAnnouncementRes || updateAnnouncementRes.status !== 200) {
             return fail(400, {
-                message: updateCourseRes?.data?.message ?? "Failed to update course",
+                message: updateAnnouncementRes?.data?.message ?? "Failed to create announcement",
             });
         }
 
         return {
             success: true,
-            group: updateCourseRes?.data?.message ?? null,
+            updateRes: updateAnnouncementRes?.data?.message ?? null,
         };
     },
     delete: async (event) => {
