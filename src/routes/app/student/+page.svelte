@@ -14,6 +14,7 @@
         PlusIcon,
         HistoryIcon,
         EyeIcon,
+        PencilIcon,
     } from "lucide-svelte";
     import type { PageData } from "./$types";
     import { goto, invalidateAll } from "$app/navigation";
@@ -737,14 +738,14 @@
                         <Button
                             variant="outline"
                             class="gap-2 h-9 border-stone-200 text-stone-500 hover:bg-stone-50 cursor-pointer"
-                            onclick={() => goto(`/app/student/view-topic-history`)}
+                            onclick={() => goto(`/app/student/topic/history`)}
                         >
                             <HistoryIcon class="w-4 h-4" />
                             History
                         </Button>
 
                         <!-- Change Topic — chỉ leader -->
-                        {#if isLeader}
+                        {#if isLeader && data.currentTopic?.status === "Approved"}
                             <Button
                                 variant="outline"
                                 class="gap-2 h-9 border-amber-200 text-amber-600 bg-amber-50 hover:bg-amber-100 cursor-pointer"
@@ -755,19 +756,33 @@
                                 Change Topic
                             </Button>
                         {/if}
+                        {#if isLeader && data.currentTopic?.status === "Pending"}
+                            <Button
+                                variant="outline"
+                                class="gap-2 h-9 border-amber-200 text-amber-600 bg-amber-50 hover:bg-amber-100 cursor-pointer"
+                                onclick={() =>
+                                    goto(
+                                        `/app/student/topic/${data.currentTopic.topicId}/update`,
+                                    )}
+                            >
+                                <PencilIcon class="w-4 h-4" />
+                                Update
+                            </Button>
+                        {/if}
                     {:else}
                         <!-- History — tất cả đều thấy dù chưa có topic -->
                         <Button
                             variant="outline"
                             class="gap-2 h-9 border-stone-200 text-stone-500 hover:bg-stone-50 cursor-pointer"
-                            onclick={() => goto(`/app/student/view-topic-history`)}
+                            onclick={() =>
+                                goto(`/app/student/view-topic-history`)}
                         >
                             <HistoryIcon class="w-4 h-4" />
                             History
                         </Button>
 
                         <!-- Register — chỉ leader khi chưa có topic -->
-                        {#if isLeader && canEdit}
+                        {#if isLeader && data.group.status === "Approved"}
                             <Button
                                 class="gap-2 h-9 bg-amber-500 hover:bg-amber-600 text-white cursor-pointer"
                                 onclick={() =>

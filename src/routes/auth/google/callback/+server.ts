@@ -64,5 +64,6 @@ export const GET = async (event) => {
   if (loginResult?.status === 200) {
     throw redirect(303, redirectTo ? decodeURIComponent(redirectTo) : '/');
   }
-  throw error(500, loginResult?.data?.detail || 'Internal Server Error');
+  const message = encodeURIComponent(loginResult?.data?.message || 'Internal Server Error');
+  redirect(303, `/auth/login?toast=error&message=${message}`);
 };
