@@ -20,6 +20,21 @@ export const getCourses = async (
     };
 };
 
+export const getAllCourses = async (
+    event: RequestEvent,
+) => {
+    // const { url } = event;
+    const response = await fetcher({
+        event,
+        url: `/courses?page=1&limit=100`
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const getCourseDetails = async (
     event: RequestEvent, id: any
 ) => {

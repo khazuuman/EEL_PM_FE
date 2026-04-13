@@ -9,6 +9,7 @@ import type { Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { fail } from "@sveltejs/kit";
 import { dataSynchronization } from "$lib/server/synchronization";
+import { getAllCourses } from "$lib/server/course";
 
 export const load: PageServerLoad = async (event) => {
     const { depends, url } = event;
@@ -90,10 +91,10 @@ export const actions: Actions = {
     },
     syncData: async (event) => {
         const formData = await event.request.formData();
-        const exe1Code = formData.get("exe1Code");
-        const exe2Code = formData.get("exe2Code");
+        const exe1CourseId = formData.get("exe1CourseId");
+        const exe2CourseId = formData.get("exe2CourseId");
 
-        const syncRes = await dataSynchronization(event, { exe1Code, exe2Code });
+        const syncRes = await dataSynchronization(event, { exe1CourseId, exe2CourseId });
         console.log("syncRes: ", syncRes);
         if (!syncRes || syncRes.status !== 200) {
             return fail(400, {
@@ -104,6 +105,15 @@ export const actions: Actions = {
         return {
             success: true,
             message: syncRes?.data?.message ?? null,
+        };
+    },
+    getAllCourses: async (event) => {
+        const coursesRes = await getAllCourses(event);
+        console.log("coursesRes: ", coursesRes);
+
+        return {
+            success: true,
+            courses: coursesRes?.data?.data?.data ?? [],
         };
     },
 };
