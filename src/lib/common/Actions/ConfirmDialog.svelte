@@ -1,18 +1,18 @@
 <script lang="ts">
-	import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js';
-	import { actions, setActions, updateActions } from '$lib/stores/actions';
-	const handleAction = () => {
-		// setIsRootLoading(true);
+	import * as AlertDialog from "$lib/components/ui/alert-dialog/index.js";
+	import { actions, setActions, updateActions } from "$lib/stores/actions";
+	const handleAction = async () => {
 		updateActions((current) => {
 			return { ...current, active: false };
 		});
-		$actions.cb();
+
+		await $actions.cb();
+
 		setActions({
 			active: false,
-			description: '',
-			cb: () => {}
+			description: "",
+			cb: () => {},
 		});
-		// setIsRootLoading(false);
 	};
 </script>
 
@@ -21,7 +21,7 @@
 		open={$actions.active}
 		onOpenChange={() =>
 			updateActions((current) => {
-				return { ...current, active: false, description: '' };
+				return { ...current, active: false, description: "" };
 			})}
 	>
 		<AlertDialog.Content>
@@ -33,7 +33,9 @@
 			</AlertDialog.Header>
 			<AlertDialog.Footer>
 				<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-				<AlertDialog.Action type="button" onclick={handleAction}>Continue</AlertDialog.Action>
+				<AlertDialog.Action type="button" onclick={handleAction}
+					>Continue</AlertDialog.Action
+				>
 			</AlertDialog.Footer>
 		</AlertDialog.Content>
 	</AlertDialog.Root>

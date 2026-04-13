@@ -4,7 +4,12 @@
     import { Button } from "$lib/components/ui/button";
     import { Textarea } from "$lib/components/ui/textarea";
     import { Label } from "$lib/components/ui/label";
-    import { CheckIcon, XIcon, LayersIcon, GraduationCapIcon } from "lucide-svelte";
+    import {
+        CheckIcon,
+        XIcon,
+        LayersIcon,
+        GraduationCapIcon,
+    } from "lucide-svelte";
     import { enhance } from "$app/forms";
     import type { SubmitFunction } from "@sveltejs/kit";
     import { toast } from "svelte-sonner";
@@ -14,9 +19,9 @@
 
     interface Props {
         open: boolean;
-        target: TargetType;       // "group" | "topic"
-        action: ActionType;       // "approve" | "reject"
-        targetName?: string;      // tên group hoặc tên topic
+        target: TargetType; // "group" | "topic"
+        action: ActionType; // "approve" | "reject"
+        targetName?: string; // tên group hoặc tên topic
         groupId?: string | number;
         topicId?: string | number;
         onSuccess?: () => void;
@@ -42,22 +47,24 @@
 
     const isApprove = $derived(action === "approve");
 
-    const config = $derived({
-        group: {
-            icon: LayersIcon,
-            label: "Group",
-            actionPath: "?/reviewGroup",
-            idField: "groupId",
-            idValue: groupId,
-        },
-        topic: {
-            icon: GraduationCapIcon,
-            label: "Topic",
-            actionPath: "?/reviewTopic",
-            idField: "topicId",
-            idValue: topicId,
-        },
-    }[target]);
+    const config = $derived(
+        {
+            group: {
+                icon: LayersIcon,
+                label: "Group",
+                actionPath: "?/reviewGroup",
+                idField: "groupId",
+                idValue: groupId,
+            },
+            topic: {
+                icon: GraduationCapIcon,
+                label: "Topic",
+                actionPath: "?/reviewTopic",
+                idField: "topicId",
+                idValue: topicId,
+            },
+        }[target],
+    );
 
     const handleEnhance: SubmitFunction = () => {
         isSubmitting = true;
@@ -65,14 +72,15 @@
             isSubmitting = false;
             if (result.type === "failure") {
                 toast.error((result.data as any)?.message ?? "Action failed");
+                await update();
             } else if (result.type === "success") {
                 toast.success(
                     isApprove
                         ? `${config.label} approved successfully!`
-                        : `${config.label} rejected successfully!`
+                        : `${config.label} rejected successfully!`,
                 );
+                await onSuccess?.(); 
                 open = false;
-                onSuccess?.();
             }
         };
     };
@@ -80,7 +88,6 @@
 
 <Dialog.Root bind:open>
     <Dialog.Content class="sm:max-w-md bg-white p-0 gap-0 overflow-hidden">
-
         <!-- Header -->
         <div
             class={`px-6 pt-6 pb-5 border-b border-gray-100 ${
@@ -108,7 +115,9 @@
                     </Dialog.Title>
                     <Dialog.Description class="text-sm text-gray-500 mt-0.5">
                         {#if targetName}
-                            <span class="font-medium text-gray-700">"{targetName}"</span>
+                            <span class="font-medium text-gray-700"
+                                >"{targetName}"</span
+                            >
                         {/if}
                     </Dialog.Description>
                 </div>
@@ -133,7 +142,9 @@
                             <span class="text-red-500 ml-0.5">*</span>
                         {/if}
                         {#if isApprove}
-                            <span class="text-gray-400 font-normal ml-1">(optional)</span>
+                            <span class="text-gray-400 font-normal ml-1"
+                                >(optional)</span
+                            >
                         {/if}
                     </Label>
                     <Textarea
@@ -155,17 +166,22 @@
 
                 <!-- Warning nếu reject -->
                 {#if !isApprove}
-                    <div class="flex gap-2.5 rounded-lg bg-red-50 border border-red-100 px-4 py-3">
+                    <div
+                        class="flex gap-2.5 rounded-lg bg-red-50 border border-red-100 px-4 py-3"
+                    >
                         <XIcon class="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
                         <p class="text-sm text-red-600">
-                            This action will notify the relevant party. Are you sure?
+                            This action will notify the relevant party. Are you
+                            sure?
                         </p>
                     </div>
                 {/if}
             </div>
 
             <!-- Footer -->
-            <div class="flex items-center justify-end gap-2 border-t border-gray-100 px-6 py-4 bg-gray-50/60">
+            <div
+                class="flex items-center justify-end gap-2 border-t border-gray-100 px-6 py-4 bg-gray-50/60"
+            >
                 <Button
                     type="button"
                     variant="ghost"
@@ -186,7 +202,9 @@
                     }`}
                 >
                     {#if isSubmitting}
-                        <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></span>
+                        <span
+                            class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"
+                        ></span>
                     {:else if isApprove}
                         <CheckIcon class="h-4 w-4 mr-1.5" />
                     {:else}
@@ -196,6 +214,5 @@
                 </Button>
             </div>
         </form>
-
     </Dialog.Content>
 </Dialog.Root>

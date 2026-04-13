@@ -1,4 +1,4 @@
-import { deleteGroup, getGroupDetail, approveGroup } from "$lib/server/groups";
+import { deleteGroup, getGroupDetail, approveGroup, updateGroup } from "$lib/server/groups";
 import type { Actions } from "@sveltejs/kit";
 import { error, fail, redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
@@ -8,6 +8,7 @@ import type { ReviewTopic } from "$lib/types/topics";
 import { getMentors } from "$lib/server/mentor";
 import { getMentorDetails } from "$lib/server/mentor";
 import { assignMentor } from "$lib/server/mentor";
+import type { UpdateGroup } from "$lib/types/group";
 
 export const load: PageServerLoad = async (event) => {
     const { params } = event;
@@ -163,5 +164,24 @@ export const actions: Actions = {
         return {
             mentorDetails: assignMentorRes?.data?.data,
         };
+    },
+    update: async (event) => {
+        const formData = await event.request.formData();
+        const groupId = formData.get("groupId");
+        // const minMembers = Number(formData.get("minMembers"));
+        // const maxMembers = Number(formData.get("maxMembers"));
+        const studentIds = formData.getAll("studentIds").map(Number);
+
+        const updateGroupRes = await updateGroup(event, groupId, { studentIds } as UpdateGroup);
+        if (!updateGroupRes || updateGroupRes.status !== 200) {
+            return fail(400, {
+                message: updateGroupRes?.data?.message ?? "Failed to update group",
+            });
+        }
+
+        return {
+            success: true,
+            result: updateGroupRes
+        }
     },
 };

@@ -36,7 +36,7 @@
         <div class="flex items-center gap-3">
             <Button
                 variant="ghost"
-                onclick={() => goto("/app/student")}
+                onclick={() => history.back()}
                 class="flex items-center gap-1.5 text-stone-400 hover:text-stone-700 px-2 py-1.5 h-auto cursor-pointer"
             >
                 <ArrowLeftIcon class="w-4 h-4" />
@@ -102,7 +102,7 @@
                 {:else if topic?.status === "Approved"}
                     <Button
                         class="gap-2 h-9 bg-amber-500 hover:bg-amber-600 text-white cursor-pointer"
-                        onclick={() => goto("/app/student/topic/register")}
+                        onclick={() => goto("/app/student/topic/change")}
                     >
                         <RepeatIcon class="w-4 h-4" />
                         Change Topic

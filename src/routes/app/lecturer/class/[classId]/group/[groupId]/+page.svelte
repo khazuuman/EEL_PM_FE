@@ -606,6 +606,9 @@
     group={updateData?.group ?? null}
     students={updateData?.students ?? []}
     classId={updateData?.classId}
+    onSuccess={async () => {
+        await invalidateAll();
+    }}
 />
 
 <form
@@ -634,4 +637,7 @@
     currentMentorId={g.mentor?.mentorId ?? null}
     groupId={g.groupId}
     groupName={g.groupName ?? ""}
+    onSuccess={async () => {
+        await invalidateAll();
+    }}
 />

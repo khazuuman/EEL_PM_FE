@@ -26,11 +26,13 @@
         groupId,
         groupName,
         currentMentorId = null,
+        onSuccess,
     }: {
         open: boolean;
         groupId: number;
         groupName: string;
         currentMentorId?: number | null;
+        onSuccess?: () => void | Promise<void>;
     } = $props();
 
     let mentors = $state<any[]>([]);
@@ -101,18 +103,19 @@
                     body: formData,
                 });
                 const result = await res.json();
+                console.log("assign result:", result);
                 if (result?.type === "failure") {
                     toast.error(
                         result?.data?.message ?? "Failed to assign mentor.",
                     );
                     return;
                 }
+                await onSuccess?.();
                 toast.success(
                     `Mentor "${selectedMentor.fullName}" assigned successfully!`,
                 );
                 open = false;
                 selectedMentor = null;
-                await invalidateAll();
             },
         });
     }

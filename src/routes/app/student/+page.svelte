@@ -15,6 +15,8 @@
         HistoryIcon,
         EyeIcon,
         PencilIcon,
+        ReplyIcon,
+        RotateCcwIcon,
     } from "lucide-svelte";
     import type { PageData } from "./$types";
     import { goto, invalidateAll } from "$app/navigation";
@@ -750,7 +752,7 @@
                                 variant="outline"
                                 class="gap-2 h-9 border-amber-200 text-amber-600 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                                 onclick={() =>
-                                    goto(`/app/student/topic/register`)}
+                                    goto(`/app/student/topic/change`)}
                             >
                                 <RefreshCwIcon class="w-4 h-4" />
                                 Change Topic
@@ -767,6 +769,19 @@
                             >
                                 <PencilIcon class="w-4 h-4" />
                                 Update
+                            </Button>
+                        {/if}
+                        {#if isLeader && data.currentTopic?.status === "Rejected"}
+                            <Button
+                                variant="outline"
+                                class="gap-2 h-9 border-amber-200 text-amber-600 bg-amber-50 hover:bg-amber-100 cursor-pointer"
+                                onclick={() =>
+                                    goto(
+                                        `/app/student/topic/resubmit`,
+                                    )}
+                            >
+                                <RotateCcwIcon class="w-4 h-4" />
+                                Resubmit
                             </Button>
                         {/if}
                     {:else}

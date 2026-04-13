@@ -12,12 +12,12 @@
         UsersIcon,
         XIcon,
     } from "lucide-svelte";
-    import { goto, invalidateAll } from "$app/navigation";
+    import { goto, invalidate, invalidateAll } from "$app/navigation";
     import ReviewDialog from "../../../../components/ReviewDialog.svelte";
     import AssignMentorDialog from "../../../../components/AssignMentorDialog.svelte";
 
     let { data }: { data: PageData } = $props();
-    const topic = data.topicDetail;
+    const topic = $derived(data.topicDetail);
 
     // state
     let assignMentorOpen = $state(false);
@@ -74,8 +74,6 @@
                     {topic.mentor === null ? "Assign Mentor" : "Change Mentor"}
                 </Button>
             {/if}
-
-            <Separator />
 
             <Badge
                 class={`rounded-full border px-3 py-1 text-xs font-bold uppercase tracking-widest ${statusColor[topic.status] ?? "bg-gray-100 text-gray-500 border-gray-200"}`}
@@ -445,4 +443,7 @@
     bind:open={assignMentorOpen}
     groupId={topic.group?.id}
     groupName={topic.group?.groupName ?? ""}
+    onSuccess={async () => {
+        await invalidateAll();
+    }}
 />

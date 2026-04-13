@@ -11,10 +11,10 @@ import { getMentors } from "$lib/server/mentor";
 export const load: PageServerLoad = async (event) => {
     const { params } = event;
     const { topicId, classId } = params;
-
+    // console.log("=== load function called ===");
     const getTopicByIdRes = await getTopicById(event, topicId);
-    console.log('topic detail: ', getTopicByIdRes?.data?.data);
-
+    // console.log('topic detail: ', getTopicByIdRes?.data?.data);
+    // console.log("=== topic mentor after reload ===", getTopicByIdRes?.data?.data?.mentor);
     if (!getTopicByIdRes || getTopicByIdRes.status != 200) {
         return fail(404, "Not found topic");
     }
