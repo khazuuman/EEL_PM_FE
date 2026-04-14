@@ -1,6 +1,6 @@
 export interface UpdateProfileRequest {
     phoneNumber?: string | null;
-    gender?: string | null;
+    gender?: number | null;
     dateOfBirth?: string | null;
     avatarUrl?: string | null;
     //mentor
