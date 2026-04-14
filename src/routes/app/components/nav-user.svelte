@@ -25,11 +25,15 @@
   }
 
   let dropdownMenu = $derived([
-    {
-      label: "My Profile",
-      path: `/app/${userRole}/my-profile`,
-      icon: CircleUserRoundIcon,
-    },
+    ...(userRole !== "academic-staff"
+      ? [
+          {
+            label: "My Profile",
+            path: `/app/${userRole}/my-profile`,
+            icon: CircleUserRoundIcon,
+          },
+        ]
+      : []),
     {
       label: "Logout",
       path: "/auth/logout",

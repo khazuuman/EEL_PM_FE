@@ -41,12 +41,12 @@
         courseName: "Course Name",
         courseDescription: "Description",
         credits: "Credits",
-        isActive: "Active",
+        isActive: "Status",
     });
 </script>
 
-<div class="bg-white w-full px-5 rounded-md pt-5 h-screen overflow-x-hidden">
-    <div class="flex items-center h-12">
+<div class="bg-white w-full pt-5 px-5 rounded-md h-screen overflow-hidden">
+    <div class="flex items-center">
         <Button
             variant="ghost"
             onclick={() => goto(`/app`)}
@@ -90,7 +90,7 @@
     <DataTable
         showAction={true}
         actions={['update', 'delete']}
-        statuses={[]}
+        statuses={ActiveStatus}
         keyId={"courseId"}
         {cacheKeyName}
         {headerValues}

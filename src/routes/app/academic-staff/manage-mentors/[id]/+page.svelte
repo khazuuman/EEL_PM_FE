@@ -43,7 +43,7 @@
             class="flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-900"
         >
             <ArrowLeftIcon class="h-4 w-4" />
-            <span class="text-sm font-semibold">Back to Mentors</span>
+            <span class="text-sm font-semibold">Back</span>
         </Button>
 
         <!-- <Button

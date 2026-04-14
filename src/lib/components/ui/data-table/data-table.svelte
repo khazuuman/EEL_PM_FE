@@ -304,7 +304,7 @@
 	onclick={handleClickOutside}
 />
 
-<div class="flex h-full flex-1 flex-col gap-6">
+<div class="flex flex-1 flex-col gap-6">
 	<NavDataTable
 		{activeHeaders}
 		{setActiveHeaders}
@@ -386,7 +386,7 @@
 								{#each activeHeaders as header, colIndex (header)}
 									<Table.Cell
 										class={[
-											"w-32 cursor-cell p-0 px-4 text-center",
+											"w-32 cursor-cell p-0 px-4 text-left",
 											isCellSelected(
 												rowIndex,
 												colIndex,
@@ -436,17 +436,19 @@
 			</div>
 		{:else}
 			<div
-				class="flex h-full flex-1 flex-col items-center justify-center gap-6"
+				class="flex flex-1 flex-col items-center justify-center gap-6"
 			>
-				<p class="text-5xl font-bold">No records available!</p>
-				{#if showAddButton}
-					<Button
-						size="lg"
-						href={`${page.url.pathname}/create?redirectTo=${encodeURIComponent(`${page.url.pathname}?${page.url.searchParams.toString()}`)}`}
-					>
-						+ Add new {tableName.toLocaleLowerCase()}
-					</Button>
-				{/if}
+				<div class="h-50 flex flex-col gap-3 justify-center items-center">
+					<p class="text-5xl font-bold text-center">No records available!</p>
+					{#if showAddButton}
+						<Button
+							size="lg"
+							href={`${page.url.pathname}/create?redirectTo=${encodeURIComponent(`${page.url.pathname}?${page.url.searchParams.toString()}`)}`}
+						>
+							+ Add new {tableName.toLocaleLowerCase()}
+						</Button>
+					{/if}
+				</div>
 			</div>
 		{/if}
 

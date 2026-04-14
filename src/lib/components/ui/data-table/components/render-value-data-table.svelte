@@ -19,7 +19,7 @@
 	<p>{formatIfDate(value, 'date-only')}</p>
 {:else if ['startTime', 'endTime'].includes(header)}
 	<p>{formatIfDate(value, 'full')}</p>
-{:else if ['status', 'difficultyLevel', 'submissionStatus', 'assignmentStatus'].includes(header)}
+{:else if ['status', 'difficultyLevel', 'submissionStatus', 'assignmentStatus', 'isActive'].includes(header)}
 	{@const curStatusIndex = statuses.findIndex((s) => s.value === value.toString())}
 	<Badge
 		variant={statuses?.[curStatusIndex]?.variant as

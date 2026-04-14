@@ -87,7 +87,7 @@ export const deleteCourse = async (
 ) => {
     const response = await fetcher({
         event,
-        url: `//courses/${id}`,
+        url: `/courses/${id}`,
         method: 'DELETE',
     });
     const data = await safeJsonParse(response);

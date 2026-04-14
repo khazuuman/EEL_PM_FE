@@ -43,7 +43,7 @@
             class="flex items-center gap-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-50 rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer -ml-3"
         >
             <ArrowLeftIcon class="w-4 h-4" />
-            Back to Home
+            Back
         </Button>
     </div>
     <!-- Page Title -->

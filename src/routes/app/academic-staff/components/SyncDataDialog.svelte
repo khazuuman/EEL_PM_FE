@@ -6,6 +6,7 @@
     import { enhance } from "$app/forms";
     import { RefreshCwIcon, Loader2Icon } from "lucide-svelte";
     import { toast } from "svelte-sonner";
+    import { invalidateAll } from "$app/navigation";
 
     type Course = {
         courseId: string | number;
@@ -68,6 +69,7 @@
                 exe2CourseId = "";
                 onOpenChange(false);
                 toast.success("Sync Data successfully!");
+                await invalidateAll();
             }
         };
     };
