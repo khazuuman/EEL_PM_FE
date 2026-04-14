@@ -2,6 +2,7 @@ export interface UpdateProfileRequest {
     phoneNumber?: string | null;
     gender?: string | null;
     dateOfBirth?: string | null;
+    avatarUrl?: string | null;
     //mentor
     currentCompany?: string | null;
     currentPosition?: string | null;
