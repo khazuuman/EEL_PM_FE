@@ -79,7 +79,7 @@
                         ? `${config.label} approved successfully!`
                         : `${config.label} rejected successfully!`,
                 );
-                await onSuccess?.(); 
+                await onSuccess?.();
                 open = false;
             }
         };
@@ -138,23 +138,17 @@
                 <div class="space-y-2">
                     <Label class="text-sm font-semibold text-gray-700">
                         {isApprove ? "Note" : "Reason for rejection"}
-                        {#if !isApprove}
-                            <span class="text-red-500 ml-0.5">*</span>
-                        {/if}
-                        {#if isApprove}
-                            <span class="text-gray-400 font-normal ml-1"
-                                >(optional)</span
-                            >
-                        {/if}
+                        <span class="text-gray-400 font-normal ml-1"
+                            >(optional)</span
+                        >
                     </Label>
                     <Textarea
                         name="note"
                         bind:value={note}
                         placeholder={isApprove
                             ? "Add a note... (optional)"
-                            : "Explain why this is being rejected..."}
+                            : "Explain why this is being rejected... (optional)"}
                         rows={3}
-                        required={!isApprove}
                         class="resize-none text-sm border-gray-200 focus:border-gray-400 focus:ring-0"
                     />
                     {#if !isApprove}

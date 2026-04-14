@@ -30,7 +30,7 @@
 <div class="flex flex-col justify-center py-10 px-15 w-120 bg-white rounded-2xl border-2 border-stone-200 overflow-hidden">
     <h1 class="text-center font-bold text-3xl mb-2">Sign In</h1>
     <h5 class="text-center text-[16px] text-orange-800 mb-8">
-        FPT University Training Management System
+        Experiential Entrepreneurship Learning process management of FPT University Students
     </h5>
 
     <form
