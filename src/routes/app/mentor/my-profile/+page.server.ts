@@ -1,62 +1,72 @@
 import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { updateProfile } from '$lib/server/accounts';
-import { isValidDateOfBirth, isValidVietnamesePhone, toIsoDate } from '$lib/utils/validation';
-import { formatIfDate } from '$lib/utils/date-format';
+import { isValidVietnamesePhone } from '$lib/utils/validation';
+import { uploadLogo } from '$lib/server/topics';
 
 export const load: PageServerLoad = async ({ parent, depends }) => {
     depends('profile:user');
     const { user } = await parent();
-    user.student.dateOfBirth = user.student.dateOfBirth !== null ? formatIfDate(user.student.dateOfBirth) : '';
-    console.log("User profile: ", user);
     return { user };
 };
 
 export const actions: Actions = {
     updateProfile: async (event) => {
         const formData = await event.request.formData();
-        console.log("form data: ", formData);
-        const gender = formData.get('gender') as string;
         const phoneNumber = formData.get('phoneNumber') as string;
-        const dateOfBirth = formData.get('dateOfBirth') as string;
+        const currentCompany = formData.get('currentCompany') as string;
+        const fieldOfWork = formData.get('fieldOfWork') as string;
+        const biography = formData.get('biography') as string;
+        const yearsOfExperience = Number(formData.get('yearsOfExperience'));
 
         const errors: Record<string, string> = {};
-
-        if (gender !== '' && gender.toLowerCase() !== 'male' && gender.toLowerCase() !== 'female') {
-            errors.gender = "Gender only accepts Male or Female"
-        }
 
         if (phoneNumber !== '' && !isValidVietnamesePhone(phoneNumber)) {
             errors.phoneNumber = 'Phone number invalid (Ex: 0912345678)';
         }
 
-        if (dateOfBirth !== '' && !isValidDateOfBirth(dateOfBirth)) {
-            errors.dateOfBirth = 'Date format invalid (Ex: 31/12/1999)';
-        }
-
-
         if (Object.keys(errors).length > 0) {
             return fail(400, { errors });
         }
 
-        const dateOfBirthIso: string | null = dateOfBirth !== '' ? toIsoDate(dateOfBirth) : null;
         const result = await updateProfile(event, {
-            gender: gender || null,
+            gender: null,
             phoneNumber: phoneNumber || null,
-            dateOfBirth: dateOfBirthIso,
-            currentCompany: null,
+            dateOfBirth: null,
+            currentCompany: currentCompany || null,
             currentPosition: null,
-            biography: null,
-            fieldOfWork: null,
-            yearsOfExperience: null
+            biography: biography || null,
+            fieldOfWork: fieldOfWork || null,
+            yearsOfExperience: yearsOfExperience || null,
         });
 
         if (result.status !== 200) {
             return fail(result.status, {
-                error: result.data?.message || 'Update failed'
+                error: result.data?.message || 'Update failed',
             });
         }
 
         return { success: true };
-    }
+    },
+
+    UploadAvatar: async (event) => {
+        const formData = await event.request.formData();
+        const file = formData.get('file');
+
+        const fd = new FormData();
+        fd.append('file', file as Blob);
+
+        const uploadImgRes = await uploadLogo(event, fd);
+
+        if (!uploadImgRes || uploadImgRes.status !== 200) {
+            return fail(400, {
+                message: uploadImgRes?.data?.message ?? 'Failed to upload avatar',
+            });
+        }
+
+        return {
+            success: true,
+            result: uploadImgRes?.data ?? null,
+        };
+    },
 };
