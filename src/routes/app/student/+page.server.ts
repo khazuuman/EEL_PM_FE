@@ -8,6 +8,7 @@ import { reviewJoinRequest } from "$lib/server/groups";
 import { getAnnouncementByRole } from "$lib/server/announcements";
 import ROLE from "$lib/enums/role";
 import { getCurrentTopicByGroupId } from "$lib/server/topics";
+import { getInvitations, reviewInviteGroupRequest } from "$lib/server/auth";
 
 export const load: PageServerLoad = async (event) => {
     const { parent } = event;
@@ -18,6 +19,8 @@ export const load: PageServerLoad = async (event) => {
         getCurrentTopicByGroupId(event, user.student.group?.groupId)
     ]);
     console.log("currentTopicRes: ", currentTopicRes?.data?.data);
+
+    //leader get join request
     let joinRequests;
     if (user.student?.group?.isLeader === true) {
         const joinRequestsRes = await getGroupRequest(event, user.student.group?.groupId);
@@ -26,10 +29,23 @@ export const load: PageServerLoad = async (event) => {
             joinRequests = list;
         }
     }
+
+    //member get invitations
+    let invitations;
+    if (user.student?.group?.isLeader === false || user.student?.group === null) {
+        const getInvitationsRes = await getInvitations(event);
+        const list = getInvitationsRes.data?.data;
+        if (Array.isArray(list) && list.length > 0) {
+            invitations = list;
+        }
+    }
+    console.log("invitations: ", invitations);
+
     return {
         group: groupRes.data?.data,
         currentTopic: currentTopicRes?.data?.data[0],
         joinRequests: joinRequests || [],
+        invitations: invitations || [],
         announcements: announcementRes.data?.data?.data || [],
         currentUser: user
     };
@@ -200,6 +216,28 @@ export const actions: Actions = {
         return {
             success: true,
             group: reviewJoinRes?.data?.data ?? null,
+        };
+    },
+    reviewInviteGroupRequest: async (event) => {
+        const formData = await event.request.formData();
+        const reqId = Number(formData.get("reqId"));
+        const status = formData.get("status") as string;
+
+        const reviewInviteGroupRequestRes = await reviewInviteGroupRequest(event, reqId, {
+            status
+        });
+        console.log("reviewJoin Res:", reviewInviteGroupRequestRes);
+
+        if (!reviewInviteGroupRequestRes || reviewInviteGroupRequestRes.status !== 200) {
+            return fail(400, {
+                message: reviewInviteGroupRequestRes?.data?.message ?? "Failed to update request status",
+            });
+        }
+
+
+        return {
+            success: true,
+            group: reviewInviteGroupRequestRes?.data?.data ?? null,
         };
     },
 };

@@ -35,6 +35,7 @@
     import InviteMemberDialog from "./components/InviteMemberDialog.svelte";
     import JoinRequestDialog from "./components/JoinRequestDialog.svelte";
     import { slide } from "svelte/transition";
+    import InvitationsDialog from "./components/InvitationsDialog.svelte";
 
     let { data } = $props<{ data: PageData }>();
 
@@ -55,6 +56,10 @@
     // join request dialog
     let joinRequestOpen = $state(false);
     const joinRequests = $derived(data?.joinRequests ?? []);
+
+    // Invitations dialog
+    let invitationsOpen = $state(false);
+    const invitations = $derived(data?.invitations ?? []);
 
     const headerCtx = getHeaderCtx();
     $effect(() => {
@@ -145,18 +150,38 @@
                 {/if}
             </div>
 
-            <!-- Toolbar -->
-            {#if data.group}
-                <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2">
+                <!-- Toolbar -->
+                <Button
+                    variant="outline"
+                    class="gap-2 h-9 border-stone-200 text-stone-500 hover:bg-stone-50 hover:text-stone-700 cursor-pointer"
+                    onclick={() => invalidateAll()}
+                >
+                    <RefreshCwIcon class="w-4 h-4" />
+                    Refresh
+                </Button>
+                {#if !isLeader}
                     <Button
                         variant="outline"
-                        class="gap-2 h-9 border-stone-200 text-stone-500 hover:bg-stone-50 hover:text-stone-700 cursor-pointer"
-                        onclick={() => invalidateAll()}
+                        class="relative gap-2 h-9 border-violet-200 text-violet-600 bg-violet-50 hover:bg-violet-100 hover:text-violet-700 cursor-pointer"
+                        onclick={() => (invitationsOpen = true)}
                     >
-                        <RefreshCwIcon class="w-4 h-4" />
-                        Refresh
+                        <InboxIcon class="w-4 h-4" />
+                        Invitations
+                        {#if invitations.length > 0}
+                            <!-- Dấu chấm nhấp nháy -->
+                            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"
+                                ></span>
+                                <span
+                                    class="relative inline-flex rounded-full h-3 w-3 bg-red-500"
+                                ></span>
+                            </span>
+                        {/if}
                     </Button>
-
+                {/if}
+                {#if data.group}
                     {#if canEdit && isLeader}
                         <Button
                             variant="outline"
@@ -292,68 +317,67 @@
                             </Button>
                         </form>
                     {/if}
-                </div>
-            {/if}
+                {/if}
+            </div>
         </div>
     </div>
 
     <!-- Scrollable body -->
     <div class="flex-1 px-8 py-6 flex flex-col gap-6">
-        {#if data.group}
-            <!-- Stats Row -->
-            {#if data.announcements?.length > 0}
-                <div class="rounded-lg border border-red-200 bg-red-50">
-                    <!-- Header -->
-                    <button
-                        type="button"
-                        class="w-full flex items-center gap-2 px-4 py-3 cursor-pointer hover:bg-red-100/50 transition-colors rounded-lg"
-                        onclick={() =>
-                            (announcementsCollapsed = !announcementsCollapsed)}
+        <!-- Stats Row -->
+        {#if data.announcements?.length > 0}
+            <div class="rounded-lg border border-red-200 bg-red-50">
+                <!-- Header -->
+                <button
+                    type="button"
+                    class="w-full flex items-center gap-2 px-4 py-3 cursor-pointer hover:bg-red-100/50 transition-colors rounded-lg"
+                    onclick={() =>
+                        (announcementsCollapsed = !announcementsCollapsed)}
+                >
+                    <BellIcon class="w-4 h-4 text-red-500 shrink-0" />
+                    <p class="text-sm font-semibold text-red-600">
+                        Announcements
+                    </p>
+                    <span
+                        class="text-xs font-medium text-red-400 bg-red-100 border border-red-200 rounded-full px-2 py-0.5"
                     >
-                        <BellIcon class="w-4 h-4 text-red-500 shrink-0" />
-                        <p class="text-sm font-semibold text-red-600">
-                            Announcements
-                        </p>
-                        <span
-                            class="text-xs font-medium text-red-400 bg-red-100 border border-red-200 rounded-full px-2 py-0.5"
-                        >
-                            {data.announcements.length}
-                        </span>
-                        <span
-                            class="ml-auto text-xs text-red-400 transition-transform duration-200 {announcementsCollapsed
-                                ? 'rotate-0'
-                                : 'rotate-180'}"
-                        >
-                            ▼
-                        </span>
-                    </button>
+                        {data.announcements.length}
+                    </span>
+                    <span
+                        class="ml-auto text-xs text-red-400 transition-transform duration-200 {announcementsCollapsed
+                            ? 'rotate-0'
+                            : 'rotate-180'}"
+                    >
+                        ▼
+                    </span>
+                </button>
 
-                    <!-- List -->
-                    {#if !announcementsCollapsed}
-                        <div
-                            transition:slide={{ duration: 200 }}
-                            class="border-t border-red-200 overflow-y-auto max-h-48 px-4 py-3"
+                <!-- List -->
+                {#if !announcementsCollapsed}
+                    <div
+                        transition:slide={{ duration: 200 }}
+                        class="border-t border-red-200 overflow-y-auto max-h-48 px-4 py-3"
+                    >
+                        <ul
+                            class="flex flex-col gap-1.5 pl-6 list-disc marker:text-red-300"
                         >
-                            <ul
-                                class="flex flex-col gap-1.5 pl-6 list-disc marker:text-red-300"
-                            >
-                                {#each data.announcements as announcement}
-                                    <li>
-                                        <span
-                                            class="text-sm font-medium text-red-600"
-                                            >{announcement.title}</span
-                                        >
-                                        <span
-                                            class="text-sm text-red-400 ml-1.5"
-                                            >— {announcement.content}</span
-                                        >
-                                    </li>
-                                {/each}
-                            </ul>
-                        </div>
-                    {/if}
-                </div>
-            {/if}
+                            {#each data.announcements as announcement}
+                                <li>
+                                    <span
+                                        class="text-sm font-medium text-red-600"
+                                        >{announcement.title}</span
+                                    >
+                                    <span class="text-sm text-red-400 ml-1.5"
+                                        >— {announcement.content}</span
+                                    >
+                                </li>
+                            {/each}
+                        </ul>
+                    </div>
+                {/if}
+            </div>
+        {/if}
+        {#if data.group}
             <div class="flex flex-col sm:flex-row gap-3">
                 <!-- Members stat -->
                 <div
@@ -776,9 +800,7 @@
                                 variant="outline"
                                 class="gap-2 h-9 border-amber-200 text-amber-600 bg-amber-50 hover:bg-amber-100 cursor-pointer"
                                 onclick={() =>
-                                    goto(
-                                        `/app/student/topic/resubmit`,
-                                    )}
+                                    goto(`/app/student/topic/resubmit`)}
                             >
                                 <RotateCcwIcon class="w-4 h-4" />
                                 Resubmit
@@ -920,4 +942,9 @@
     bind:open={joinRequestOpen}
     joinRequests={data.joinRequests ?? []}
     onSuccess={async () => await invalidateAll()}
+/>
+
+<InvitationsDialog
+    bind:open={invitationsOpen}
+    invitations={data.invitations ?? []}
 />
