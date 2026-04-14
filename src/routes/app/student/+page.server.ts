@@ -9,16 +9,18 @@ import { getAnnouncementByRole } from "$lib/server/announcements";
 import ROLE from "$lib/enums/role";
 import { getCurrentTopicByGroupId } from "$lib/server/topics";
 import { getInvitations, reviewInviteGroupRequest } from "$lib/server/auth";
+import { getDeadlines } from "$lib/server/deadline";
 
 export const load: PageServerLoad = async (event) => {
     const { parent } = event;
     const { user } = await parent();
-    const [groupRes, announcementRes, currentTopicRes] = await Promise.all([
+    const [groupRes, announcementRes, currentTopicRes, deadlineRes] = await Promise.all([
         getMyGroup(event, user.student.studentId),
         getAnnouncementByRole(event, ROLE.STUDENT, user.student?.campusId),
-        getCurrentTopicByGroupId(event, user.student.group?.groupId)
+        getCurrentTopicByGroupId(event, user.student.group?.groupId),
+        getDeadlines(event, user.student?.classId)
     ]);
-    console.log("currentTopicRes: ", currentTopicRes?.data?.data);
+    console.log("deadlineRes: ", deadlineRes?.data?.data);
 
     //leader get join request
     let joinRequests;
@@ -47,6 +49,7 @@ export const load: PageServerLoad = async (event) => {
         joinRequests: joinRequests || [],
         invitations: invitations || [],
         announcements: announcementRes.data?.data?.data || [],
+        deadlines: deadlineRes?.data?.data,
         currentUser: user
     };
 };

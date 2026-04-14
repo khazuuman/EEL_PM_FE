@@ -113,6 +113,19 @@
         Active: "bg-emerald-50 text-emerald-700 border-emerald-200",
         Completed: "bg-blue-50 text-blue-700 border-blue-200",
     };
+
+    function formatDeadline(val: string | undefined): string {
+        if (!val) return "—";
+        const d = new Date(val);
+        if (isNaN(d.getTime())) return val;
+        const dd = String(d.getDate()).padStart(2, "0");
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const yyyy = d.getFullYear();
+        const HH = String(d.getHours()).padStart(2, "0");
+        const min = String(d.getMinutes()).padStart(2, "0");
+        const ss = String(d.getSeconds()).padStart(2, "0");
+        return `${dd}/${mm}/${yyyy} ${HH}:${min}:${ss}`;
+    }
 </script>
 
 <div class="h-[calc(100vh-4rem)] flex flex-col bg-white overflow-y-auto">
@@ -324,6 +337,58 @@
 
     <!-- Scrollable body -->
     <div class="flex-1 px-8 py-6 flex flex-col gap-6">
+        <!-- Deadlines -->
+        {#if data.deadlines}
+            <div class="flex flex-wrap gap-3">
+                {#if data.deadlines.groupFormationEndDate}
+                    <div
+                        class="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-3"
+                    >
+                        <div
+                            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 border border-blue-200"
+                        >
+                            <UsersIcon class="w-4 h-4 text-blue-600" />
+                        </div>
+                        <div>
+                            <p
+                                class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
+                            >
+                                Group Formation Deadline
+                            </p>
+                            <p class="text-sm font-semibold text-stone-800">
+                                {formatDeadline(
+                                    data.deadlines.groupFormationEndDate,
+                                )}
+                            </p>
+                        </div>
+                    </div>
+                {/if}
+
+                {#if data.deadlines.topicRegistrationEndDate}
+                    <div
+                        class="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-3"
+                    >
+                        <div
+                            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 border border-amber-200"
+                        >
+                            <BookOpenIcon class="w-4 h-4 text-amber-600" />
+                        </div>
+                        <div>
+                            <p
+                                class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
+                            >
+                                Topic Registration Deadline
+                            </p>
+                            <p class="text-sm font-semibold text-stone-800">
+                                {formatDeadline(
+                                    data.deadlines.topicRegistrationEndDate,
+                                )}
+                            </p>
+                        </div>
+                    </div>
+                {/if}
+            </div>
+        {/if}
         <!-- Stats Row -->
         {#if data.announcements?.length > 0}
             <div class="rounded-lg border border-red-200 bg-red-50">
