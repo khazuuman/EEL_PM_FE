@@ -35,12 +35,12 @@
                 <div
                     class="flex items-center gap-1.5 text-md font-semibold text-stone-800 tracking-tight"
                 >
-                    <span class="text-amber-500 font-bold text-base">EXE</span>
+                    <span class="text-amber-500 font-bold text-base">EELPM</span>
                     <span
                         class="w-1 h-1 rounded-full bg-stone-300 hidden sm:block"
                     ></span>
                     <span class="hidden sm:block text-stone-600 font-medium"
-                        >FPT University Portal</span
+                        >FPT</span
                     >
                 </div>
             </button>
