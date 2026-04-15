@@ -168,10 +168,15 @@
                     body: formData,
                 });
                 const result = await res.json();
+                console.log("result: ", result);
                 if (result?.type === "failure") {
-                    toast.error(
-                        result?.data?.message ?? "Failed to publish groups.",
-                    );
+                    let message = "Failed to publish groups.";
+                    try {
+                        const parsed = JSON.parse(result.data);
+                        message = parsed[1] ?? message;
+                    } catch {}
+
+                    toast.error(message);
                     return;
                 }
                 toast.success(
@@ -228,8 +233,12 @@
     let deadlineGroupOpen = $state(false);
     let deadlineTopicOpen = $state(false);
 
-    const groupDeadline = $derived(data?.deadlines?.groupFormationEndDate ?? null); // Date string | null
-    const topicDeadline = $derived(data?.deadlines?.topicRegistrationEndDate ?? null); // Date string | null
+    const groupDeadline = $derived(
+        data?.deadlines?.groupFormationEndDate ?? null,
+    ); // Date string | null
+    const topicDeadline = $derived(
+        data?.deadlines?.topicRegistrationEndDate ?? null,
+    ); // Date string | null
 
     function formatDeadline(dateStr: string | null): string {
         if (!dateStr) return "Not set";
