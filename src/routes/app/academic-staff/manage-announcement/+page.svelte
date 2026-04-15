@@ -40,7 +40,7 @@
         title: "Title",
         content: "Content",
         targets: "Notification To",
-        isActive: "Active",
+        isActive: "Status",
     });
 </script>
 
@@ -90,7 +90,7 @@
         showAction={true}
         actions={["view", "update", "delete"]}
         showAddButton={true}
-        statuses={[]}
+        statuses={ActiveStatus}
         keyId={"announcementId"}
         {cacheKeyName}
         {headerValues}

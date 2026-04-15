@@ -77,7 +77,7 @@
     <div class="flex items-center h-10 mb-2">
         <Button
             variant="ghost"
-            onclick={() => history.back()}
+            onclick={() => goto(`/app/lecturer/class/${data.classId}`)}
             class="flex items-center gap-1.5 text-stone-400 hover:text-stone-700 cursor-pointer -ml-3"
         >
             <ArrowLeftIcon class="w-4 h-4" />
