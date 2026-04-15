@@ -1,6 +1,6 @@
 <script lang="ts">
     import { deserialize, enhance } from "$app/forms";
-    import { goto } from "$app/navigation";
+    import { goto, invalidateAll } from "$app/navigation";
     import { page } from "$app/stores";
     import { toast } from "svelte-sonner";
     import { Button } from "$lib/components/ui/button";
@@ -156,8 +156,7 @@
             variant="ghost"
             size="icon"
             class="w-9 h-9 text-stone-400 hover:text-stone-700 hover:bg-stone-100 cursor-pointer"
-            onclick={() =>
-                goto(`/app/lecturer/class/${classId}/assignments-management`)}
+            onclick={() => history.back()}
         >
             <ArrowLeftIcon class="w-4 h-4" />
         </Button>
@@ -176,11 +175,12 @@
         class="flex-1 flex flex-col min-h-0"
         use:enhance={() => {
             saving = true;
-            return async ({ result, update }) => {
+            return async ({ result }) => {
                 saving = false;
-                if (result.type === "redirect") {
+                if (result.type === "success") {
                     toast.success("Assignment updated successfully.");
-                    await update();
+                    history.back();
+                    await invalidateAll();
                 } else if (result.type === "failure") {
                     toast.error(
                         (result.data as any)?.message ??
@@ -376,121 +376,204 @@
                         Attachments
                     </p>
 
-                    {#if existingFiles.length > 0 || uploadedFiles.length > 0}
-                        <div class="space-y-2">
-                            <!-- Existing files -->
-                            {#each existingFiles as ef (ef.fileId)}
-                                <div
-                                    class="rounded-lg border border-stone-200 bg-stone-50 overflow-hidden"
-                                >
-                                    {#if isImageUrl(ef.fileUrl)}
+                    <!-- Fixed height scrollable container -->
+                    <div class="h-72 overflow-y-auto pr-1 space-y-3">
+                        {#if existingFiles.length > 0 || uploadedFiles.length > 0}
+                            {@const existingImages = existingFiles.filter(
+                                (ef) => isImageUrl(ef.fileUrl),
+                            )}
+                            {@const existingFileItems = existingFiles.filter(
+                                (ef) => !isImageUrl(ef.fileUrl),
+                            )}
+                            {@const newImages = uploadedFiles.filter(
+                                (f) => f.isImage,
+                            )}
+                            {@const newFileItems = uploadedFiles.filter(
+                                (f) => !f.isImage,
+                            )}
+
+                            <!-- Images: 2-column grid -->
+                            {#if existingImages.length > 0 || newImages.length > 0}
+                                <div class="grid grid-cols-2 gap-2">
+                                    {#each existingImages as ef (ef.fileId)}
                                         <div
-                                            class="w-full bg-stone-100 border-b border-stone-200"
-                                            style="max-height:160px"
+                                            class="rounded-lg border border-stone-200 bg-stone-50 overflow-hidden"
                                         >
-                                            <img
-                                                src={ef.fileUrl}
-                                                alt={getDisplayName(
+                                            <div
+                                                class="w-full bg-stone-100"
+                                                style="height:120px"
+                                            >
+                                                <img
+                                                    src={ef.fileUrl}
+                                                    alt={getDisplayName(
+                                                        ef.fileName,
+                                                    )}
+                                                    class="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <div
+                                                class="px-2 py-1.5 flex items-center gap-1.5"
+                                            >
+                                                <a
+                                                    href={ef.fileUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    class="flex-1 text-xs text-stone-600 font-medium truncate hover:text-amber-600 hover:underline transition-colors"
+                                                    title={getDisplayName(
+                                                        ef.fileName,
+                                                    )}
+                                                >
+                                                    {getDisplayName(
+                                                        ef.fileName,
+                                                    )}
+                                                </a>
+                                                <button
+                                                    type="button"
+                                                    onclick={() =>
+                                                        removeExistingFile(
+                                                            ef.fileId,
+                                                        )}
+                                                    class="text-stone-300 hover:text-red-500 transition-colors cursor-pointer shrink-0"
+                                                >
+                                                    <XIcon
+                                                        class="w-3.5 h-3.5"
+                                                    />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    {/each}
+
+                                    {#each newImages as f (f.url)}
+                                        <div
+                                            class="rounded-lg border border-amber-200 bg-amber-50 overflow-hidden"
+                                        >
+                                            <div
+                                                class="w-full bg-stone-100"
+                                                style="height:120px"
+                                            >
+                                                <img
+                                                    src={f.url}
+                                                    alt={f.name}
+                                                    class="w-full h-full object-cover"
+                                                />
+                                            </div>
+                                            <div
+                                                class="px-2 py-1.5 flex items-center gap-1.5"
+                                            >
+                                                <a
+                                                    href={f.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    class="flex-1 text-xs text-stone-600 font-medium truncate hover:text-amber-600 hover:underline transition-colors"
+                                                    title={f.name}
+                                                >
+                                                    {f.name}
+                                                </a>
+                                                <Badge
+                                                    class="text-[10px] px-1 py-0 bg-amber-100 text-amber-600 border-amber-200 pointer-events-none shrink-0"
+                                                >
+                                                    New
+                                                </Badge>
+                                                <button
+                                                    type="button"
+                                                    onclick={() =>
+                                                        removeUploadedFile(
+                                                            f.url,
+                                                        )}
+                                                    class="text-stone-300 hover:text-red-500 transition-colors cursor-pointer shrink-0"
+                                                >
+                                                    <XIcon
+                                                        class="w-3.5 h-3.5"
+                                                    />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    {/each}
+                                </div>
+                            {/if}
+
+                            <!-- Non-image files: 1 row each -->
+                            {#if existingFileItems.length > 0 || newFileItems.length > 0}
+                                <div class="space-y-2">
+                                    {#each existingFileItems as ef (ef.fileId)}
+                                        <div
+                                            class="rounded-lg border border-stone-200 bg-stone-50 flex items-center gap-3 px-3 py-2.5"
+                                        >
+                                            <FileIcon
+                                                class="w-4 h-4 text-stone-400 shrink-0"
+                                            />
+                                            <a
+                                                href={ef.fileUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="flex-1 text-sm text-stone-700 font-medium truncate hover:text-amber-600 hover:underline transition-colors"
+                                                title={getDisplayName(
                                                     ef.fileName,
                                                 )}
-                                                class="w-full object-contain"
-                                                style="max-height:160px"
-                                            />
+                                            >
+                                                {getDisplayName(ef.fileName)}
+                                            </a>
+                                            <button
+                                                type="button"
+                                                onclick={() =>
+                                                    removeExistingFile(
+                                                        ef.fileId,
+                                                    )}
+                                                class="text-stone-300 hover:text-red-500 transition-colors cursor-pointer shrink-0"
+                                            >
+                                                <XIcon class="w-4 h-4" />
+                                            </button>
                                         </div>
-                                    {/if}
-                                    <div
-                                        class="flex items-center gap-3 px-3 py-2.5"
-                                    >
-                                        <FileIcon
-                                            class="w-4 h-4 text-stone-400 shrink-0"
-                                        />
-                                        <a
-                                            href={ef.fileUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="flex-1 text-sm text-stone-700 font-medium truncate hover:text-amber-600 hover:underline transition-colors"
-                                            title={getDisplayName(ef.fileName)}
-                                        >
-                                            {getDisplayName(ef.fileName)}
-                                        </a>
-                                        <button
-                                            type="button"
-                                            onclick={() =>
-                                                removeExistingFile(ef.fileId)}
-                                            class="text-stone-300 hover:text-red-500 transition-colors cursor-pointer"
-                                            title="Remove file"
-                                        >
-                                            <XIcon class="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </div>
-                            {/each}
+                                    {/each}
 
-                            <!-- Newly uploaded files -->
-                            {#each uploadedFiles as f (f.url)}
-                                <div
-                                    class="rounded-lg border border-amber-200 bg-amber-50 overflow-hidden"
-                                >
-                                    {#if f.isImage}
+                                    {#each newFileItems as f (f.url)}
                                         <div
-                                            class="w-full bg-stone-100 border-b border-amber-200"
-                                            style="max-height:160px"
+                                            class="rounded-lg border border-amber-200 bg-amber-50 flex items-center gap-3 px-3 py-2.5"
                                         >
-                                            <img
-                                                src={f.url}
-                                                alt={f.name}
-                                                class="w-full object-contain"
-                                                style="max-height:160px"
+                                            <FileIcon
+                                                class="w-4 h-4 text-amber-500 shrink-0"
                                             />
+                                            <a
+                                                href={f.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                class="flex-1 text-sm text-stone-700 font-medium truncate hover:text-amber-600 hover:underline transition-colors"
+                                                title={f.name}
+                                            >
+                                                {f.name}
+                                            </a>
+                                            <Badge
+                                                class="text-xs bg-amber-100 text-amber-600 border-amber-200 pointer-events-none shrink-0"
+                                            >
+                                                New
+                                            </Badge>
+                                            <button
+                                                type="button"
+                                                onclick={() =>
+                                                    removeUploadedFile(f.url)}
+                                                class="text-stone-300 hover:text-red-500 transition-colors cursor-pointer shrink-0"
+                                            >
+                                                <XIcon class="w-4 h-4" />
+                                            </button>
                                         </div>
-                                    {/if}
-                                    <div
-                                        class="flex items-center gap-3 px-3 py-2.5"
-                                    >
-                                        <FileIcon
-                                            class="w-4 h-4 text-amber-500 shrink-0"
-                                        />
-                                        <a
-                                            href={f.url}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="flex-1 text-sm text-stone-700 font-medium truncate hover:text-amber-600 hover:underline transition-colors"
-                                            title={f.name}
-                                        >
-                                            {f.name}
-                                        </a>
-                                        <Badge
-                                            class="text-xs bg-amber-100 text-amber-600 border-amber-200 pointer-events-none"
-                                        >
-                                            New
-                                        </Badge>
-                                        <button
-                                            type="button"
-                                            onclick={() =>
-                                                removeUploadedFile(f.url)}
-                                            class="text-stone-300 hover:text-red-500 transition-colors cursor-pointer"
-                                            title="Remove file"
-                                        >
-                                            <XIcon class="w-4 h-4" />
-                                        </button>
-                                    </div>
+                                    {/each}
                                 </div>
-                            {/each}
-                        </div>
-                    {:else}
-                        <!-- Empty state -->
-                        <div
-                            class="flex flex-col items-center gap-2 py-12 text-stone-300"
-                        >
-                            <UploadCloudIcon class="w-10 h-10" />
-                            <p class="text-sm font-semibold text-stone-400">
-                                No attachments yet
-                            </p>
-                            <p class="text-xs text-stone-300">
-                                Upload files below
-                            </p>
-                        </div>
-                    {/if}
+                            {/if}
+                        {:else}
+                            <!-- Empty state -->
+                            <div
+                                class="flex flex-col items-center justify-center h-full gap-2 text-stone-300"
+                            >
+                                <UploadCloudIcon class="w-10 h-10" />
+                                <p class="text-sm font-semibold text-stone-400">
+                                    No attachments yet
+                                </p>
+                                <p class="text-xs text-stone-300">
+                                    Upload files below
+                                </p>
+                            </div>
+                        {/if}
+                    </div>
 
                     <!-- Upload button -->
                     <label
@@ -522,10 +605,7 @@
                 type="button"
                 variant="ghost"
                 class="text-stone-400 hover:text-stone-600 cursor-pointer"
-                onclick={() =>
-                    goto(
-                        `/app/lecturer/class/${classId}/assignments-management`,
-                    )}
+                onclick={() => history.back()}
             >
                 Cancel
             </Button>

@@ -1,3 +1,4 @@
+import { deleteAssignment } from "$lib/server/assignments";
 import { updateAssignment } from "$lib/server/assignments";
 import { createAssignment, uploadFile } from "$lib/server/assignments";
 import type { CreateAssignment } from "$lib/types/assignment";
@@ -30,7 +31,8 @@ export const actions: Actions = {
         if (!updateAssignmentRes || updateAssignmentRes.status !== 200) {
             return fail(400, updateAssignmentRes.data?.message ?? "Fail to update assignment");
         }
-        redirect(303, `/app/lecturer/class/${classId}/assignments-management`);
+        // redirect(303, `/app/lecturer/class/${classId}/assignments-management`);
+        return { success: true };
     },
     uploadFile: async (event) => {
         const formData = await event.request.formData();
@@ -54,5 +56,18 @@ export const actions: Actions = {
             success: true,
             result: uploadFileRes?.data ?? null,
         };
+    },
+    delete: async (event) => {
+        const formData = await event.request.formData();
+        const assignmentId = formData.get("assignmentId");
+
+        const deleteAssignmentRes = await deleteAssignment(event, assignmentId);
+        if (!deleteAssignmentRes || deleteAssignmentRes.status !== 200) {
+            return fail(400, deleteAssignmentRes.data.message ?? "Fail to delete assignment");
+        }
+        return {
+            success: true,
+            data: deleteAssignmentRes
+        }
     },
 };
