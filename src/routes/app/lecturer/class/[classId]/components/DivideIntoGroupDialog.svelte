@@ -41,7 +41,7 @@
 >
     <Dialog.Content class="sm:max-w-[400px]">
         <Dialog.Header>
-            <Dialog.Title>Grouping</Dialog.Title>
+            <Dialog.Title>Divide Into Group</Dialog.Title>
             <Dialog.Description>
                 Configure group allocation settings for this class.
             </Dialog.Description>
@@ -94,7 +94,7 @@
                         id="groupCount"
                         name="groupCount"
                         type="number"
-                        min="2"
+                        min="1"
                         placeholder="e.g. 5"
                         bind:value={groupCount}
                         class="border-zinc-300"

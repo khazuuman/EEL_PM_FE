@@ -49,6 +49,10 @@
         groupLabel: "Others",
         items: [
             {
+                name: "Assignment Management",
+                url: `/app/lecturer/class/${classId}/assignments-management`,
+            },
+            {
                 name: "View Student List",
                 url: `/app/lecturer/class/${classId}/student-list`,
             },
@@ -75,21 +79,21 @@
     //         },
     //     ],
     // };
-    const lecturerAssignmentManage: NavigationGroup = {
-        groupLabel: "Assignment / Checkpoint Management",
-        items: [
-            {
-                name: "Checkpoints Management",
-                url: `/app/lecturer/class/${classId}/checkpoints-management`,
-            },
-            {
-                name: "Assignment Management",
-                url: `/app/lecturer/class/${classId}/assignments-management`,
-            },
-        ],
-    };
+    // const lecturerAssignmentManage: NavigationGroup = {
+    //     groupLabel: "Assignment / Checkpoint Management",
+    //     items: [
+    //         {
+    //             name: "Checkpoints Management",
+    //             url: `/app/lecturer/class/${classId}/checkpoints-management`,
+    //         },
+    //         {
+    //             name: "Assignment Management",
+    //             url: `/app/lecturer/class/${classId}/assignments-management`,
+    //         },
+    //     ],
+    // };
     const finalNavGroups = [
-        lecturerAssignmentManage,
+        // lecturerAssignmentManage,
         lecturerStudentManage,
         // lecturerProjectManage,
     ];

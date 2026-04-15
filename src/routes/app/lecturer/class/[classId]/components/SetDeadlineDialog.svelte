@@ -139,10 +139,11 @@
                     type="datetime-local"
                     bind:value={deadlineValue}
                     class="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm text-stone-900
-                           focus:outline-none focus:ring-2 focus:ring-offset-1
-                           {config.accent === 'amber'
+                            focus:outline-none focus:ring-2 focus:ring-offset-1
+                            {config.accent === 'amber'
                         ? 'focus:ring-amber-400'
                         : 'focus:ring-blue-400'}"
+                    style="color-scheme: light;"
                 />
             </div>
 

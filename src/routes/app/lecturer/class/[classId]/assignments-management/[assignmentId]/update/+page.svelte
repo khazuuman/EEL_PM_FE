@@ -330,13 +330,20 @@
                             >
                                 Due Date <span class="text-red-500">*</span>
                             </Label>
-                            <Input
+                            <input
                                 id="dueDate"
                                 name="dueDate"
                                 type="datetime-local"
                                 bind:value={dueDate}
                                 required
-                                class="border-stone-200 focus-visible:ring-amber-500"
+                                class="flex h-9 w-full rounded-md border border-stone-200 bg-transparent px-3 py-1 text-sm
+                                        shadow-sm transition-colors placeholder:text-stone-400
+                                        focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500
+                                        disabled:cursor-not-allowed disabled:opacity-50
+                                        [&::-webkit-calendar-picker-indicator]:opacity-60
+                                        [&::-webkit-calendar-picker-indicator]:cursor-pointer
+                                        [&::-webkit-calendar-picker-indicator]:invert-[45%]
+                                        [&::-webkit-calendar-picker-indicator]:ml-auto"
                             />
                         </div>
                         <div class="space-y-1.5">
