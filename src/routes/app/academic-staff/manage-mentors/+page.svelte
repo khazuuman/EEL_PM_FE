@@ -95,7 +95,7 @@
         matchSearchColumns={["mentorName", "mentorCode"]}
         {filters}
     >
-        <!-- {#snippet headerActions()}
+        {#snippet headerActions()}
             <Button class="gap-2 flex justify-center items-center px-3 py-4 rounded-sm cursor-pointer" onclick={() => (importOpen = true)}>
                 <ImportIcon />Import mentor
             </Button>
@@ -106,6 +106,6 @@
             />
             <ImportMentorDialog open={importOpen}
                 onOpenChange={(v) => (importOpen = v)} />
-        {/snippet} -->
+        {/snippet}
     </DataTable>
 </div>
