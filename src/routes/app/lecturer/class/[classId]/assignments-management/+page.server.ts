@@ -1,4 +1,4 @@
-import { getCheckpoints, getOtherAssignments } from "$lib/server/assignments";
+import { getCheckpoints, getOtherAssignments, toggleStatusAssignment } from "$lib/server/assignments";
 import type { Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { deleteAssignment } from "$lib/server/assignments";
@@ -9,7 +9,7 @@ export const load: PageServerLoad = async (event) => {
     const { classDetails } = await parent();
 
     const [otherassignmentsRes, checkpointsRes] = await Promise.all([
-        getOtherAssignments(event, classDetails.classId), 
+        getOtherAssignments(event, classDetails.classId),
         getCheckpoints(event, classDetails.classId),
     ]);
 
@@ -33,6 +33,19 @@ export const actions: Actions = {
         return {
             success: true,
             data: deleteAssignmentRes
+        }
+    },
+    toggleStatus: async (event) => {
+        const formData = await event.request.formData();
+        const assignmentId = formData.get("assignmentId");
+
+        const toggleStatusAssignmentRes = await toggleStatusAssignment(event, assignmentId);
+        if (!toggleStatusAssignmentRes || toggleStatusAssignmentRes.status !== 200) {
+            return fail(400, toggleStatusAssignmentRes.data.message ?? "Fail to update assignment status");
+        }
+        return {
+            success: true,
+            data: toggleStatusAssignmentRes
         }
     },
 };

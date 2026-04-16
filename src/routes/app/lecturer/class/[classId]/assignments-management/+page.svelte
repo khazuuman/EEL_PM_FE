@@ -23,6 +23,8 @@
         Loader2Icon,
         ChevronRightIcon,
         ChevronLeftIcon,
+        LockIcon,
+        LockOpenIcon,
     } from "lucide-svelte";
 
     let { data }: { data: PageData } = $props();
@@ -34,6 +36,7 @@
     );
     let otherAssignments = $derived(data.otherAssignments ?? []);
     let deletingId = $state<number | null>(null);
+    let togglingId = $state<number | null>(null);
 
     // Detect type: tất cả Outcome hoặc tất cả Checkpoint
     let checkpointType = $derived(
@@ -274,6 +277,77 @@
                                         <div
                                             class="flex items-center justify-center gap-1"
                                         >
+                                            <!-- Toggle Status -->
+                                            {#if cp.status === "Active" || cp.status === "Closed"}
+                                                <form
+                                                    id="toggle-cp-{cp.id}"
+                                                    method="POST"
+                                                    action="?/toggleStatus"
+                                                    use:enhance={() => {
+                                                        togglingId = cp.id;
+                                                        return async ({
+                                                            result,
+                                                        }) => {
+                                                            togglingId = null;
+                                                            if (
+                                                                result.type ===
+                                                                "success"
+                                                            ) {
+                                                                toast.success(
+                                                                    "Status updated.",
+                                                                );
+                                                                await invalidateAll();
+                                                            } else if (
+                                                                result.type ===
+                                                                "failure"
+                                                            ) {
+                                                                toast.error(
+                                                                    (
+                                                                        result.data as any
+                                                                    )
+                                                                        ?.message ??
+                                                                        "Failed to update status.",
+                                                                );
+                                                            }
+                                                        };
+                                                    }}
+                                                >
+                                                    <input
+                                                        type="hidden"
+                                                        name="assignmentId"
+                                                        value={cp.id}
+                                                    />
+                                                    <Button
+                                                        type="submit"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        class="w-8 h-8 cursor-pointer {cp.status ===
+                                                        'Active'
+                                                            ? 'text-green-500 hover:text-red-600 hover:bg-red-50'
+                                                            : 'text-stone-400 hover:text-green-600 hover:bg-green-50'}"
+                                                        title={cp.status ===
+                                                        "Active"
+                                                            ? "Close"
+                                                            : "Reopen"}
+                                                        disabled={togglingId ===
+                                                            cp.id}
+                                                    >
+                                                        {#if togglingId === cp.id}
+                                                            <Loader2Icon
+                                                                class="w-4 h-4 animate-spin"
+                                                            />
+                                                        {:else if cp.status === "Active"}
+                                                            <LockIcon
+                                                                class="w-4 h-4"
+                                                            />
+                                                        {:else}
+                                                            <LockOpenIcon
+                                                                class="w-4 h-4"
+                                                            />
+                                                        {/if}
+                                                    </Button>
+                                                </form>
+                                            {/if}
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
@@ -521,6 +595,76 @@
                                         <div
                                             class="flex items-center justify-center gap-1"
                                         >
+                                            {#if asgn.status === "Active" || asgn.status === "Closed"}
+                                                <form
+                                                    id="toggle-asgn-{asgn.id}"
+                                                    method="POST"
+                                                    action="?/toggleStatus"
+                                                    use:enhance={() => {
+                                                        togglingId = asgn.id;
+                                                        return async ({
+                                                            result,
+                                                        }) => {
+                                                            togglingId = null;
+                                                            if (
+                                                                result.type ===
+                                                                "success"
+                                                            ) {
+                                                                toast.success(
+                                                                    "Status updated.",
+                                                                );
+                                                                await invalidateAll();
+                                                            } else if (
+                                                                result.type ===
+                                                                "failure"
+                                                            ) {
+                                                                toast.error(
+                                                                    (
+                                                                        result.data as any
+                                                                    )
+                                                                        ?.message ??
+                                                                        "Failed to update status.",
+                                                                );
+                                                            }
+                                                        };
+                                                    }}
+                                                >
+                                                    <input
+                                                        type="hidden"
+                                                        name="assignmentId"
+                                                        value={asgn.id}
+                                                    />
+                                                    <Button
+                                                        type="submit"
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        class="w-8 h-8 cursor-pointer {asgn.status ===
+                                                        'Active'
+                                                            ? 'text-green-500 hover:text-red-600 hover:bg-red-50'
+                                                            : 'text-stone-400 hover:text-green-600 hover:bg-green-50'}"
+                                                        title={asgn.status ===
+                                                        "Active"
+                                                            ? "Close"
+                                                            : "Reopen"}
+                                                        disabled={togglingId ===
+                                                            asgn.id}
+                                                    >
+                                                        {#if togglingId === asgn.id}
+                                                            <Loader2Icon
+                                                                class="w-4 h-4 animate-spin"
+                                                            />
+                                                        {:else if asgn.status === "Active"}
+                                                            <LockIcon
+                                                                class="w-4 h-4"
+                                                            />
+                                                        {:else}
+                                                            <LockOpenIcon
+                                                                class="w-4 h-4"
+                                                            />
+                                                        {/if}
+                                                    </Button>
+                                                </form>
+                                            {/if}
                                             <Button
                                                 variant="ghost"
                                                 size="icon"

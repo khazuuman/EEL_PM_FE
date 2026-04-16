@@ -1,21 +1,13 @@
 import { deleteAssignment } from "$lib/server/assignments";
 import { updateAssignment } from "$lib/server/assignments";
-import { createAssignment, uploadFile } from "$lib/server/assignments";
+import { uploadFile, toggleStatusAssignment } from "$lib/server/assignments";
 import type { CreateAssignment } from "$lib/types/assignment";
-import type { PageServerLoad, Actions } from "./$types";
-import { fail, redirect } from "@sveltejs/kit";
-
-// export const load: PageServerLoad = async ({ url, parent }) => {
-//     const { classDetails } = await parent();
-//     const type = url.searchParams.get("type") ?? "Checkpoint"; // Checkpoint | Outcome | Other
-
-//     return { type, classId: classDetails.classId };
-// };
+import type { Actions } from "./$types";
+import { fail } from "@sveltejs/kit";
 
 export const actions: Actions = {
     updateAssignment: async (event) => {
         const formData = await event.request.formData();
-        const classId = formData.get("classId");
         const assignmentId = formData.get("assignmentId");
 
         const updateAssignmentRes = await updateAssignment(event, {
@@ -31,7 +23,6 @@ export const actions: Actions = {
         if (!updateAssignmentRes || updateAssignmentRes.status !== 200) {
             return fail(400, updateAssignmentRes.data?.message ?? "Fail to update assignment");
         }
-        // redirect(303, `/app/lecturer/class/${classId}/assignments-management`);
         return { success: true };
     },
     uploadFile: async (event) => {
@@ -68,6 +59,19 @@ export const actions: Actions = {
         return {
             success: true,
             data: deleteAssignmentRes
+        }
+    },
+    toggleStatus: async (event) => {
+        const formData = await event.request.formData();
+        const assignmentId = formData.get("assignmentId");
+
+        const toggleStatusAssignmentRes = await toggleStatusAssignment(event, assignmentId);
+        if (!toggleStatusAssignmentRes || toggleStatusAssignmentRes.status !== 200) {
+            return fail(400, toggleStatusAssignmentRes.data.message ?? "Fail to update assignment status");
+        }
+        return {
+            success: true,
+            data: toggleStatusAssignmentRes
         }
     },
 };

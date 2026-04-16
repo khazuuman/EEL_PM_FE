@@ -75,6 +75,10 @@
             name: "View Groups In Class",
             url: `/app/student/view-group-in-class`,
         },
+        {
+            name: "Checkpoints/Assignment",
+            url: `/app/student/assignment-checkpoint`,
+        },
     ];
 
     const roleItem =

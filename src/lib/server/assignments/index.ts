@@ -99,6 +99,21 @@ export const updateAssignment = async (
     };
 };
 
+export const toggleStatusAssignment = async (
+    event: RequestEvent, id: any
+) => {
+    const response = await fetcher({
+        event,
+        url: `/assignments/${id}/status`,
+        method: 'PATCH',
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const uploadFile = async (event: RequestEvent, body: any) => {
     const response = await fetcher({
         event,

@@ -5,11 +5,9 @@
 	import { ArrowLeftIcon, UsersIcon } from "lucide-svelte";
 
 	const { data } = $props();
-	console.log("data client: ", data);
 	let students = $derived(data?.students || []);
 	let totalCount = $derived(data?.totalCount || 0);
 	let majors = $derived(data?.majors || []);
-	console.log("majors client: ", majors);
 	const cacheKeyName = "lecturer-student-management";
 	let filters = $derived([
 		{
@@ -22,14 +20,12 @@
 		"studentCode",
 		"fullName",
 		"email",
-		// "groupName",
 		"majorName",
 	]);
 	let headerValues = $state({
 		studentCode: "Student Code",
 		fullName: "Full Name",
 		email: "Email",
-		// groupName: "Group",
 		majorName: "Major",
 	});
 </script>
