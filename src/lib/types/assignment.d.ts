@@ -8,3 +8,14 @@ export interface CreateAssignment {
     files: string[];
     status: string;
 }
+
+export interface SubmitAssignment {
+    fileUrls: string[];
+    links: LinkSubmit[];
+    notes: string;
+}
+
+export interface LinkSubmit {
+    title: string;
+    url: string;
+}

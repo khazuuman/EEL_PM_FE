@@ -1,7 +1,7 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { fetcher } from "../fetcher";
 import { safeJsonParse } from "$lib/utils";
-import type { CreateAssignment } from "$lib/types/assignment";
+import type { CreateAssignment, SubmitAssignment } from "$lib/types/assignment";
 
 export const getOtherAssignments = async (
     event: RequestEvent, classId: any
@@ -38,6 +38,35 @@ export const getCheckpoints = async (
     };
 };
 
+export const getCheckpointsForStudent = async (
+    event: RequestEvent, classId: any, groupId: any
+) => {
+    const response = await fetcher({
+        event,
+        url: `/assignments/student/checkpoint-outcome?classId=${classId}&groupId=${groupId}`,
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+export const getOtherAssignmentForStudent = async (
+    event: RequestEvent, classId: any, groupId: any
+) => {
+    const response = await fetcher({
+        event,
+        url: `/assignments/student/asignment-other?classId=${classId}&groupId=${groupId}`,
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+
 export const getAssignmentById = async (
     event: RequestEvent, id: any
 ) => {
@@ -52,12 +81,42 @@ export const getAssignmentById = async (
     };
 };
 
+export const getStudentSubmission = async (
+    event: RequestEvent, assignmentId: any, groupId: any
+) => {
+    const response = await fetcher({
+        event,
+        url: `/assignments/${assignmentId}/submission?groupId=${groupId}`,
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const createAssignment = async (
     event: RequestEvent, body: CreateAssignment, classId: any
 ) => {
     const response = await fetcher({
         event,
         url: `/classes/${classId}/assignments`,
+        method: 'POST',
+        data: body
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+export const submitAssignment = async (
+    event: RequestEvent, assignmentId: any, body: SubmitAssignment
+) => {
+    const response = await fetcher({
+        event,
+        url: `/assignments/${assignmentId}/submit`,
         method: 'POST',
         data: body
     });
