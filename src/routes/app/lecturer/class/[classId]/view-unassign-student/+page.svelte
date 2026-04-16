@@ -14,7 +14,7 @@
 	let filters = $derived([
 		{
 			title: "Majors",
-			key: "MajorId",
+			key: "majorId",
 			data: majors,
 		},
 	]);

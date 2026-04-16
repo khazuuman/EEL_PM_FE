@@ -46,6 +46,7 @@ export const actions: Actions = {
                 id: s.studentId,
                 name: s.fullName,
                 studentCode: s.studentCode,
+                majorName: s.majorName,
             })),
             group: groupRes?.data?.data,
             classId: classId

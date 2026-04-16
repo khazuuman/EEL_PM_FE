@@ -26,7 +26,7 @@ export const getAllCourses = async (
     // const { url } = event;
     const response = await fetcher({
         event,
-        url: `/courses?page=1&limit=100`
+        url: `/courses?isActive=true&page=1&limit=100`
     });
     const data = await safeJsonParse(response);
     return {

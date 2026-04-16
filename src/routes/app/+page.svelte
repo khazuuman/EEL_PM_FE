@@ -145,22 +145,13 @@
                 name: "Manage Academic Data",
                 url: "/app/academic-staff/manage-academic-data",
             },
-            {
-                name: "Manage Mentor Data",
-                url: "/app/academic-staff/manage-mentors",
-            },
+            // {
+            //     name: "Manage Mentor Data",
+            //     url: "/app/academic-staff/manage-mentors",
+            // },
             {
                 name: "Manage Lecturers",
                 url: "/app/academic-staff/manage-lecturers",
-            },
-        ],
-    };
-    const staffAnnouncementNav: NavigationGroup = {
-        groupLabel: "Announcement",
-        items: [
-            {
-                name: "Manage Annoucement",
-                url: "/app/academic-staff/manage-announcement",
             },
         ],
     };
@@ -174,6 +165,10 @@
             {
                 name: "Manage Courses",
                 url: "/app/academic-staff/manage-courses",
+            },
+            {
+                name: "Manage Annoucement",
+                url: "/app/academic-staff/manage-announcement",
             },
             // {
             //     name: "Manage Campuses",
@@ -247,7 +242,7 @@
         // finalNavGroups.push(staffClassNav);
         // finalNavGroups.push(staffGroupNav);
         finalNavGroups.push(staffAcademicDataNav);
-        finalNavGroups.push(staffAnnouncementNav);
+        // finalNavGroups.push(staffAnnouncementNav);
         finalNavGroups.push(staffOtherNav);
     }
 

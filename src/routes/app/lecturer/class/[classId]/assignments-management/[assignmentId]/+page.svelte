@@ -308,7 +308,7 @@
                         <Table.Row class="border-stone-50 hover:bg-transparent bg-stone-50">
                             <Table.Head class="text-xs font-semibold text-stone-500 uppercase tracking-wide pl-5 py-3">Group</Table.Head>
                             <Table.Head class="text-xs font-semibold text-stone-500 uppercase tracking-wide py-3">Status</Table.Head>
-                            <Table.Head class="text-xs font-semibold text-stone-500 uppercase tracking-wide py-3 text-center">Version</Table.Head>
+                            <!-- <Table.Head class="text-xs font-semibold text-stone-500 uppercase tracking-wide py-3 text-center">Version</Table.Head> -->
                             <Table.Head class="text-xs font-semibold text-stone-500 uppercase tracking-wide py-3">Submitted At</Table.Head>
                             <Table.Head class="text-xs font-semibold text-stone-500 uppercase tracking-wide py-3 text-center">Score</Table.Head>
                             <Table.Head class="text-xs font-semibold text-stone-500 uppercase tracking-wide py-3 text-right pr-5">Action</Table.Head>
@@ -342,7 +342,7 @@
                                 </Table.Cell>
 
                                 <!-- Version -->
-                                <Table.Cell class="text-center py-4">
+                                <!-- <Table.Cell class="text-center py-4">
                                     {#if submission.versionNumber > 0}
                                         <span class="text-sm bg-stone-100 text-stone-600 rounded-lg px-2.5 py-1 font-mono tabular-nums font-medium">
                                             v{submission.versionNumber}
@@ -350,7 +350,7 @@
                                     {:else}
                                         <span class="text-sm text-stone-300">—</span>
                                     {/if}
-                                </Table.Cell>
+                                </Table.Cell> -->
 
                                 <!-- Submitted At -->
                                 <Table.Cell class="py-4">

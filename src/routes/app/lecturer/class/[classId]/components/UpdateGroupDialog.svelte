@@ -10,7 +10,12 @@
     import { Check, ChevronsUpDown } from "@lucide/svelte";
     import { cn } from "$lib/utils";
 
-    type Student = { id: number; name: string; studentCode: string };
+    type Student = {
+        id: number;
+        name: string;
+        studentCode: string;
+        majorName: string;
+    };
     type Group = {
         groupId: number | string;
         groupName?: string;
@@ -19,6 +24,7 @@
             studentId: number;
             fullName: string;
             studentCode: string;
+            majorName: string;
         }[];
     };
 
@@ -71,6 +77,7 @@
                 id: m.studentId,
                 name: m.fullName,
                 studentCode: m.studentCode,
+                majorName: m.majorName ?? "", // ✅ đảm bảo có fallback
             }));
         return [...students, ...currentMembers];
     });
@@ -221,7 +228,7 @@
                                 <Command.Group class="max-h-64 overflow-y-auto">
                                     {#each allStudents() as student}
                                         <Command.Item
-                                            value={`${student.studentCode} ${student.name}`}
+                                            value={`${student.studentCode} ${student.name} ${student.majorName}`}
                                             onSelect={() =>
                                                 toggleStudent(student.id)}
                                             class="cursor-pointer"
@@ -236,16 +243,26 @@
                                                         : "opacity-0",
                                                 )}
                                             />
-                                            <span
-                                                class="font-mono text-xs text-stone-500 mr-2"
-                                            >
-                                                {student.studentCode}
-                                            </span>
-                                            <span
-                                                class="text-sm text-stone-700"
-                                            >
-                                                {student.name}
-                                            </span>
+                                            <div class="flex justify-between w-full">
+                                                <div>
+                                                    <span
+                                                        class="font-mono text-xs text-stone-500 mr-2"
+                                                    >
+                                                        {student.studentCode}
+                                                    </span>
+                                                    <span
+                                                        class="text-sm text-stone-700"
+                                                    >
+                                                        {student.name}
+                                                    </span>
+                                                </div>
+
+                                                <span
+                                                    class="ml-auto text-xs text-stone-400"
+                                                >
+                                                    {student.majorName}
+                                                </span>
+                                            </div>
                                         </Command.Item>
                                     {/each}
                                 </Command.Group>
@@ -263,6 +280,9 @@
                                         >{student.studentCode}</span
                                     >
                                     <span>{student.name}</span>
+                                    <span class="text-amber-600"
+                                        >· {student.majorName}</span
+                                    >
                                     <button
                                         type="button"
                                         class="ml-0.5 text-amber-500 hover:text-amber-700"
