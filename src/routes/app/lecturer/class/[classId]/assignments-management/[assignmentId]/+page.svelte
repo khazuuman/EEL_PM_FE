@@ -615,7 +615,7 @@
                                             class="h-8 px-3 text-sm text-stone-500 hover:text-stone-800 hover:bg-stone-100 cursor-pointer"
                                             onclick={() =>
                                                 goto(
-                                                    `/app/lecturer/class/${classId}/assignments-management/${assignmentId}/submissions/${submission.groupId}`,
+                                                    `/app/lecturer/class/${classId}/assignments-management/${assignmentId}/submission/${submission.submissionId}`,
                                                 )}
                                         >
                                             <EyeIcon class="w-4 h-4 mr-1.5" />

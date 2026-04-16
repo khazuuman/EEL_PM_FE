@@ -19,3 +19,8 @@ export interface LinkSubmit {
     title: string;
     url: string;
 }
+
+export interface GradeAssignment {
+    score: number;
+    feedback: string;
+}

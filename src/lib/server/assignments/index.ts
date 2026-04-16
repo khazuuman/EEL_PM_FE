@@ -1,7 +1,7 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { fetcher } from "../fetcher";
 import { safeJsonParse } from "$lib/utils";
-import type { CreateAssignment, SubmitAssignment } from "$lib/types/assignment";
+import type { CreateAssignment, GradeAssignment, SubmitAssignment } from "$lib/types/assignment";
 
 export const getOtherAssignments = async (
     event: RequestEvent, classId: any
@@ -180,6 +180,36 @@ export const uploadFile = async (event: RequestEvent, body: any) => {
         url: `/upload/file`,
         method: 'POST',
         formData: body
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+export const getSubmissionById = async (
+    event: RequestEvent, id: any
+) => {
+    const response = await fetcher({
+        event,
+        url: `/submissions/${id}`
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+export const gradeSubmission = async (
+    event: RequestEvent, body: GradeAssignment, id: any
+) => {
+    const response = await fetcher({
+        event,
+        url: `/submissions/${id}/grade`,
+        method: 'PUT',
+        data: body
     });
     const data = await safeJsonParse(response);
     return {
