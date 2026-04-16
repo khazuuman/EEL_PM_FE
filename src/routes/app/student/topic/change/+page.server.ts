@@ -22,7 +22,7 @@ export const load: PageServerLoad = async (event) => {
 
     console.log('Sorted topics: ', topics);
     return {
-        currentTopic: topics,
+        currentTopic: topics[0],
         groupId: user.student.group?.groupId
     };
 };
