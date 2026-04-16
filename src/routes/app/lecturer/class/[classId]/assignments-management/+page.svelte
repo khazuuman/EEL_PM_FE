@@ -558,10 +558,16 @@
                                             1}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        <span
-                                            class="text-sm font-semibold text-stone-900"
-                                            >{asgn.title}</span
+                                    <button
+                                            type="button"
+                                            onclick={() =>
+                                                goto(
+                                                    `/app/lecturer/class/${data.classId}/assignments-management/${asgn.id}`,
+                                                )}
+                                            class="text-sm font-semibold text-stone-900 hover:text-amber-600 hover:underline transition-colors cursor-pointer text-left"
                                         >
+                                            {asgn.title}
+                                        </button>
                                     </Table.Cell>
                                     <Table.Cell>
                                         <Badge

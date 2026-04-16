@@ -34,7 +34,7 @@
             ? new Date(assignment.dueDate).toISOString().slice(0, 16)
             : "",
     );
-    let maxScore = $state(assignment?.maxScore ?? 100);
+    let maxScore = $state(assignment?.maxScore ?? 10);
     type UploadedFile = { name: string; url: string; isImage: boolean };
     // Existing files from server
     let existingFiles: { fileId: number; fileName: string; fileUrl: string }[] =
@@ -358,6 +358,8 @@
                                 name="maxScore"
                                 type="number"
                                 min="0"
+                                max="10"
+                                step="0.1"
                                 bind:value={maxScore}
                                 required
                                 class="border-stone-200 focus-visible:ring-amber-500"

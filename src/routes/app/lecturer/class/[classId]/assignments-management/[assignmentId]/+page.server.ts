@@ -9,11 +9,15 @@ export const actions: Actions = {
     updateAssignment: async (event) => {
         const formData = await event.request.formData();
         const assignmentId = formData.get("assignmentId");
+        let sequenceNumber = Number(formData.get("sequenceNumber")) || null;
+        const type = formData.get("type") as string;
+        if (type === "Other")
+            sequenceNumber = null;
 
         const updateAssignmentRes = await updateAssignment(event, {
             title: formData.get("title") as string,
             type: formData.get("type") as string,
-            sequenceNumber: Number(formData.get("sequenceNumber")) ?? null,
+            sequenceNumber: sequenceNumber,
             description: formData.get("description") as string ?? "",
             dueDate: new Date(formData.get("dueDate") as string).toISOString(),
             maxScore: Number(formData.get("maxScore")),

@@ -21,7 +21,7 @@
 
     let { data }: { data: PageData } = $props();
 
-    const topic = $derived(data.currentTopic?.[0]);
+    const topic = $derived(data.currentTopic);
 
     const statusClass: Record<string, string> = {
         Approved: "bg-emerald-50 text-emerald-700 border-emerald-200",

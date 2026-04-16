@@ -151,6 +151,7 @@ export const updateAssignment = async (
         method: 'PUT',
         data: body
     });
+    console.log("body: ", body);
     const data = await safeJsonParse(response);
     return {
         status: response.status,
