@@ -223,7 +223,7 @@
                 variant="outline"
                 size="sm"
                 class="text-stone-600 border-stone-200 hover:bg-stone-50 cursor-pointer"
-                onclick={() => goto(`...update`)}
+                onclick={() => goto(`/app/lecturer/class/${classId}/assignments-management/${assignmentId}/update`)}
             >
                 <EditIcon class="w-4 h-4 mr-1.5" />
                 Edit

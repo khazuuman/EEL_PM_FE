@@ -214,26 +214,36 @@
                         Basic Information
                     </p>
 
-                    <!-- Title -->
-                    <div class="space-y-1.5">
-                        <Label
-                            for="title"
-                            class="text-sm font-semibold text-stone-700"
-                        >
-                            Title <span class="text-red-500">*</span>
-                        </Label>
-                        <Input
-                            id="title"
-                            name="title"
-                            bind:value={title}
-                            placeholder="Enter assignment title"
-                            required
-                            class="border-stone-200 focus-visible:ring-amber-500"
-                        />
-                    </div>
-
                     <!-- Type + Sequence Number -->
                     <div class="grid grid-cols-2 gap-4">
+                        {#if showSequence}
+                            <div class="space-y-1.5">
+                                <Label
+                                    for="sequenceNumber"
+                                    class="text-sm font-semibold text-stone-700"
+                                >
+                                    {type === "Checkpoint"
+                                        ? "Checkpoint Number"
+                                        : "Outcome Number"}
+                                    <span class="text-red-500">*</span>
+                                </Label>
+                                <Input
+                                    id="sequenceNumber"
+                                    name="sequenceNumber"
+                                    type="number"
+                                    min="1"
+                                    bind:value={sequenceNumber}
+                                    required={showSequence}
+                                    class="border-stone-200 focus-visible:ring-amber-500"
+                                />
+                            </div>
+                        {:else}
+                            <input
+                                type="hidden"
+                                name="sequenceNumber"
+                                value="0"
+                            />
+                        {/if}
                         <div class="space-y-1.5">
                             <Label
                                 for="type"
@@ -266,34 +276,24 @@
                             </Select.Root>
                             <input type="hidden" name="type" value={type} />
                         </div>
+                    </div>
 
-                        {#if showSequence}
-                            <div class="space-y-1.5">
-                                <Label
-                                    for="sequenceNumber"
-                                    class="text-sm font-semibold text-stone-700"
-                                >
-                                    Sequence No. <span class="text-red-500"
-                                        >*</span
-                                    >
-                                </Label>
-                                <Input
-                                    id="sequenceNumber"
-                                    name="sequenceNumber"
-                                    type="number"
-                                    min="1"
-                                    bind:value={sequenceNumber}
-                                    required={showSequence}
-                                    class="border-stone-200 focus-visible:ring-amber-500"
-                                />
-                            </div>
-                        {:else}
-                            <input
-                                type="hidden"
-                                name="sequenceNumber"
-                                value="0"
-                            />
-                        {/if}
+                    <!-- Title -->
+                    <div class="space-y-1.5">
+                        <Label
+                            for="title"
+                            class="text-sm font-semibold text-stone-700"
+                        >
+                            Title <span class="text-red-500">*</span>
+                        </Label>
+                        <Input
+                            id="title"
+                            name="title"
+                            bind:value={title}
+                            placeholder="Enter assignment title"
+                            required
+                            class="border-stone-200 focus-visible:ring-amber-500"
+                        />
                     </div>
 
                     <!-- Description -->

@@ -213,6 +213,30 @@
                         Basic Information
                     </p>
 
+                    <!-- Sequence Number — chỉ Checkpoint / Outcome -->
+                    {#if type !== "Other"}
+                        <div class="space-y-1.5">
+                            <Label class="text-sm font-semibold text-stone-700">
+                                {type === "Checkpoint"
+                                    ? "Checkpoint Number"
+                                    : "Outcome Number"}
+                                <span class="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                name="sequenceNumber"
+                                type="number"
+                                min={1}
+                                max={4}
+                                bind:value={sequenceNumber}
+                                class="border-stone-200 {typeConfig.ring} w-32"
+                            />
+                            <p class="text-xs text-stone-400">
+                                Order within the {typeConfig.label.toLowerCase()}
+                                list (1–4)
+                            </p>
+                        </div>
+                    {/if}
+
                     <!-- Title -->
                     <div class="space-y-1.5">
                         <Label class="text-sm font-semibold text-stone-700">
@@ -231,29 +255,6 @@
                             </p>
                         {/if}
                     </div>
-
-                    <!-- Sequence Number — chỉ Checkpoint / Outcome -->
-                    {#if type !== "Other"}
-                        <div class="space-y-1.5">
-                            <Label class="text-sm font-semibold text-stone-700">
-                                Sequence Number <span class="text-red-500"
-                                    >*</span
-                                >
-                            </Label>
-                            <Input
-                                name="sequenceNumber"
-                                type="number"
-                                min={1}
-                                max={4}
-                                bind:value={sequenceNumber}
-                                class="border-stone-200 {typeConfig.ring} w-32"
-                            />
-                            <p class="text-xs text-stone-400">
-                                Order within the {typeConfig.label.toLowerCase()}
-                                list (1–4)
-                            </p>
-                        </div>
-                    {/if}
 
                     <!-- Description -->
                     <div class="space-y-1.5">

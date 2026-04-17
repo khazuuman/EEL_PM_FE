@@ -836,7 +836,7 @@
                             onclick={() => goto(`/app/student/topic/history`)}
                         >
                             <HistoryIcon class="w-4 h-4" />
-                            History
+                            Topic History
                         </Button>
 
                         <!-- Change Topic — chỉ leader -->
