@@ -142,7 +142,7 @@
         groupLabel: "Academic Data",
         items: [
             {
-                name: "Manage Academic Data",
+                name: "Manage Student",
                 url: "/app/academic-staff/manage-academic-data",
             },
             // {
@@ -182,16 +182,12 @@
         groupLabel: "System",
         items: [
             {
-                name: "Monitor System Changes (Audit Log)",
-                url: "/app/admin/monitor-system",
+                name: "Manage Staff",
+                url: "/app/admin/manage-staff",
             },
             {
-                name: "Config System Rules",
-                url: "/app/admin/config-rules",
-            },
-            {
-                name: "Manage Roles",
-                url: "/app/admin/manage-roles",
+                name: "Setting System Email",
+                url: "/app/admin/config-email",
             },
         ],
     };

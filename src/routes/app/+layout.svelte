@@ -23,7 +23,6 @@
         <!-- Logo & Brand -->
         <div class="flex items-center gap-3 shrink-0">
             <button
-                onclick={() => goto("/app")}
                 class="flex items-center gap-2.5 group"
                 aria-label="Go to home"
             >
