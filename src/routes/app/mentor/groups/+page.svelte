@@ -1,9 +1,9 @@
 <script lang="ts">
     import Input from "$lib/components/ui/input/input.svelte";
     import {
-        ArrowRightIcon,
         SearchIcon,
         UsersIcon,
+        ArrowRightIcon,
         UserStarIcon,
         BuildingIcon,
         CalendarIcon,
@@ -117,7 +117,7 @@
         </div>
 
         <!-- Stats bar -->
-        <div class="flex items-center gap-3 mb-8">
+        <div class="flex items-center gap-3 mb-6">
             <div
                 class="flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-50 border border-stone-100"
             >
@@ -129,10 +129,10 @@
             </div>
         </div>
 
-        <!-- Groups Grid -->
+        <!-- Table -->
         {#if groups.length === 0}
             <div
-                class="flex flex-col items-center justify-center py-24 text-center"
+                class="flex flex-col items-center justify-center py-24 text-center border border-stone-100 rounded-2xl"
             >
                 <div
                     class="w-14 h-14 rounded-2xl bg-stone-50 border border-stone-100 flex items-center justify-center mb-4"
@@ -147,197 +147,207 @@
                 </p>
             </div>
         {:else}
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {#each groups as group}
-                    {@const cfg = statusConfig[group.status] ?? {
-                        class: "bg-stone-100 text-stone-500 border border-stone-200",
-                        dot: "bg-stone-400",
-                    }}
-                    {@const fillPct = Math.min(
-                        100,
-                        Math.round((group.memberCount / group.maxMember) * 100),
-                    )}
-                    {@const isFull = group.memberCount >= group.maxMember}
-
-                    <div
-                        class="group/card relative flex flex-col bg-white border border-stone-200 rounded-2xl overflow-hidden hover:border-amber-300 hover:shadow-lg transition-all duration-200"
-                    >
-                        <div
-                            class="h-0.5 w-full bg-gradient-to-r from-amber-400 to-amber-300 opacity-0 group-hover/card:opacity-100 transition-opacity duration-200"
-                        ></div>
-
-                        <div class="p-6 flex flex-col flex-1">
-                            <!-- Header -->
-                            <div
-                                class="flex items-start justify-between gap-3 mb-6"
+            <div class="rounded-2xl border border-stone-200 overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-stone-50 border-b border-stone-200">
+                            <th
+                                class="text-left px-5 py-3 text-xs font-semibold text-stone-500 uppercase tracking-wider w-12"
                             >
-                                <h3
-                                    class="font-bold text-stone-900 text-lg leading-snug line-clamp-2 flex-1"
-                                >
-                                    {group.name}
-                                </h3>
-                                <span
-                                    class="inline-flex items-center gap-1.5 shrink-0 px-3 py-1 rounded-full text-xs font-semibold {cfg.class}"
-                                >
+                                #
+                            </th>
+                            <th
+                                class="text-left px-5 py-3 text-xs font-semibold text-stone-500 uppercase tracking-wider"
+                            >
+                                <div class="flex items-center gap-1.5">
+                                    <UsersIcon class="w-3.5 h-3.5" />
+                                    Group
+                                </div>
+                            </th>
+                            <th
+                                class="text-left px-5 py-3 text-xs font-semibold text-stone-500 uppercase tracking-wider"
+                            >
+                                <div class="flex items-center gap-1.5">
+                                    <UserStarIcon class="w-3.5 h-3.5" />
+                                    Leader
+                                </div>
+                            </th>
+                            <th
+                                class="text-left px-5 py-3 text-xs font-semibold text-stone-500 uppercase tracking-wider"
+                            >
+                                <div class="flex items-center gap-1.5">
+                                    <LayersIcon class="w-3.5 h-3.5" />
+                                    Class
+                                </div>
+                            </th>
+                            <th
+                                class="text-left px-5 py-3 text-xs font-semibold text-stone-500 uppercase tracking-wider"
+                            >
+                                <div class="flex items-center gap-1.5">
+                                    <CalendarIcon class="w-3.5 h-3.5" />
+                                    Semester
+                                </div>
+                            </th>
+                            <th
+                                class="text-left px-5 py-3 text-xs font-semibold text-stone-500 uppercase tracking-wider"
+                            >
+                                <div class="flex items-center gap-1.5">
+                                    <BuildingIcon class="w-3.5 h-3.5" />
+                                    Campus
+                                </div>
+                            </th>
+                            <th
+                                class="text-left px-5 py-3 text-xs font-semibold text-stone-500 uppercase tracking-wider"
+                            >
+                                <div class="flex items-center gap-1.5">
+                                    <UsersIcon class="w-3.5 h-3.5" />
+                                    Members
+                                </div>
+                            </th>
+                            <th
+                                class="text-left px-5 py-3 text-xs font-semibold text-stone-500 uppercase tracking-wider"
+                            >
+                                Status
+                            </th>
+                            <th class="px-5 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-100">
+                        {#each groups as group, i}
+                            {@const cfg = statusConfig[group.status] ?? {
+                                class: "bg-stone-100 text-stone-500 border border-stone-200",
+                                dot: "bg-stone-400",
+                            }}
+                            {@const fillPct = Math.min(
+                                100,
+                                Math.round(
+                                    (group.memberCount / group.maxMember) * 100,
+                                ),
+                            )}
+                            {@const isFull =
+                                group.memberCount >= group.maxMember}
+
+                            <tr
+                                class="bg-white hover:bg-amber-50/40 transition-colors duration-100 group/row"
+                            >
+                                <!-- Index -->
+                                <td class="px-5 py-4">
                                     <span
-                                        class="w-1.5 h-1.5 rounded-full {cfg.dot}"
-                                    ></span>
-                                    {group.status}
-                                </span>
-                            </div>
-
-                            <!-- Info rows -->
-                            <div class="flex flex-col gap-3 flex-1">
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0"
+                                        class="text-sm font-medium text-stone-400 tabular-nums"
                                     >
-                                        <UserStarIcon
-                                            class="w-4 h-4 text-amber-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <p
-                                            class="text-xs text-stone-400 leading-none mb-0.5"
-                                        >
-                                            Leader
-                                        </p>
-                                        <p
-                                            class="text-base font-semibold text-stone-700"
-                                        >
-                                            {group.leaderName}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0"
+                                        {i + 1}
+                                    </span>
+                                </td>
+                                <!-- Group Name -->
+                                <td class="px-5 py-4">
+                                    <p
+                                        class="font-semibold text-stone-900 truncate max-w-[180px]"
                                     >
-                                        <LayersIcon
-                                            class="w-4 h-4 text-amber-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <p
-                                            class="text-xs text-stone-400 leading-none mb-0.5"
-                                        >
-                                            Class
-                                        </p>
-                                        <p
-                                            class="text-base font-semibold text-stone-700"
-                                        >
-                                            {group.className}
-                                        </p>
-                                    </div>
-                                </div>
+                                        {group.name}
+                                    </p>
+                                </td>
 
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0"
-                                    >
-                                        <CalendarIcon
-                                            class="w-4 h-4 text-amber-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <p
-                                            class="text-xs text-stone-400 leading-none mb-0.5"
+                                <!-- Leader -->
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-2">
+                                        <div
+                                            class="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center text-xs font-bold text-amber-700 shrink-0"
                                         >
-                                            Semester
-                                        </p>
-                                        <p
-                                            class="text-base font-semibold text-stone-700"
+                                            {group.leaderName?.charAt(0) ?? "?"}
+                                        </div>
+                                        <span
+                                            class="text-stone-700 font-medium truncate max-w-[140px]"
                                         >
-                                            {group.semesterName}
-                                        </p>
+                                            {group.leaderName ?? "—"}
+                                        </span>
                                     </div>
-                                </div>
+                                </td>
 
-                                <div class="flex items-center gap-3">
-                                    <div
-                                        class="w-8 h-8 rounded-lg bg-amber-50 flex items-center justify-center shrink-0"
+                                <!-- Class -->
+                                <td class="px-5 py-4">
+                                    <span
+                                        class="text-stone-600 truncate max-w-[120px] block"
                                     >
-                                        <BuildingIcon
-                                            class="w-4 h-4 text-amber-500"
-                                        />
-                                    </div>
-                                    <div>
-                                        <p
-                                            class="text-xs text-stone-400 leading-none mb-0.5"
-                                        >
-                                            Campus
-                                        </p>
-                                        <p
-                                            class="text-base font-semibold text-stone-700"
-                                        >
-                                            {group.campusName}
-                                        </p>
-                                    </div>
-                                </div>
+                                        {group.className ?? "—"}
+                                    </span>
+                                </td>
 
-                                <!-- Members progress -->
-                                <div class="mt-1">
-                                    <div
-                                        class="flex items-center justify-between mb-1.5"
+                                <!-- Semester -->
+                                <td class="px-5 py-4">
+                                    <span
+                                        class="text-stone-600 truncate max-w-[120px] block"
                                     >
-                                        <div class="flex items-center gap-1.5">
-                                            <UsersIcon
-                                                class="w-3.5 h-3.5 text-stone-400"
-                                            />
+                                        {group.semesterName ?? "—"}
+                                    </span>
+                                </td>
+
+                                <!-- Campus -->
+                                <td class="px-5 py-4">
+                                    <span
+                                        class="text-stone-600 truncate max-w-[100px] block"
+                                    >
+                                        {group.campusName ?? "—"}
+                                    </span>
+                                </td>
+
+                                <!-- Members + Progress -->
+                                <td class="px-5 py-4">
+                                    <div
+                                        class="flex flex-col gap-1 min-w-[90px]"
+                                    >
+                                        <div
+                                            class="flex items-center justify-between"
+                                        >
                                             <span
-                                                class="text-xs text-stone-500 font-medium"
+                                                class="text-xs text-stone-500 font-medium tabular-nums"
                                             >
                                                 {group.memberCount}<span
                                                     class="text-stone-300 mx-0.5"
                                                     >/</span
-                                                >{group.maxMember} members
+                                                >{group.maxMember}
                                             </span>
                                         </div>
-                                        <span
-                                            class="text-xs font-bold {isFull
-                                                ? 'text-red-400'
-                                                : 'text-stone-400'}"
-                                        >
-                                            {isFull ? "Full" : `${fillPct}%`}
-                                        </span>
-                                    </div>
-                                    <div
-                                        class="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden"
-                                    >
                                         <div
-                                            class="h-full rounded-full transition-all duration-500 {isFull
-                                                ? 'bg-red-400'
-                                                : 'bg-amber-400'}"
-                                            style="width: {fillPct}%"
-                                        ></div>
+                                            class="w-full h-1.5 bg-stone-100 rounded-full overflow-hidden"
+                                        >
+                                            <div
+                                                class="h-full rounded-full transition-all duration-500 {isFull
+                                                    ? 'bg-red-400'
+                                                    : 'bg-amber-400'}"
+                                                style="width: {fillPct}%"
+                                            ></div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
+                                </td>
 
-                            <!-- Footer -->
-                            <div class="mt-6 pt-4 border-t border-stone-100">
-                                <a
-                                    href="/app/mentor/groups/{group.id}"
-                                    class="flex items-center justify-between w-full group/link"
-                                >
+                                <!-- Status -->
+                                <td class="px-5 py-4">
                                     <span
-                                        class="text-base font-semibold text-amber-500 group-hover/link:text-amber-600 transition-colors"
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold {cfg.class}"
                                     >
-                                        Manage Group
+                                        <span
+                                            class="w-1.5 h-1.5 rounded-full {cfg.dot}"
+                                        ></span>
+                                        {group.status}
                                     </span>
-                                    <div
-                                        class="flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 group-hover/link:bg-amber-100 transition-colors"
+                                </td>
+
+                                <!-- Action -->
+                                <td class="px-5 py-4">
+                                    <a
+                                        href="/app/mentor/groups/{group.id}"
+                                        class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-500 hover:text-amber-600 transition-colors whitespace-nowrap"
                                     >
+                                        View
                                         <ArrowRightIcon
-                                            class="w-4 h-4 text-amber-500 group-hover/link:translate-x-0.5 transition-transform duration-150"
+                                            class="w-3.5 h-3.5 group-hover/row:translate-x-0.5 transition-transform duration-150"
                                         />
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                {/each}
+                                    </a>
+                                </td>
+                            </tr>
+                        {/each}
+                    </tbody>
+                </table>
             </div>
         {/if}
     </main>
