@@ -13,13 +13,25 @@ export const getMentorInformation = async (event: RequestEvent, classId: any) =>
     };
 };
 
-export const getMentors = async (event: RequestEvent) => {
-    const { url } = event;
-    const response = await fetcher({ event, url: `/mentors?IsActive=true&${url.searchParams.toString()}` });
+export const getMentors = async (
+    event: RequestEvent,
+    params?: { page?: number; email?: string; limit?: number }
+) => {
+    const searchParams = new URLSearchParams();
+    searchParams.set("IsActive", "true");
+
+    if (params?.page) searchParams.set("page", String(params.page));
+    if (params?.limit) searchParams.set("limit", String(params.limit));
+    if (params?.email) searchParams.set("email", params.email);
+
+    const response = await fetcher({
+        event,
+        url: `/mentors?${searchParams.toString()}`,
+    });
     const data = await safeJsonParse(response);
     return {
         status: response.status,
-        data: data
+        data: data,
     };
 };
 
@@ -86,6 +98,7 @@ export const assignMentor = async (event: RequestEvent, groupId: any, body: any)
         method: 'POST',
         data: body
     });
+    console.log('assign mentor body: ', body);
     const data = await safeJsonParse(response);
     return {
         status: response.status,

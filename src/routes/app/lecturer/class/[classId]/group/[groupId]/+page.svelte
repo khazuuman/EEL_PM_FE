@@ -460,7 +460,7 @@
                                 )}
                         >
                             <HistoryIcon class="h-4 w-4 mr-1.5" />
-                            History
+                            Topic History
                         </Button>
 
                         <Button
@@ -576,14 +576,14 @@
                     <span class="text-sm italic text-gray-400"
                         >No mentor assigned yet.</span
                     >
-                    <Button
+                    <!-- <Button
                         variant="outline"
                         size="sm"
                         class="text-sm text-gray-700 bg-white border-gray-200 cursor-pointer"
                         href="{pageUrl}/assign-mentor"
                     >
                         Find a Mentor
-                    </Button>
+                    </Button> -->
                 </div>
             {/if}
         </section>

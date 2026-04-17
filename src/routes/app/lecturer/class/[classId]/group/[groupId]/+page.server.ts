@@ -124,16 +124,29 @@ export const actions: Actions = {
         };
     },
     getMentors: async (event) => {
-        const { params, url } = event;
+        const { params, request } = event;
 
-        const limit = url.searchParams.get("limit") ?? "10";
-        url.searchParams.set("limit", limit);
+        // FIX: Đọc page và email từ formData thay vì url.searchParams
+        const formData = await request.formData();
+        const page = Number(formData.get("page") ?? 1);
+        const email = (formData.get("email") as string) ?? "";
 
-        const mentorRes = await getMentors(event);
+        const mentorRes = await getMentors(event, { page, email });
 
-        console.log("mentorRes: ", mentorRes.data?.data?.data);
+        console.log("mentorRes data:", mentorRes.data?.data);
+
+        // FIX: Tách đúng data và pagination từ response
+        const responseData = mentorRes?.data?.data;
+
         return {
-            mentors: mentorRes?.data?.data?.data || [],
+            mentors: responseData?.data || [],
+            // FIX: pagination nằm ở responseData.pagination, không phải responseData.data.pagination
+            pagination: {
+                page: responseData?.pagination?.page ?? page,
+                limit: responseData?.pagination?.limit ?? 20,
+                totalItems: responseData?.pagination?.totalItems ?? 0,
+                totalPages: responseData?.pagination?.totalPages ?? 0,
+            },
             classId: params.classId
         };
     },
@@ -154,8 +167,18 @@ export const actions: Actions = {
     assignMentor: async (event) => {
         const formData = await event.request.formData();
         const groupId = Number(formData.get("groupId"));
-        const mentorId = Number(formData.get("mentorId"));
-        const assignMentorRes = await assignMentor(event, groupId, { mentorId });
+        const mentorIdRaw = formData.get("mentorId");
+        const mentorEmail = (formData.get("mentorEmail") as string) || null;
+        const mentorFullName = (formData.get("mentorFullName") as string) || null;
+
+        const mentorId = mentorIdRaw ? Number(mentorIdRaw) || null : null;
+
+        const assignMentorRes = await assignMentor(event, groupId, {
+            ...(mentorId ? { mentorId } : {}),
+            ...(mentorEmail ? { mentorEmail } : {}),
+            ...(mentorFullName ? { mentorFullName } : {}),
+        });
+
         if (!assignMentorRes || assignMentorRes.status !== 200) {
             return fail(400, {
                 message: assignMentorRes?.data?.message ?? "Failed to assign mentor",
@@ -169,8 +192,6 @@ export const actions: Actions = {
     update: async (event) => {
         const formData = await event.request.formData();
         const groupId = formData.get("groupId");
-        // const minMembers = Number(formData.get("minMembers"));
-        // const maxMembers = Number(formData.get("maxMembers"));
         const studentIds = formData.getAll("studentIds").map(Number);
 
         const updateGroupRes = await updateGroup(event, groupId, { studentIds } as UpdateGroup);
