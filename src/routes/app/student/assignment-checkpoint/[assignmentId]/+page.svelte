@@ -851,7 +851,7 @@
                                 <Button
                                     type="submit"
                                     disabled={submitting || uploadingFile}
-                                    class="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer px-8 h-11 text-base font-semibold"
+                                    class="gap-2 bg-amber-600 hover:bg-amber-700 text-white cursor-pointer px-8 h-11 text-base font-semibold"
                                 >
                                     {#if submitting}
                                         <Loader2Icon
@@ -862,7 +862,7 @@
                                         <SendIcon class="w-4 h-4" />
                                         {editMode
                                             ? "Update Submission"
-                                            : "Submit Assignment"}
+                                            : "Submit"}
                                     {/if}
                                 </Button>
                                 {#if editMode}
