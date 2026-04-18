@@ -20,7 +20,6 @@ export const load: PageServerLoad = async (event) => {
         getCurrentTopicByGroupId(event, user.student.group?.groupId),
         getDeadlines(event, user.student?.classId)
     ]);
-    console.log("deadlineRes: ", deadlineRes?.data?.data);
 
     //leader get join request
     let joinRequests;
@@ -41,7 +40,6 @@ export const load: PageServerLoad = async (event) => {
             invitations = list;
         }
     }
-    console.log("invitations: ", invitations);
 
     return {
         group: groupRes.data?.data,

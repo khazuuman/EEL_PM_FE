@@ -180,7 +180,7 @@
                 {#if !isLeader}
                     <Button
                         variant="outline"
-                        class="relative gap-2 h-9 border-violet-200 text-violet-600 bg-violet-50 hover:bg-violet-100 hover:text-violet-700 cursor-pointer"
+                        class="relative gap-2 h-9 border-amber-200 text-amber-600 bg-amber-50 hover:bg-amber-100 hover:text-amber-700 cursor-pointer"
                         onclick={() => (invitationsOpen = true)}
                     >
                         <InboxIcon class="w-4 h-4" />
@@ -202,7 +202,7 @@
                     {#if canEdit && isLeader}
                         <Button
                             variant="outline"
-                            class="relative gap-2 h-9 border-violet-200 text-violet-600 bg-violet-50 hover:bg-violet-100 hover:text-violet-700 cursor-pointer"
+                            class="relative gap-2 h-9 border-amber-200 text-amber-600 bg-amber-50 hover:bg-amber-100 hover:text-amber-700 cursor-pointer"
                             onclick={() => (joinRequestOpen = true)}
                         >
                             <InboxIcon class="w-4 h-4" />
@@ -224,7 +224,7 @@
                         <!-- Invite Member -->
                         <Button
                             variant="outline"
-                            class="gap-2 h-9 border-violet-200 text-violet-600 bg-violet-50 hover:bg-violet-100 hover:text-violet-700 cursor-pointer"
+                            class="gap-2 h-9 border-amber-200 text-amber-600 bg-amber-50 hover:bg-amber-100 hover:text-amber-700 cursor-pointer"
                             onclick={() => (inviteMemberOpen = true)}
                         >
                             <UserCircleIcon class="w-4 h-4" />
@@ -950,6 +950,112 @@
                                 {:else}
                                     Waiting for the leader to register a topic.
                                 {/if}
+                            </p>
+                        </div>
+                    </div>
+                {/if}
+            </div>
+        </div>
+        <!-- Mentor Section -->
+        <div class="rounded-xl border border-stone-200 bg-white">
+            <!-- Header -->
+            <div
+                class="flex items-center gap-3 px-6 py-4 border-b border-stone-100"
+            >
+                <div
+                    class="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0"
+                >
+                    <UserCircleIcon class="w-4 h-4 text-amber-500" />
+                </div>
+                <div>
+                    <p
+                        class="text-[10px] font-bold text-amber-500 uppercase tracking-widest leading-none"
+                    >
+                        Mentor
+                    </p>
+                    <h2
+                        class="text-base font-extrabold text-stone-900 leading-tight"
+                    >
+                        {data.group.mentor
+                            ? data.group.mentor.fullName
+                            : "No Mentor Assigned"}
+                    </h2>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="px-6 py-5">
+                {#if data.group.mentor}
+                    <div class="flex items-center gap-4">
+                        <!-- Avatar -->
+                        <div
+                            class="h-12 w-12 shrink-0 rounded-full bg-amber-100 flex items-center justify-center font-bold text-amber-700 text-base"
+                        >
+                            {data.group.mentor.fullName?.charAt(0) ?? "?"}
+                        </div>
+
+                        <!-- Info -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap mb-1">
+                                <p class="text-sm font-semibold text-stone-900">
+                                    {data.group.mentor.fullName}
+                                </p>
+                                <span
+                                    class="text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5"
+                                >
+                                    {data.group.mentor.mentorCode}
+                                </span>
+                            </div>
+                            <p class="text-sm text-stone-500">
+                                {data.group.mentor.email}
+                            </p>
+                        </div>
+
+                        <!-- Stats -->
+                        <div class="flex gap-3 shrink-0">
+                            <div
+                                class="rounded-lg bg-stone-50 border border-stone-100 px-4 py-2.5 text-center min-w-[90px]"
+                            >
+                                <p
+                                    class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-0.5"
+                                >
+                                    Phone
+                                </p>
+                                <p class="text-sm font-semibold text-stone-600">
+                                    {data.group.mentor.phoneNumber ?? "—"}
+                                </p>
+                            </div>
+                            <div
+                                class="rounded-lg bg-stone-50 border border-stone-100 px-4 py-2.5 text-center min-w-[90px]"
+                            >
+                                <p
+                                    class="text-[10px] font-bold text-stone-400 uppercase tracking-widest mb-0.5"
+                                >
+                                    Field
+                                </p>
+                                <p class="text-sm font-semibold text-stone-600">
+                                    {data.group.mentor.fieldOfWork ?? "—"}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {:else}
+                    <!-- Empty state -->
+                    <div
+                        class="flex flex-col items-center justify-center py-10 gap-3 text-center"
+                    >
+                        <div
+                            class="w-14 h-14 rounded-full bg-amber-50 border border-amber-100 flex items-center justify-center"
+                        >
+                            <UserCircleIcon class="w-7 h-7 text-amber-300" />
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-stone-600">
+                                No mentor has been assigned yet
+                            </p>
+                            <p class="text-xs text-stone-400 mt-0.5">
+                                Waiting for the instructor to assign a mentor to
+                                your group.
                             </p>
                         </div>
                     </div>
