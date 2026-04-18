@@ -4,31 +4,50 @@
     import {
         ArrowLeftIcon,
         BookOpenIcon,
-        BriefcaseIcon,
         CalendarIcon,
+        CheckCircle2Icon,
+        CheckSquareIcon,
+        ChevronLeftIcon,
+        ChevronRightIcon,
+        ClipboardListIcon,
+        ClockIcon,
         CrownIcon,
-        GraduationCapIcon,
-        LayersIcon,
-        MailIcon,
-        PhoneIcon,
-        UsersIcon,
-        BuildingIcon,
         EyeIcon,
+        GraduationCapIcon,
         HistoryIcon,
+        LayersIcon,
+        TrophyIcon,
+        UsersIcon,
+        XCircleIcon,
+        AlertCircleIcon,
     } from "lucide-svelte";
     import type { PageData } from "./$types";
-    import { page } from "$app/state";
     import Button from "$lib/components/ui/button/button.svelte";
     import { goto } from "$app/navigation";
     import { enhance } from "$app/forms";
     import type { SubmitFunction } from "@sveltejs/kit";
     import { toast } from "svelte-sonner";
     import StudentDetailsDialog from "../../../lecturer/class/[classId]/components/StudentDetailsDialog.svelte";
+    import * as Table from "$lib/components/ui/table/index";
 
     let { data }: { data: PageData } = $props();
     const g = $derived(data.groupDetails as any);
     const members = $derived(g.members ?? []);
-    const mentor = $derived(g.mentor ?? null);
+
+    const checkpoints = $derived(
+        [...(data.checkpoints ?? [])].sort(
+            (a: any, b: any) =>
+                (a.sequenceNumber ?? 0) - (b.sequenceNumber ?? 0),
+        ),
+    );
+    const otherAssignments = $derived(data.otherAssignments ?? []);
+    const otherAssignmentsPagination = $derived(
+        data.otherAssignmentsPagination,
+    );
+
+    const checkpointType = $derived(
+        checkpoints.length > 0 ? (checkpoints[0] as any).type : "Checkpoint",
+    );
 
     const statusColor: Record<string, string> = {
         Approved: "bg-green-100 text-green-700 border-green-200",
@@ -46,6 +65,27 @@
         Rejected: "bg-red-100 text-red-700 border-red-200",
     };
 
+    const submissionStatusClass: Record<string, string> = {
+        "Not Submitted": "bg-stone-100 text-stone-500 border-stone-200",
+        Submitted: "bg-blue-100 text-blue-700 border-blue-200",
+        Graded: "bg-green-100 text-green-700 border-green-200",
+        Late: "bg-orange-100 text-orange-600 border-orange-200",
+        Overdue: "bg-red-100 text-red-600 border-red-200",
+    };
+
+    const assignmentStatusClass: Record<string, string> = {
+        Active: "bg-green-100 text-green-700 border-green-200",
+        Inactive: "bg-stone-100 text-stone-500 border-stone-200",
+        Upcoming: "bg-blue-100 text-blue-700 border-blue-200",
+        Closed: "bg-red-100 text-red-600 border-red-200",
+    };
+
+    const typeClass: Record<string, string> = {
+        Checkpoint: "bg-amber-100 text-amber-700 border-amber-200",
+        Outcome: "bg-purple-100 text-purple-700 border-purple-200",
+        Other: "bg-sky-100 text-sky-700 border-sky-200",
+    };
+
     const majorStats = $derived(
         members.reduce((acc: Record<string, number>, member: any) => {
             const major = member.majorCode ?? "Unknown";
@@ -55,12 +95,11 @@
     );
     const totalMajors = $derived(Object.keys(majorStats).length);
 
-    // Dialog state for student detail
+    // Student detail dialog
     let studentDetailOpen = $state(false);
     let selectedStudent = $state<any>(null);
     let isFetchingStudent = $state(false);
 
-    // Xử lý enhance khi bấm View Detail (gọi action getStudentDetail)
     const handleStudentDetailEnhance: SubmitFunction = () => {
         isFetchingStudent = true;
         return async ({ result }) => {
@@ -73,6 +112,40 @@
             }
         };
     };
+
+    function formatDate(val: string | undefined): string {
+        if (!val) return "—";
+        const d = new Date(val);
+        if (isNaN(d.getTime())) return val;
+        const dd = String(d.getDate()).padStart(2, "0");
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const yyyy = d.getFullYear();
+        const HH = String(d.getHours()).padStart(2, "0");
+        const min = String(d.getMinutes()).padStart(2, "0");
+        return `${dd}/${mm}/${yyyy} ${HH}:${min}`;
+    }
+
+    function getSubmissionIcon(status: string) {
+        if (status === "Submitted" || status === "Graded")
+            return CheckCircle2Icon;
+        if (status === "Overdue") return XCircleIcon;
+        if (status === "Late") return AlertCircleIcon;
+        return ClockIcon;
+    }
+
+    function getSubmissionIconClass(status: string): string {
+        if (status === "Submitted" || status === "Graded")
+            return "text-green-500";
+        if (status === "Overdue") return "text-red-400";
+        if (status === "Late") return "text-orange-400";
+        return "text-gray-300";
+    }
+
+    function goToPage(paramKey: string, p: number) {
+        const url = new URL(window.location.href);
+        url.searchParams.set(paramKey, String(p));
+        goto(url.toString());
+    }
 </script>
 
 <div class="min-h-screen bg-white font-sans">
@@ -93,7 +166,6 @@
     <!-- ─── Overview Banner ───────────────────────────────────────── -->
     <div class="border-b border-gray-100 bg-gray-50/60 px-8 py-6">
         <div class="flex items-start justify-between gap-6 flex-wrap">
-            <!-- Left: identity -->
             <div class="flex items-center gap-5">
                 <span
                     class="flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 shrink-0"
@@ -119,7 +191,6 @@
                 </div>
             </div>
 
-            <!-- Right: meta chips -->
             <div class="flex flex-wrap items-center gap-2">
                 <div
                     class="flex items-center gap-1.5 rounded-lg bg-white border border-gray-200 px-3 py-1.5 text-sm text-gray-600"
@@ -179,6 +250,9 @@
                                     >Student Code</th
                                 >
                                 <th class="px-6 py-3.5 font-semibold">Major</th>
+                                <th class="px-6 py-3.5 font-semibold text-right"
+                                    >Action</th
+                                >
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -188,9 +262,8 @@
                                 >
                                     <td
                                         class="px-6 py-4 text-gray-400 tabular-nums text-sm"
+                                        >{i + 1}</td
                                     >
-                                        {i + 1}
-                                    </td>
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
                                             <div
@@ -204,9 +277,8 @@
                                             >
                                                 <span
                                                     class="font-semibold text-gray-900"
+                                                    >{member.fullName}</span
                                                 >
-                                                    {member.fullName}
-                                                </span>
                                                 {#if member.isLeader}
                                                     <span
                                                         class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold uppercase text-amber-700"
@@ -222,12 +294,11 @@
                                     </td>
                                     <td
                                         class="px-6 py-4 font-mono text-sm text-gray-500"
+                                        >{member.studentCode}</td
                                     >
-                                        {member.studentCode}
-                                    </td>
-                                    <td class="px-6 py-4 text-gray-600 text-sm">
-                                        {member.majorName}
-                                    </td>
+                                    <td class="px-6 py-4 text-gray-600 text-sm"
+                                        >{member.majorName}</td
+                                    >
                                     <td class="px-6 py-4 text-right">
                                         <form
                                             method="POST"
@@ -286,19 +357,14 @@
                             >
                                 {g.topic.title}
                             </p>
-
                             {#if g.topic.status}
                                 <Badge
-                                    class={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide border ${
-                                        topicStatusColor[g.topic.status] ??
-                                        "bg-gray-100 text-gray-500 border-gray-200"
-                                    }`}
+                                    class={`rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide border ${topicStatusColor[g.topic.status] ?? "bg-gray-100 text-gray-500 border-gray-200"}`}
                                 >
                                     {g.topic.status}
                                 </Badge>
                             {/if}
                         </div>
-
                         {#if g.topic.description}
                             <p
                                 class="text-sm text-gray-500 line-clamp-2 max-w-2xl"
@@ -321,12 +387,11 @@
                             <HistoryIcon class="h-4 w-4 mr-1.5" />
                             Topic History
                         </Button>
-
                         <Button
                             variant="outline"
                             size="sm"
                             class="h-9 px-4 text-sm text-gray-700 border-gray-200 bg-white hover:bg-gray-50 cursor-pointer"
-                            href="/app/mentor/groups/${g.groupId}/topic/{g.topic
+                            href="/app/mentor/groups/{g.groupId}/topic/{g.topic
                                 .id}"
                         >
                             <EyeIcon class="h-4 w-4 mr-1.5" />
@@ -342,6 +407,471 @@
                 </div>
             {/if}
         </section>
+
+        <Separator />
+
+        <!-- § Checkpoints / Outcomes -->
+        <section class="flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-8 h-8 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0"
+                >
+                    {#if checkpointType === "Outcome"}
+                        <TrophyIcon class="w-4 h-4 text-purple-500" />
+                    {:else}
+                        <LayersIcon class="w-4 h-4 text-amber-500" />
+                    {/if}
+                </div>
+                <div>
+                    <p
+                        class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
+                    >
+                        Milestones
+                    </p>
+                    <h2
+                        class="text-base font-extrabold text-stone-900 leading-tight"
+                    >
+                        {checkpointType === "Outcome"
+                            ? "Outcomes"
+                            : "Checkpoints"}
+                    </h2>
+                </div>
+                <span
+                    class="text-xs font-bold text-stone-400 bg-stone-100 border border-stone-200 rounded-full px-2.5 py-0.5"
+                >
+                    {checkpoints.length}
+                </span>
+            </div>
+
+            <div class="rounded-xl border border-stone-200 overflow-hidden">
+                <Table.Root>
+                    <Table.Header>
+                        <Table.Row class="bg-stone-50 hover:bg-stone-50">
+                            <Table.Head
+                                class="w-12 text-center text-stone-400 font-semibold"
+                                >#</Table.Head
+                            >
+                            <Table.Head class="text-stone-600 font-semibold"
+                                >Title</Table.Head
+                            >
+                            <Table.Head class="text-stone-600 font-semibold"
+                                >Type</Table.Head
+                            >
+                            <Table.Head class="text-stone-600 font-semibold">
+                                <div class="flex items-center gap-1.5">
+                                    <CalendarIcon class="w-3.5 h-3.5" /> Due Date
+                                </div>
+                            </Table.Head>
+                            <Table.Head class="text-stone-600 font-semibold">
+                                <div class="flex items-center gap-1.5">
+                                    <TrophyIcon class="w-3.5 h-3.5" /> Score
+                                </div>
+                            </Table.Head>
+                            <Table.Head
+                                class="text-stone-600 font-semibold text-center"
+                                >Assignment</Table.Head
+                            >
+                            <Table.Head
+                                class="text-stone-600 font-semibold text-center"
+                                >Submission</Table.Head
+                            >
+                            <Table.Head
+                                class="text-stone-600 font-semibold text-center"
+                                >Action</Table.Head
+                            >
+                        </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                        {#if checkpoints.length === 0}
+                            <Table.Row>
+                                <Table.Cell
+                                    colspan={8}
+                                    class="py-16 text-center"
+                                >
+                                    <div
+                                        class="flex flex-col items-center gap-2 text-stone-300"
+                                    >
+                                        <LayersIcon class="w-10 h-10" />
+                                        <p
+                                            class="text-sm font-semibold text-stone-400"
+                                        >
+                                            No {checkpointType === "Outcome"
+                                                ? "outcomes"
+                                                : "checkpoints"} yet
+                                        </p>
+                                        <p class="text-xs text-stone-300">
+                                            Your lecturer hasn't created any yet
+                                        </p>
+                                    </div>
+                                </Table.Cell>
+                            </Table.Row>
+                        {:else}
+                            {#each checkpoints as cp (cp.id)}
+                                {@const StatusIcon = getSubmissionIcon(
+                                    (cp as any).status,
+                                )}
+                                <Table.Row
+                                    class="hover:bg-amber-50/40 transition-colors"
+                                >
+                                    <Table.Cell
+                                        class="text-center text-stone-400 text-sm font-mono"
+                                    >
+                                        {(cp as any).sequenceNumber ?? "—"}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <span
+                                            class="text-sm font-semibold text-stone-900"
+                                            >{(cp as any).title}</span
+                                        >
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <Badge
+                                            class="text-xs font-semibold border pointer-events-none {typeClass[
+                                                (cp as any).type
+                                            ] ??
+                                                'bg-stone-100 text-stone-500 border-stone-200'}"
+                                        >
+                                            {(cp as any).type}
+                                        </Badge>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <div class="flex flex-col gap-0.5">
+                                            <span class="text-sm text-stone-500"
+                                                >{formatDate(
+                                                    (cp as any).dueDate,
+                                                )}</span
+                                            >
+                                            {#if (cp as any).isLate}
+                                                <span
+                                                    class="text-[10px] font-bold text-orange-500 uppercase tracking-wide"
+                                                    >Late</span
+                                                >
+                                            {/if}
+                                        </div>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {#if (cp as any).score !== null && (cp as any).score !== undefined}
+                                            <span
+                                                class="text-sm font-bold text-stone-800"
+                                            >
+                                                {(cp as any).score}
+                                                <span
+                                                    class="text-xs font-normal text-stone-400"
+                                                    >/ {(cp as any)
+                                                        .maxScore}</span
+                                                >
+                                            </span>
+                                        {:else}
+                                            <span class="text-sm text-stone-300"
+                                                >— / {(cp as any)
+                                                    .maxScore}</span
+                                            >
+                                        {/if}
+                                    </Table.Cell>
+                                    <Table.Cell class="text-center">
+                                        <Badge
+                                            class="text-xs font-semibold border pointer-events-none {assignmentStatusClass[
+                                                (cp as any).assignmentStatus
+                                            ] ??
+                                                'bg-stone-100 text-stone-500 border-stone-200'}"
+                                        >
+                                            {(cp as any).assignmentStatus}
+                                        </Badge>
+                                    </Table.Cell>
+                                    <Table.Cell class="text-center">
+                                        <div
+                                            class="flex items-center justify-center gap-1.5"
+                                        >
+                                            <StatusIcon
+                                                class="w-3.5 h-3.5 {getSubmissionIconClass(
+                                                    (cp as any).status,
+                                                )}"
+                                            />
+                                            <Badge
+                                                class="text-xs font-semibold border pointer-events-none {submissionStatusClass[
+                                                    (cp as any).status
+                                                ] ??
+                                                    'bg-stone-100 text-stone-500 border-stone-200'}"
+                                            >
+                                                {(cp as any).status}
+                                            </Badge>
+                                        </div>
+                                    </Table.Cell>
+                                    <Table.Cell class="text-center">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onclick={() =>
+                                                goto(
+                                                    `/app/mentor/groups/${g.groupId}/assignment/${(cp as any).id}`,
+                                                )}
+                                            class="gap-1.5 text-stone-400 hover:text-amber-600 hover:bg-amber-50 cursor-pointer h-7 text-xs"
+                                        >
+                                            View
+                                        </Button>
+                                    </Table.Cell>
+                                </Table.Row>
+                            {/each}
+                        {/if}
+                    </Table.Body>
+                </Table.Root>
+            </div>
+        </section>
+
+        <Separator />
+
+        <!-- § Other Assignments -->
+        <section class="flex flex-col gap-4">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-8 h-8 rounded-lg bg-sky-50 border border-sky-100 flex items-center justify-center shrink-0"
+                >
+                    <ClipboardListIcon class="w-4 h-4 text-sky-500" />
+                </div>
+                <div>
+                    <p
+                        class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
+                    >
+                        Small Tasks
+                    </p>
+                    <h2
+                        class="text-base font-extrabold text-stone-900 leading-tight"
+                    >
+                        Other Assignments
+                    </h2>
+                </div>
+                <span
+                    class="text-xs font-bold text-stone-400 bg-stone-100 border border-stone-200 rounded-full px-2.5 py-0.5"
+                >
+                    {otherAssignmentsPagination?.totalItems ??
+                        otherAssignments.length}
+                </span>
+            </div>
+
+            <div class="rounded-xl border border-stone-200 overflow-hidden">
+                <Table.Root>
+                    <Table.Header>
+                        <Table.Row class="bg-stone-50 hover:bg-stone-50">
+                            <Table.Head
+                                class="w-12 text-center text-stone-400 font-semibold"
+                                >#</Table.Head
+                            >
+                            <Table.Head class="text-stone-600 font-semibold"
+                                >Title</Table.Head
+                            >
+                            <Table.Head class="text-stone-600 font-semibold"
+                                >Type</Table.Head
+                            >
+                            <Table.Head class="text-stone-600 font-semibold">
+                                <div class="flex items-center gap-1.5">
+                                    <CalendarIcon class="w-3.5 h-3.5" /> Due Date
+                                </div>
+                            </Table.Head>
+                            <Table.Head class="text-stone-600 font-semibold">
+                                <div class="flex items-center gap-1.5">
+                                    <TrophyIcon class="w-3.5 h-3.5" /> Score
+                                </div>
+                            </Table.Head>
+                            <Table.Head
+                                class="text-stone-600 font-semibold text-center"
+                                >Assignment</Table.Head
+                            >
+                            <Table.Head
+                                class="text-stone-600 font-semibold text-center"
+                                >Submission</Table.Head
+                            >
+                            <Table.Head
+                                class="text-stone-600 font-semibold text-center"
+                                >Action</Table.Head
+                            >
+                        </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
+                        {#if otherAssignments.length === 0}
+                            <Table.Row>
+                                <Table.Cell
+                                    colspan={8}
+                                    class="py-16 text-center"
+                                >
+                                    <div
+                                        class="flex flex-col items-center gap-2 text-stone-300"
+                                    >
+                                        <ClipboardListIcon class="w-10 h-10" />
+                                        <p
+                                            class="text-sm font-semibold text-stone-400"
+                                        >
+                                            No assignments yet
+                                        </p>
+                                        <p class="text-xs text-stone-300">
+                                            Your lecturer hasn't created any yet
+                                        </p>
+                                    </div>
+                                </Table.Cell>
+                            </Table.Row>
+                        {:else}
+                            {#each otherAssignments as asgn, i (asgn.id)}
+                                {@const StatusIcon = getSubmissionIcon(
+                                    (asgn as any).status,
+                                )}
+                                <Table.Row
+                                    class="hover:bg-sky-50/40 transition-colors"
+                                >
+                                    <Table.Cell
+                                        class="text-center text-stone-400 text-sm font-mono"
+                                    >
+                                        {((otherAssignmentsPagination?.page ??
+                                            1) -
+                                            1) *
+                                            (otherAssignmentsPagination?.limit ??
+                                                10) +
+                                            i +
+                                            1}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <span
+                                            class="text-sm font-semibold text-stone-900"
+                                            >{(asgn as any).title}</span
+                                        >
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <Badge
+                                            class="text-xs font-semibold border pointer-events-none {typeClass[
+                                                (asgn as any).type
+                                            ] ??
+                                                'bg-stone-100 text-stone-500 border-stone-200'}"
+                                        >
+                                            {(asgn as any).type}
+                                        </Badge>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        <div class="flex flex-col gap-0.5">
+                                            <span class="text-sm text-stone-500"
+                                                >{formatDate(
+                                                    (asgn as any).dueDate,
+                                                )}</span
+                                            >
+                                            {#if (asgn as any).isLate}
+                                                <span
+                                                    class="text-[10px] font-bold text-orange-500 uppercase tracking-wide"
+                                                    >Late</span
+                                                >
+                                            {/if}
+                                        </div>
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {#if (asgn as any).score !== null && (asgn as any).score !== undefined}
+                                            <span
+                                                class="text-sm font-bold text-stone-800"
+                                            >
+                                                {(asgn as any).score}
+                                                <span
+                                                    class="text-xs font-normal text-stone-400"
+                                                    >/ {(asgn as any)
+                                                        .maxScore}</span
+                                                >
+                                            </span>
+                                        {:else}
+                                            <span class="text-sm text-stone-300"
+                                                >— / {(asgn as any)
+                                                    .maxScore}</span
+                                            >
+                                        {/if}
+                                    </Table.Cell>
+                                    <Table.Cell class="text-center">
+                                        <Badge
+                                            class="text-xs font-semibold border pointer-events-none {assignmentStatusClass[
+                                                (asgn as any).assignmentStatus
+                                            ] ??
+                                                'bg-stone-100 text-stone-500 border-stone-200'}"
+                                        >
+                                            {(asgn as any).assignmentStatus}
+                                        </Badge>
+                                    </Table.Cell>
+                                    <Table.Cell class="text-center">
+                                        <div
+                                            class="flex items-center justify-center gap-1.5"
+                                        >
+                                            <StatusIcon
+                                                class="w-3.5 h-3.5 {getSubmissionIconClass(
+                                                    (asgn as any).status,
+                                                )}"
+                                            />
+                                            <Badge
+                                                class="text-xs font-semibold border pointer-events-none {submissionStatusClass[
+                                                    (asgn as any).status
+                                                ] ??
+                                                    'bg-stone-100 text-stone-500 border-stone-200'}"
+                                            >
+                                                {(asgn as any).status}
+                                            </Badge>
+                                        </div>
+                                    </Table.Cell>
+                                    <Table.Cell class="text-center">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onclick={() =>
+                                                goto(
+                                                    `/app/mentor/groups/${g.groupId}/assignment/${(asgn as any).id}`,
+                                                )}
+                                            class="gap-1.5 text-stone-400 hover:text-sky-600 hover:bg-sky-50 cursor-pointer h-7 text-xs"
+                                        >
+                                            View
+                                        </Button>
+                                    </Table.Cell>
+                                </Table.Row>
+                            {/each}
+                        {/if}
+                    </Table.Body>
+                </Table.Root>
+            </div>
+
+            <!-- Pagination -->
+            {#if otherAssignmentsPagination && otherAssignmentsPagination.totalPages > 1}
+                {@const p = otherAssignmentsPagination}
+                <div class="flex items-center justify-between px-1">
+                    <p class="text-xs text-stone-400">
+                        Showing {(p.page - 1) * p.limit + 1}–{Math.min(
+                            p.page * p.limit,
+                            p.totalItems,
+                        )} of {p.totalItems}
+                    </p>
+                    <div class="flex items-center gap-1">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            class="w-8 h-8 cursor-pointer text-stone-400 hover:text-stone-700"
+                            disabled={p.page <= 1}
+                            onclick={() => goToPage("otherPage", p.page - 1)}
+                        >
+                            <ChevronLeftIcon class="w-4 h-4" />
+                        </Button>
+                        {#each Array.from({ length: p.totalPages }, (_, i) => i + 1) as pg}
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                class="w-8 h-8 cursor-pointer text-xs font-semibold {pg ===
+                                p.page
+                                    ? 'bg-sky-500 text-white border border-sky-500 hover:bg-sky-500'
+                                    : 'text-stone-500 hover:text-stone-700'}"
+                                onclick={() => goToPage("otherPage", pg)}
+                                >{pg}</Button
+                            >
+                        {/each}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            class="w-8 h-8 cursor-pointer text-stone-400 hover:text-stone-700"
+                            disabled={p.page >= p.totalPages}
+                            onclick={() => goToPage("otherPage", p.page + 1)}
+                        >
+                            <ChevronRightIcon class="w-4 h-4" />
+                        </Button>
+                    </div>
+                </div>
+            {/if}
+        </section>
     </div>
 </div>
+
 <StudentDetailsDialog bind:open={studentDetailOpen} student={selectedStudent} />

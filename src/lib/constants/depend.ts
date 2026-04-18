@@ -4,6 +4,7 @@ export const APP_LECTURER_MANAGE_STUDENT = 'app:lecturer-student-management';
 export const APP_LECTURER_MANAGE_GROUP = 'app:lecturer-group-management';
 export const APP_STAFF_MANAGE_SEMESTER = 'app:staff-semester-management';
 export const APP_STAFF_MANAGE_COURSE = 'app:staff-course-management';
+export const APP_ADMIN_MANAGE_STAFF = 'app:admin-staff-management';
 export const APP_STAFF_MANAGE_CAMPUS = 'app:staff-campus-management';
 export const APP_STAFF_MANAGE_ANNOUNCEMENT = 'app:staff-announcement-management';
 export const APP_STAFF_MANAGE_STUDENT = 'app:staff-student-management';

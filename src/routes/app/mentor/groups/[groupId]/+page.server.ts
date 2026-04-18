@@ -1,5 +1,6 @@
 import type { Actions } from "@sveltejs/kit";
 import { getStudentDetail } from "$lib/server/students";
+import { getOtherAssignmentForMentor, getCheckpointsForMentor } from "$lib/server/assignments";
 import { fail } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { getGroupDetail } from "$lib/server/groups";
@@ -7,10 +8,22 @@ import { getGroupDetail } from "$lib/server/groups";
 export const load: PageServerLoad = async (event) => {
     const { params } = event;
     const groupDetails = await getGroupDetail(event, params.groupId);
-    console.log("groupDetails details: ", groupDetails.data.data);
+
+    const groupId = groupDetails?.data?.data?.groupId;
+
+    const [otherassignmentsRes, checkpointsRes] = await Promise.all([
+        getOtherAssignmentForMentor(event, groupId),
+        getCheckpointsForMentor(event, groupId),
+    ]);
+
+    console.log("others: ", otherassignmentsRes?.data?.data);
+    console.log("checkpoints: ", checkpointsRes?.data?.data);
 
     return {
         groupDetails: groupDetails.data.data,
+        otherAssignments: otherassignmentsRes?.data?.data?.data ?? [],
+        otherAssignmentsPagination: otherassignmentsRes?.data?.data?.pagination ?? null,
+        checkpoints: checkpointsRes?.data?.data ?? [],
     };
 };
 
@@ -19,12 +32,11 @@ export const actions: Actions = {
         const formData = await event.request.formData();
         const stuId = formData.get("stuId");
         const studentRes: any = await getStudentDetail(event, stuId);
-        console.log("studentRes: ", studentRes?.data?.data);
         if (!studentRes || studentRes.status != 200) {
-            return fail(404, "Not found student");
+            return fail(404, { message: "Not found student" });
         }
         return {
-            students: studentRes?.data?.data
+            students: studentRes?.data?.data,
         };
     },
 };

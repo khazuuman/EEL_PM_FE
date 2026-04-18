@@ -66,6 +66,34 @@ export const getOtherAssignmentForStudent = async (
     };
 };
 
+export const getCheckpointsForMentor = async (
+    event: RequestEvent, groupId: any
+) => {
+    const response = await fetcher({
+        event,
+        url: `/mentors/groups/${groupId}/assignments/checkpoint-outcome`,
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+export const getOtherAssignmentForMentor = async (
+    event: RequestEvent, groupId: any
+) => {
+    const { url } = event;
+    const response = await fetcher({
+        event,
+        url: `/mentors/groups/${groupId}/assignments?${url.searchParams.toString()}`,
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
 
 export const getAssignmentById = async (
     event: RequestEvent, id: any
