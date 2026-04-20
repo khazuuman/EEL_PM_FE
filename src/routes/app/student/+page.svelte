@@ -976,7 +976,7 @@
                     <h2
                         class="text-base font-extrabold text-stone-900 leading-tight"
                     >
-                        {data.group.mentor
+                        {data?.group?.mentor
                             ? data.group.mentor.fullName
                             : "No Mentor Assigned"}
                     </h2>
@@ -985,7 +985,7 @@
 
             <!-- Body -->
             <div class="px-6 py-5">
-                {#if data.group.mentor}
+                {#if data.group?.mentor}
                     <div class="flex items-center gap-4">
                         <!-- Avatar -->
                         <div

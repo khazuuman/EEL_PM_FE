@@ -25,6 +25,7 @@
         ChevronLeftIcon,
         LockIcon,
         LockOpenIcon,
+        DownloadIcon,
     } from "lucide-svelte";
 
     let { data }: { data: PageData } = $props();
@@ -37,6 +38,7 @@
     let otherAssignments = $derived(data.otherAssignments ?? []);
     let deletingId = $state<number | null>(null);
     let togglingId = $state<number | null>(null);
+    let exporting = $state(false);
 
     // Detect type: tất cả Outcome hoặc tất cả Checkpoint
     let checkpointType = $derived(
@@ -73,6 +75,44 @@
         Outcome: "bg-purple-100 text-purple-700 border-purple-200",
         Other: "bg-sky-100 text-sky-700 border-sky-200",
     };
+
+    async function handleExportGrade() {
+        exporting = true;
+        try {
+            const res = await fetch(`/api/export/grades/${data.classId}`);
+
+            if (!res.ok) {
+                toast.error("Failed to export grade.");
+                return;
+            }
+
+            // Parse filename từ Content-Disposition
+            const disposition = res.headers.get("content-disposition") ?? "";
+            const filenameMatch =
+                disposition.match(/filename\*=UTF-8''([^;\n]+)/i) ??
+                disposition.match(/filename="?([^";\n]+)"?/i);
+            const filename = filenameMatch
+                ? decodeURIComponent(filenameMatch[1])
+                : `grades_${data.classId}.xlsx`;
+
+            // Trigger download
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            toast.success("Grade exported successfully.");
+        } catch {
+            toast.error("Failed to export grade.");
+        } finally {
+            exporting = false;
+        }
+    }
 </script>
 
 <div class="bg-white w-full px-10 pt-6 pb-12 min-h-screen">
@@ -114,6 +154,21 @@
     <div class="flex flex-col gap-8">
         <!-- ── SECTION 1: Checkpoints / Outcomes ─────────────────── -->
         <section class="flex flex-col gap-4">
+            <!-- Export Grade Button -->
+            <Button
+                type="button"
+                onclick={handleExportGrade}
+                class="gap-2 w-40 bg-emerald-500 hover:bg-emerald-600 text-white cursor-pointer"
+                disabled={exporting}
+            >
+                {#if exporting}
+                    <Loader2Icon class="w-4 h-4 animate-spin" />
+                    Exporting...
+                {:else}
+                    <DownloadIcon class="w-4 h-4" />
+                    Export Grade
+                {/if}
+            </Button>
             <!-- Section Header -->
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -558,7 +613,7 @@
                                             1}
                                     </Table.Cell>
                                     <Table.Cell>
-                                    <button
+                                        <button
                                             type="button"
                                             onclick={() =>
                                                 goto(

@@ -33,3 +33,17 @@ export const importMentorData = async (
         data: data
     };
 };
+
+export const exportGrade = async (
+    event: RequestEvent, classId: any
+) => {
+    const response = await fetcher({
+        event: event,
+        url: `/export/grades/${classId}`,
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};

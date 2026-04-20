@@ -3,6 +3,7 @@ import type { Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { deleteAssignment } from "$lib/server/assignments";
 import { fail } from "@sveltejs/kit";
+import { exportGrade } from "$lib/server/import";
 
 export const load: PageServerLoad = async (event) => {
     const { parent, url } = event;
@@ -48,4 +49,23 @@ export const actions: Actions = {
             data: toggleStatusAssignmentRes
         }
     },
+    // exportGrade: async (event) => {
+    //     const formData = await event.request.formData();
+    //     const classId = formData.get("classId");
+
+    //     const exportGradeRes = await exportGrade(event, classId);
+    //     if (!exportGradeRes || exportGradeRes.status !== 200) {
+    //         return fail(400, { message: exportGradeRes?.data?.message ?? "Fail to export grade data" });
+    //     }
+
+    //     // Lấy binary data từ response
+    //     const blob = exportGradeRes.data; // hoặc exportGradeRes nếu là Response object
+    //     const contentDisposition = exportGradeRes.headers?.['content-disposition'] ?? '';
+    //     const filename = contentDisposition.match(/filename="?([^";\n]+)"?/)?.[1] ?? 'grades.xlsx';
+
+    //     return {
+    //         success: true,
+    //         filename
+    //     };
+    // }
 };
