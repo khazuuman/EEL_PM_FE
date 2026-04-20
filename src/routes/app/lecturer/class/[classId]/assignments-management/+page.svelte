@@ -158,7 +158,7 @@
             <Button
                 type="button"
                 onclick={handleExportGrade}
-                class="gap-2 w-40 bg-emerald-500 hover:bg-emerald-600 text-white cursor-pointer"
+                class="gap-2 w-40 bg-neutral-600 hover:bg-neutral-900 text-white cursor-pointer"
                 disabled={exporting}
             >
                 {#if exporting}

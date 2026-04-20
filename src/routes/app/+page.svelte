@@ -153,6 +153,10 @@
                 name: "Manage Lecturers",
                 url: "/app/academic-staff/manage-lecturers",
             },
+            {
+                name: "Manage Topics",
+                url: "/app/academic-staff/manage-topic",
+            },
         ],
     };
     const staffOtherNav: NavigationGroup = {

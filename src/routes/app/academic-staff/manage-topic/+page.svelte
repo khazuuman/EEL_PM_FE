@@ -1,45 +1,57 @@
 <script lang="ts">
-    import DataTable from "$lib/components/ui/data-table/data-table.svelte";
-    import { ArrowLeftIcon, RefreshCwIcon, UsersIcon } from "lucide-svelte";
-    import { Button } from "$lib/components/ui/button";
-    import SyncDataDialog from "../components/SyncDataDialog.svelte";
     import { goto } from "$app/navigation";
+    import Button from "$lib/components/ui/button/button.svelte";
+    import DataTable from "$lib/components/ui/data-table/data-table.svelte";
+    import { ArrowLeftIcon, BookAIcon, UsersIcon } from "lucide-svelte";
 
     const { data } = $props();
-    let students = $derived(data?.students || []);
-    let majors = $derived(data?.majors || []);
-    let classes = $derived(data?.classes || []);
+    let topics = $derived(data?.topics || []);
     let totalCount = $derived(data?.totalCount || 0);
-    const cacheKeyName = "staff-student-management";
+    let classes = $derived(data?.classes || []);
 
-    let syncOpen = $state(false);
+    const ReviewStatus = [
+        {
+            label: "Approved",
+            value: "Approved",
+            variant: "active",
+        },
+        {
+            label: "Rejected",
+            value: "Rejected",
+            variant: "destructive",
+        },
+        {
+            label: "Pending",
+            value: "Pending",
+            variant: "default",
+        },
+    ];
 
+    const cacheKeyName = "topic-management";
     let filters = $derived([
-        { title: "Majors", key: "majorId", data: majors },
+        {
+            title: "Status",
+            key: "status",
+            data: ReviewStatus,
+        },
         { title: "Classes", key: "classId", data: classes },
     ]);
     let defaultHeaders = $state([
-        "studentCode",
-        "fullName",
-        "email",
-        "majorCode",
+        "title",
+        "status",
+        "groupName",
         "classCode",
-        // "campusName",
     ]);
     let headerValues = $state({
-        studentCode: "Student Code",
-        fullName: "Full Name",
-        email: "Email",
-        majorCode: "Major Code",
-        classCode: "Class Code",
-        // campusName: "Campus Name",
+        title: "Title",
+        status: "Status",
+        groupName: "Group",
+        classCode: "Class",
     });
 </script>
 
-<div
-    class="bg-white w-full px-10 rounded-md pt-5 overflow-x-hidden pb-10 z-10"
->
-    <div class="flex items-center h-12">
+<div class="bg-white w-full pt-5 px-5 rounded-md h-screen overflow-hidden">
+    <div class="flex items-center">
         <Button
             variant="ghost"
             onclick={() => goto(`/app`)}
@@ -55,7 +67,7 @@
             <div
                 class="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center shrink-0"
             >
-                <UsersIcon class="w-5 h-5 text-amber-500" />
+                <BookAIcon class="w-5 h-5 text-amber-500" />
             </div>
             <div>
                 <p
@@ -66,7 +78,7 @@
                 <h1
                     class="text-2xl font-extrabold text-stone-900 leading-tight"
                 >
-                    Student List
+                    Topic List
                 </h1>
             </div>
         </div>
@@ -77,39 +89,24 @@
             <span class="text-sm font-extrabold text-stone-800"
                 >{totalCount}</span
             >
-            <span class="text-sm text-stone-400">students</span>
+            <span class="text-sm text-stone-400">topics</span>
         </div>
     </div>
     <DataTable
         showAction={true}
         showAddButton={false}
-        statuses={[]}
-        actions={['view']}
-        keyId={"studentId"}
+        actions={["view"]}
+        statuses={ReviewStatus}
+        keyId={"topicId"}
         {cacheKeyName}
         {headerValues}
         allowSortHeaders={[]}
-        tableName={"Student"}
+        tableName={"Course"}
         {defaultHeaders}
-        items={students}
+        items={topics}
         totalItems={totalCount}
         activePaginate
-        matchSearchColumns={["studentName", "studentCode"]}
+        matchSearchColumns={["title"]}
         {filters}
-    >
-        {#snippet headerActions()}
-            <Button
-                class="gap-2 px-3 py-4 rounded-sm cursor-pointer"
-                onclick={() => (syncOpen = true)}
-            >
-                <RefreshCwIcon size={16} />
-                Sync Data
-            </Button>
-
-            <SyncDataDialog
-                open={syncOpen}
-                onOpenChange={(v: any) => (syncOpen = v)}
-            />
-        {/snippet}
-    </DataTable>
+    />
 </div>

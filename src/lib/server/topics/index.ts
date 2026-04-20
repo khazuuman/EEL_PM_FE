@@ -3,6 +3,16 @@ import { fetcher } from "../fetcher";
 import { safeJsonParse } from "$lib/utils";
 import type { ChangeTopic, CreateTopic, ReviewTopic, UpdateTopic } from "$lib/types/topics";
 
+export const getTopics = async (event: RequestEvent) => {
+    const { url } = event;
+    const response = await fetcher({ event, url: `/project-topics?${url.searchParams.toString()}` });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const getTopicByClass = async (event: RequestEvent, classId: any) => {
     const { url } = event;
     const response = await fetcher({ event, url: `/project-topics?classId=${classId}&limit=100&${url.searchParams.toString()}` });
