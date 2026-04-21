@@ -78,8 +78,8 @@
 
     <DataTable
         showAction={true}
+        actions={['view']}
         showAddButton={false}
-        actions={[]}
         statuses={[]}
         keyId={"lecturerId"}
         {cacheKeyName}

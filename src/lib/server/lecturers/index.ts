@@ -30,3 +30,17 @@ export const getLecturers = async (
         data: data
     };
 };
+
+export const getLecturerById = async (
+    event: RequestEvent, id: any
+) => {
+    const response = await fetcher({
+        event,
+        url: `/lecturers/${id}`
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
