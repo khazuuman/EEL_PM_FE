@@ -8,7 +8,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 export const handle: Handle = async ({ event, resolve }) => {
   const { locals } = event;
 
-  const publicRoutes = ['/auth', '/api'];
+  const publicRoutes = ['/auth', '/api', '/sso', '/feid-callback'];
   const isPublicRoute = publicRoutes.some((r) => event.url.pathname.startsWith(r));
 
   if (!isPublicRoute) {

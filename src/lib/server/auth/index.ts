@@ -41,6 +41,40 @@ export const loginByFEID = async (event: RequestEvent, body: LoginFEIDRequest) =
 	};
 };
 
+export const authorizeFeid = async (event: RequestEvent, body: LoginFEIDRequest) => {
+	const response = await fetcher({
+		event,
+		url: '/feid/authorize',
+		method: 'POST',
+		data: body
+	});
+	const data = await safeJsonParse(response);
+	return {
+		status: response.status,
+		data: data
+	};
+};
+
+export const exchangeCodeForToken = async (event: RequestEvent, body: any) => {
+    const response = await fetcher({
+        event,
+        url: '/feid/token', 
+        method: 'POST',
+        data: body
+    });
+    const data = await safeJsonParse(response);
+
+    if (response.status === 200) {
+        const loginRes = data.data as LoginResponse;
+        setCookies(event, loginRes);
+    }
+
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const logout = async (event: RequestEvent) => {
 	const response = await fetcher({
 		event,
