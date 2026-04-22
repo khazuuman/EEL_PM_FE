@@ -18,6 +18,20 @@ export const getGradeItemByCourseId = async (
     };
 };
 
+export const getGradeItemByClassId = async (
+    event: RequestEvent, classId: any
+) => {
+    const response = await fetcher({
+        event,
+        url: `/classes/${classId}/grade-items`
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
 export const createGradeItem = async (
     event: RequestEvent, body: CreateGradeItem
 ) => {

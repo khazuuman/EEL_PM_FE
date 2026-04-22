@@ -126,6 +126,7 @@ export const getStudentSubmission = async (
 export const createAssignment = async (
     event: RequestEvent, body: CreateAssignment, classId: any
 ) => {
+    console.log("body request: ", body);
     const response = await fetcher({
         event,
         url: `/classes/${classId}/assignments`,

@@ -27,7 +27,10 @@
     // Form state
     let title = $state(assignment?.title ?? "");
     let type = $state(assignment?.assignmentType ?? "Checkpoint");
-    let sequenceNumber = $state(assignment?.sequenceNumber ?? 1);
+    const gradeItems = $derived((data.gradeItems as any[]) ?? []);
+    let selectedGradeItemId = $state<number | null>(
+        assignment?.gradeItemId ?? null,
+    );
     let description = $state(assignment?.description ?? "");
     let dueDate = $state(
         assignment?.dueDate
@@ -46,9 +49,6 @@
     // Uploading state
     let uploadingFile = $state(false);
     let saving = $state(false);
-
-    // Show sequenceNumber only for Checkpoint and Outcome
-    let showSequence = $derived(type === "Checkpoint" || type === "Outcome");
 
     function isImageUrl(url: string): boolean {
         return /\.(png|jpe?g|gif|webp|svg|bmp)(\?.*)?$/i.test(url);
@@ -214,50 +214,18 @@
                         Basic Information
                     </p>
 
-                    <!-- Type + Sequence Number -->
+                    <!-- Type + Grade Item -->
                     <div class="grid grid-cols-2 gap-4">
-                        {#if showSequence}
-                            <div class="space-y-1.5">
-                                <Label
-                                    for="sequenceNumber"
-                                    class="text-sm font-semibold text-stone-700"
-                                >
-                                    {type === "Checkpoint"
-                                        ? "Checkpoint Number"
-                                        : "Outcome Number"}
-                                    <span class="text-red-500">*</span>
-                                </Label>
-                                <Input
-                                    id="sequenceNumber"
-                                    name="sequenceNumber"
-                                    type="number"
-                                    min="1"
-                                    bind:value={sequenceNumber}
-                                    required={showSequence}
-                                    class="border-stone-200 focus-visible:ring-amber-500"
-                                />
-                            </div>
-                        {:else}
-                            <input
-                                type="hidden"
-                                name="sequenceNumber"
-                                value="0"
-                            />
-                        {/if}
+                        <!-- Type (disabled) -->
                         <div class="space-y-1.5">
-                            <Label
-                                for="type"
-                                class="text-sm font-semibold text-stone-700"
-                            >
+                            <Label class="text-sm font-semibold text-stone-700">
                                 Type <span class="text-red-500">*</span>
                             </Label>
                             <Select.Root
                                 type="single"
                                 disabled={true}
                                 value={type}
-                                onValueChange={(v) => {
-                                    type = v;
-                                }}
+                                onValueChange={(v) => (type = v)}
                             >
                                 <Select.Trigger class="w-full border-stone-200">
                                     {type || "Select type"}
@@ -276,6 +244,81 @@
                             </Select.Root>
                             <input type="hidden" name="type" value={type} />
                         </div>
+
+                        <!-- Grade Item (chỉ hiện khi không phải Other) -->
+                        {#if type !== "Other"}
+                            <div class="space-y-1.5">
+                                <Label
+                                    class="text-sm font-semibold text-stone-700"
+                                >
+                                    Grade Item <span class="text-red-500"
+                                        >*</span
+                                    >
+                                </Label>
+                                <input
+                                    type="hidden"
+                                    name="gradeItemId"
+                                    value={selectedGradeItemId ?? ""}
+                                />
+                                <Select.Root
+                                    type="single"
+                                    value={selectedGradeItemId
+                                        ? String(selectedGradeItemId)
+                                        : ""}
+                                    onValueChange={(val) =>
+                                        (selectedGradeItemId = Number(val))}
+                                >
+                                    <Select.Trigger
+                                        class="w-full border-stone-200 focus-visible:ring-amber-500"
+                                    >
+                                        {#if selectedGradeItemId}
+                                            {@const selected = gradeItems.find(
+                                                (g: any) =>
+                                                    g.gradeItemId ===
+                                                    selectedGradeItemId,
+                                            )}
+                                            {selected
+                                                ? `${selected.name} — ${selected.weight}%`
+                                                : "Select a grade item…"}
+                                        {:else}
+                                            <span class="text-stone-400"
+                                                >Select a grade item…</span
+                                            >
+                                        {/if}
+                                    </Select.Trigger>
+                                    <Select.Content>
+                                        {#if gradeItems.length === 0}
+                                            <div
+                                                class="px-3 py-4 text-center text-sm text-stone-400 italic"
+                                            >
+                                                No grade items available
+                                            </div>
+                                        {:else}
+                                            {#each gradeItems as item (item.gradeItemId)}
+                                                <Select.Item
+                                                    value={String(
+                                                        item.gradeItemId,
+                                                    )}
+                                                >
+                                                    <div
+                                                        class="flex items-center justify-between gap-4 w-full"
+                                                    >
+                                                        <span
+                                                            class="font-medium"
+                                                            >{item.name}</span
+                                                        >
+                                                        <span
+                                                            class="text-xs text-stone-400 shrink-0"
+                                                            >{item.weight}%</span
+                                                        >
+                                                    </div>
+                                                </Select.Item>
+                                            {/each}
+                                        {/if}
+                                    </Select.Content>
+                                </Select.Root>
+                            </div>
+                        {/if}
                     </div>
 
                     <!-- Title -->

@@ -741,7 +741,7 @@
                                             <form
                                                 id="delete-asgn-{asgn.id}"
                                                 method="POST"
-                                                action="?/deleteAssignment"
+                                                action="?/delete"
                                                 use:enhance={() => {
                                                     deletingId = asgn.id;
                                                     return async ({
@@ -772,7 +772,7 @@
                                             >
                                                 <input
                                                     type="hidden"
-                                                    name="id"
+                                                    name="assignmentId"
                                                     value={asgn.id}
                                                 />
                                                 <Button

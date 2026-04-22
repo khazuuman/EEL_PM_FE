@@ -19,6 +19,7 @@
         UploadCloudIcon,
         SaveIcon,
     } from "lucide-svelte";
+    import * as Select from "$lib/components/ui/select/index";
 
     let { data, form }: { data: PageData; form: ActionData } = $props();
 
@@ -66,8 +67,9 @@
     let title = $state("");
     let description = $state("");
     let dueDate = $state("");
-    let maxScore = $state(100);
-    let sequenceNumber = $state(1);
+    let maxScore = $state(10);
+    const gradeItems = $derived((data.gradeItems as any[]) ?? []);
+    let selectedGradeItemId = $state<number | null>(null);
     let isSubmitting = $state(false);
 
     // ── File upload ────────────────────────────────────────
@@ -190,9 +192,6 @@
         <!-- Hidden fields -->
         <input type="hidden" name="type" value={type} />
         <input type="hidden" name="classId" value={data.classId} />
-        {#if type === "Other"}
-            <input type="hidden" name="sequenceNumber" value="0" />
-        {/if}
 
         <!-- Uploaded file URLs -->
         {#each uploadedFiles as f (f.url)}
@@ -213,27 +212,76 @@
                         Basic Information
                     </p>
 
-                    <!-- Sequence Number — chỉ Checkpoint / Outcome -->
                     {#if type !== "Other"}
                         <div class="space-y-1.5">
                             <Label class="text-sm font-semibold text-stone-700">
-                                {type === "Checkpoint"
-                                    ? "Checkpoint Number"
-                                    : "Outcome Number"}
-                                <span class="text-red-500">*</span>
+                                Grade Item <span class="text-red-500">*</span>
                             </Label>
-                            <Input
-                                name="sequenceNumber"
-                                type="number"
-                                min={1}
-                                max={4}
-                                bind:value={sequenceNumber}
-                                class="border-stone-200 {typeConfig.ring} w-32"
+
+                            <!-- Hidden input để submit giá trị qua form -->
+                            <input
+                                type="hidden"
+                                name="gradeItemId"
+                                value={selectedGradeItemId ?? ""}
                             />
-                            <p class="text-xs text-stone-400">
-                                Order within the {typeConfig.label.toLowerCase()}
-                                list (1–4)
-                            </p>
+
+                            <Select.Root
+                                type="single"
+                                onValueChange={(val) =>
+                                    (selectedGradeItemId = Number(val))}
+                            >
+                                <Select.Trigger
+                                    class="w-full border-stone-200 {typeConfig.ring}"
+                                >
+                                    {#if selectedGradeItemId}
+                                        {@const selected = gradeItems.find(
+                                            (g) =>
+                                                g.gradeItemId ===
+                                                selectedGradeItemId,
+                                        )}
+                                        {selected
+                                            ? `${selected.name} — ${selected.weight}%`
+                                            : "Select a grade item…"}
+                                    {:else}
+                                        <span class="text-stone-400"
+                                            >Select a grade item…</span
+                                        >
+                                    {/if}
+                                </Select.Trigger>
+                                <Select.Content>
+                                    {#if gradeItems.length === 0}
+                                        <div
+                                            class="px-3 py-4 text-center text-sm text-stone-400 italic"
+                                        >
+                                            No grade items available
+                                        </div>
+                                    {:else}
+                                        {#each gradeItems as item (item.gradeItemId)}
+                                            <Select.Item
+                                                value={String(item.gradeItemId)}
+                                            >
+                                                <div
+                                                    class="flex items-center justify-between gap-4 w-full"
+                                                >
+                                                    <span class="font-medium"
+                                                        >{item.name}</span
+                                                    >
+                                                    <span
+                                                        class="text-xs text-stone-400 shrink-0"
+                                                        >{item.weight}%</span
+                                                    >
+                                                </div>
+                                            </Select.Item>
+                                        {/each}
+                                    {/if}
+                                </Select.Content>
+                            </Select.Root>
+
+                            {#if gradeItems.length === 0}
+                                <p class="text-xs text-stone-400 italic">
+                                    No grade items available for this course.
+                                </p>
+                            {/if}
                         </div>
                     {/if}
 
