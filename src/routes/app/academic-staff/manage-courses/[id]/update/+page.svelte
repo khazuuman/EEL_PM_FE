@@ -138,7 +138,7 @@
                     type="button"
                     variant="outline"
                     class="cursor-pointer border-stone-300 text-stone-600"
-                    onclick={() => goto("/app/academic-staff/manage-courses")}
+                    onclick={() => history.back()}
                 >
                     Cancel
                 </Button>

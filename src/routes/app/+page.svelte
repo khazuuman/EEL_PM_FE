@@ -175,6 +175,10 @@
                 url: "/app/academic-staff/manage-announcement",
             },
             // {
+            //     name: "Configure Score Weights",
+            //     url: "/app/academic-staff/configure-score",
+            // },
+            // {
             //     name: "Manage Campuses",
             //     url: "/app/academic-staff/manage-campuses",
             // },

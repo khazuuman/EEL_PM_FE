@@ -89,7 +89,7 @@
     </div>
     <DataTable
         showAction={true}
-        actions={["view", "update", "delete"]}
+        actions={['update', 'delete']}
         statuses={ActiveStatus}
         keyId={"courseId"}
         {cacheKeyName}
