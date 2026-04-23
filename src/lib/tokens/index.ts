@@ -2,6 +2,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { fetcher } from '$lib/server/fetcher';
 import type { LoginResponse } from '$lib/types/response/authResponse';
 import { safeJsonParse } from '$lib/utils';
+import { dev } from '$app/environment';
 
 export const setCookies = (event: RequestEvent, loginResponse: LoginResponse) => {
 	const accessExpiry = new Date(loginResponse.accessTokenExpiresAt);
@@ -10,14 +11,14 @@ export const setCookies = (event: RequestEvent, loginResponse: LoginResponse) =>
 		path: '/',
 		httpOnly: true,
 		sameSite: 'lax',
-		secure: false,
+		secure: !dev,
 		expires: accessExpiry
 	});
 	event.cookies.set('refreshToken', loginResponse.refreshToken, {
 		path: '/',
 		httpOnly: true,
 		sameSite: 'lax',
-		secure: false,
+		secure: !dev,
 		expires: refreshExpiry
 	});
 };
