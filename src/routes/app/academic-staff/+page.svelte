@@ -29,10 +29,10 @@
                 name: "Manage Topics",
                 url: "/app/academic-staff/manage-topic",
             },
-            {
-                name: "View Academic Report",
-                url: "/app/academic-staff/academic-report",
-            },
+            // {
+            //     name: "View Academic Report",
+            //     url: "/app/academic-staff/academic-report",
+            // },
         ],
     };
     const staffOtherNav: NavigationGroup = {
