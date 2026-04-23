@@ -9,6 +9,7 @@
     let totalCount = $derived(data?.totalCount || 0);
     let classes = $derived(data?.classes || []);
     let semesters = $derived(data?.semesters || []);
+    let courses = $derived(data?.courses || []);
 
     const ReviewStatus = [
         {
@@ -37,6 +38,7 @@
         },
         { title: "Classes", key: "classId", data: classes },
         { title: "Semesters", key: "semesterId", data: semesters },
+        { title: "Courses", key: "courseId", data: courses },
     ]);
     let defaultHeaders = $state([
         "title",

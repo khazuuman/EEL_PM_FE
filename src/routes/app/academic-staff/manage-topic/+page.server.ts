@@ -3,15 +3,17 @@ import { getTopics } from "$lib/server/topics";
 import type { PageServerLoad } from "./$types";
 import { getAllClasses } from "$lib/server/classes";
 import { getAllSemesters } from "$lib/server/semesters";
+import { getAllCourses } from "$lib/server/course";
 
 export const load: PageServerLoad = async (event) => {
     const { depends } = event;
     depends(APP_STAFF_MANAGE_TOPIC);
 
-    const [topicsRes, classesRes, semestersRes] = await Promise.all([
+    const [topicsRes, classesRes, semestersRes, coursesRes] = await Promise.all([
         getTopics(event),
         getAllClasses(event),
-        getAllSemesters(event)
+        getAllSemesters(event),
+        getAllCourses(event)
     ]);
 
     // Flatten topics thành 1 cấp
@@ -39,12 +41,20 @@ export const load: PageServerLoad = async (event) => {
             variant: "primary",
         })),
     ];
-
+    const courses = [
+        { label: "All", value: "", variant: "primary" },
+        ...coursesRes?.data?.data?.data.map((s: any) => ({
+            label: s.courseCode,
+            value: String(s.courseId),
+            variant: "primary",
+        })),
+    ];
     return {
         topics,
         pageSize: topicsRes?.data?.data?.pagination?.limit ?? 0,
         totalCount: topicsRes?.data?.data?.pagination?.totalItems ?? 0,
         classes,
-        semesters
+        semesters,
+        courses
     };
 };
