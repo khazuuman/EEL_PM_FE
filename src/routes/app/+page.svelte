@@ -42,13 +42,21 @@
         throw redirect(302, "/app/lecturer/class");
     }
 
-    if (
-        [ROLE.LECTURER, ROLE.MENTOR, ROLE.STUDENT, ROLE.ACADEMICSTAFF].some((role) =>
-            user.roles.includes(role),
-        )
-    ) {
-        throw error(404, "Not Found!");
+    if (user.roles.includes(ROLE.ACADEMICSTAFF)) {
+        throw redirect(302, "/app/academic-staff");
     }
+
+     if (user.roles.includes(ROLE.MENTOR)) {
+        throw redirect(302, "/app/mentor/groups");
+    }
+
+    // if (
+    //     [ROLE.LECTURER, ROLE.MENTOR, ROLE.STUDENT, ROLE.ACADEMICSTAFF].some((role) =>
+    //         user.roles.includes(role),
+    //     )
+    // ) {
+    //     throw error(404, "Not Found!");
+    // }
 
     if (user.roles.includes("Admin")) {
         roleLabel.push("Admin");

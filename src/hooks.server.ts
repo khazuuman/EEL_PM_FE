@@ -20,7 +20,7 @@ export const handle: Handle = async ({ event, resolve }) => {
       throw redirect(303, `/auth/login?redirectTo=${encodeURIComponent(event.url.pathname)}`);
     }
 
-    if (event.url.pathname === '/' || event.url.pathname === '/app') {
+    if (event.url.pathname === '/') {
       if (locals.user.roles.includes(ROLE.LECTURER)) {
         throw redirect(302, "/app/lecturer/class");
       }
