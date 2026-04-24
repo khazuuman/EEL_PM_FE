@@ -209,7 +209,6 @@
                             >
                                 Status
                             </th>
-                            <th class="px-5 py-3"></th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-stone-100">
@@ -240,11 +239,12 @@
                                 </td>
                                 <!-- Group Name -->
                                 <td class="px-5 py-4">
-                                    <p
-                                        class="font-semibold text-stone-900 truncate max-w-[180px]"
+                                    <a
+                                        href="/app/mentor/groups/{group.id}"
+                                        class="font-semibold text-stone-900 truncate max-w-[180px] hover:text-amber-600 hover:underline underline-offset-2 transition-colors block"
                                     >
                                         {group.name}
-                                    </p>
+                                    </a>
                                 </td>
 
                                 <!-- Leader -->
@@ -330,19 +330,6 @@
                                         ></span>
                                         {group.status}
                                     </span>
-                                </td>
-
-                                <!-- Action -->
-                                <td class="px-5 py-4">
-                                    <a
-                                        href="/app/mentor/groups/{group.id}"
-                                        class="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-500 hover:text-amber-600 transition-colors whitespace-nowrap"
-                                    >
-                                        View
-                                        <ArrowRightIcon
-                                            class="w-3.5 h-3.5 group-hover/row:translate-x-0.5 transition-transform duration-150"
-                                        />
-                                    </a>
                                 </td>
                             </tr>
                         {/each}

@@ -1,7 +1,7 @@
 <script lang="ts">
     import DataTable from "$lib/components/ui/data-table/data-table.svelte";
-    import { ArrowLeftIcon, ImportIcon, UsersIcon } from "lucide-svelte";
-    import ImportMentorDialog from "../components/ImportMentorDialog.svelte";
+    import { ArrowLeftIcon, UsersIcon } from "lucide-svelte";
+    // import ImportMentorDialog from "../components/ImportMentorDialog.svelte";
     import Button from "$lib/components/ui/button/button.svelte";
     import { goto } from "$app/navigation";
 
@@ -30,7 +30,7 @@
         // isActive: "Status",
     });
 
-    let importOpen = $state(false);
+    // let importOpen = $state(false);
 </script>
 
 <div
@@ -39,7 +39,7 @@
     <div class="flex items-center h-12">
         <Button
             variant="ghost"
-            onclick={() => goto(`/app`)}
+            onclick={() => goto(`/app/academic-staff`)}
             class="flex items-center gap-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-50 rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer -ml-3"
         >
             <ArrowLeftIcon class="w-4 h-4" />
@@ -95,7 +95,7 @@
         matchSearchColumns={["mentorName", "mentorCode"]}
         {filters}
     >
-        {#snippet headerActions()}
+        <!-- {#snippet headerActions()}
             <Button class="gap-2 flex justify-center items-center px-3 py-4 rounded-sm cursor-pointer" onclick={() => (importOpen = true)}>
                 <ImportIcon />Import mentor
             </Button>
@@ -106,6 +106,6 @@
             />
             <ImportMentorDialog open={importOpen}
                 onOpenChange={(v) => (importOpen = v)} />
-        {/snippet}
+        {/snippet} -->
     </DataTable>
 </div>

@@ -101,9 +101,8 @@
         isSubmitting = true;
         return async ({ result, update }) => {
             isSubmitting = false;
-            console.log("result: ", result);
             if (result.type === "failure") {
-                await update({ reset: false });
+                // await update({ reset: false });
                 toast.error(
                     (result.data as any)?.message ?? "Failed to update group",
                 );

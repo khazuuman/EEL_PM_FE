@@ -22,8 +22,12 @@
                 url: "/app/academic-staff/manage-academic-data",
             },
             {
-                name: "Manage Lecturers",
+                name: "Manage Lecturer",
                 url: "/app/academic-staff/manage-lecturers",
+            },
+            {
+                name: "Manage Mentor",
+                url: "/app/academic-staff/manage-mentors",
             },
             {
                 name: "Manage Topics",
@@ -103,7 +107,7 @@
                     onclick={() => (syncOpen = true)}
                 >
                     <RefreshCwIcon size={16} />
-                    Sync Data
+                    Sync Data From FAP
                 </Button>
             </div>
         </div>
