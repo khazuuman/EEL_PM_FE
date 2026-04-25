@@ -12,7 +12,7 @@
     let totalCount = $derived(data?.totalCount || 0);
     const cacheKeyName = "staff-student-management";
 
-    let syncOpen = $state(false);
+    // let syncOpen = $state(false);
 
     let filters = $derived([
         { title: "Majors", key: "majorId", data: majors },
@@ -97,7 +97,7 @@
         matchSearchColumns={["studentName", "studentCode"]}
         {filters}
     >
-        {#snippet headerActions()}
+        <!-- {#snippet headerActions()}
             <Button
                 class="gap-2 px-3 py-4 rounded-sm cursor-pointer"
                 onclick={() => (syncOpen = true)}
@@ -110,6 +110,6 @@
                 open={syncOpen}
                 onOpenChange={(v: any) => (syncOpen = v)}
             />
-        {/snippet}
+        {/snippet} -->
     </DataTable>
 </div>
