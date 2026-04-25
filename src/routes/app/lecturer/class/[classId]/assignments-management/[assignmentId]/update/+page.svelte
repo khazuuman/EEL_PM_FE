@@ -183,7 +183,7 @@
                     await invalidateAll();
                 } else if (result.type === "failure") {
                     toast.error(
-                        (result.data as any)?.message ??
+                        (result.data?.message as any) ??
                             "Failed to update assignment.",
                     );
                 }

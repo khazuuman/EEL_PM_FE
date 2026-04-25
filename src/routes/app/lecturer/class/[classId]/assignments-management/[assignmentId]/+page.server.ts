@@ -30,8 +30,9 @@ export const actions: Actions = {
             files: formData.getAll("files"),
             status: "Active"
         } as CreateAssignment, assignmentId);
+        console.log("updateAssignmentRes: ", updateAssignmentRes);
         if (!updateAssignmentRes || updateAssignmentRes.status !== 200) {
-            return fail(400, updateAssignmentRes.data?.message ?? "Fail to update assignment");
+            return fail(400, { message: updateAssignmentRes.data?.message ?? "Fail to update assignment" });
         }
         return { success: true };
     },

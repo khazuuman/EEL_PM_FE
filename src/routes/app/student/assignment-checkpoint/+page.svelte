@@ -14,11 +14,11 @@
         LayersIcon,
         ChevronRightIcon,
         ChevronLeftIcon,
-        SendIcon,
         ClockIcon,
         CheckCircle2Icon,
         XCircleIcon,
         AlertCircleIcon,
+        TagIcon,
     } from "lucide-svelte";
 
     let { data }: { data: PageData } = $props();
@@ -69,25 +69,12 @@
         Closed: "bg-red-100 text-red-600 border-red-200",
     };
 
-    const typeClass: Record<string, string> = {
-        Checkpoint: "bg-amber-100 text-amber-700 border-amber-200",
-        Outcome: "bg-purple-100 text-purple-700 border-purple-200",
-        Other: "bg-sky-100 text-sky-700 border-sky-200",
-    };
-
     function getSubmissionIcon(status: string) {
         if (status === "Submitted" || status === "Graded")
             return CheckCircle2Icon;
         if (status === "Overdue") return XCircleIcon;
         if (status === "Late") return AlertCircleIcon;
         return ClockIcon;
-    }
-
-    function isSubmittable(item: { status: string; assignmentStatus: string }) {
-        return (
-            item.status === "Not Submitted" &&
-            item.assignmentStatus === "Active"
-        );
     }
 </script>
 
@@ -186,9 +173,11 @@
                             <Table.Head class="text-stone-600 font-semibold"
                                 >Title</Table.Head
                             >
-                            <Table.Head class="text-stone-600 font-semibold"
-                                >Type</Table.Head
-                            >
+                            <Table.Head class="text-stone-600 font-semibold">
+                                <div class="flex items-center gap-1.5">
+                                    <TagIcon class="w-3.5 h-3.5" /> Grade Item
+                                </div>
+                            </Table.Head>
                             <Table.Head class="text-stone-600 font-semibold">
                                 <div class="flex items-center gap-1.5">
                                     <CalendarIcon class="w-3.5 h-3.5" /> Due Date
@@ -207,10 +196,10 @@
                                 class="text-stone-600 font-semibold text-center"
                                 >Submission</Table.Head
                             >
-                            <Table.Head
+                            <!-- <Table.Head
                                 class="text-stone-600 font-semibold text-center"
                                 >Action</Table.Head
-                            >
+                            > -->
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
@@ -238,17 +227,18 @@
                                 </Table.Cell>
                             </Table.Row>
                         {:else}
-                            {#each checkpoints as cp (cp.id)}
+                            {#each checkpoints as cp, i (cp.id)}
                                 {@const StatusIcon = getSubmissionIcon(
                                     cp.status,
                                 )}
                                 <Table.Row
                                     class="hover:bg-amber-50/40 transition-colors"
                                 >
+                                    <!-- Index tự sinh (1-based) -->
                                     <Table.Cell
                                         class="text-center text-stone-400 text-sm font-mono"
                                     >
-                                        {cp.sequenceNumber ?? "—"}
+                                        {i + 1}
                                     </Table.Cell>
                                     <Table.Cell>
                                         <button
@@ -262,15 +252,20 @@
                                             {cp.title}
                                         </button>
                                     </Table.Cell>
+                                    <!-- Grade Item column (checkpoint/outcome only) -->
                                     <Table.Cell>
-                                        <Badge
-                                            class="text-xs font-semibold border pointer-events-none {typeClass[
-                                                cp.type
-                                            ] ??
-                                                'bg-stone-100 text-stone-500 border-stone-200'}"
-                                        >
-                                            {cp.type}
-                                        </Badge>
+                                        {#if cp.gradeItem}
+                                            <div class="flex flex-col gap-0.5">
+                                                <span class="text-sm font-semibold text-stone-700">
+                                                    {cp.gradeItem.name}
+                                                </span>
+                                                <span class="text-[11px] text-stone-400">
+                                                    Weight: {cp.gradeItem.weight}%
+                                                </span>
+                                            </div>
+                                        {:else}
+                                            <span class="text-sm text-stone-300">—</span>
+                                        {/if}
                                     </Table.Cell>
                                     <Table.Cell>
                                         <div class="flex flex-col gap-0.5">
@@ -339,7 +334,7 @@
                                             </Badge>
                                         </div>
                                     </Table.Cell>
-                                    <Table.Cell class="text-center">
+                                    <!-- <Table.Cell class="text-center">
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -351,7 +346,7 @@
                                         >
                                             View
                                         </Button>
-                                    </Table.Cell>
+                                    </Table.Cell> -->
                                 </Table.Row>
                             {/each}
                         {/if}
@@ -389,7 +384,7 @@
                 </span>
             </div>
 
-            <!-- Other Assignments Table -->
+            <!-- Other Assignments Table (no Grade Item column, no Type column) -->
             <div class="rounded-xl border border-stone-200 overflow-hidden">
                 <Table.Root>
                     <Table.Header>
@@ -400,9 +395,6 @@
                             >
                             <Table.Head class="text-stone-600 font-semibold"
                                 >Title</Table.Head
-                            >
-                            <Table.Head class="text-stone-600 font-semibold"
-                                >Type</Table.Head
                             >
                             <Table.Head class="text-stone-600 font-semibold">
                                 <div class="flex items-center gap-1.5">
@@ -422,17 +414,17 @@
                                 class="text-stone-600 font-semibold text-center"
                                 >Submission</Table.Head
                             >
-                            <Table.Head
+                            <!-- <Table.Head
                                 class="text-stone-600 font-semibold text-center"
                                 >Action</Table.Head
-                            >
+                            > -->
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
                         {#if otherAssignments.length === 0}
                             <Table.Row>
                                 <Table.Cell
-                                    colspan={8}
+                                    colspan={7}
                                     class="py-16 text-center"
                                 >
                                     <div
@@ -458,6 +450,7 @@
                                 <Table.Row
                                     class="hover:bg-sky-50/40 transition-colors"
                                 >
+                                    <!-- Global index across pages -->
                                     <Table.Cell
                                         class="text-center text-stone-400 text-sm font-mono"
                                     >
@@ -480,16 +473,6 @@
                                         >
                                             {asgn.title}
                                         </button>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        <Badge
-                                            class="text-xs font-semibold border pointer-events-none {typeClass[
-                                                asgn.type
-                                            ] ??
-                                                'bg-stone-100 text-stone-500 border-stone-200'}"
-                                        >
-                                            {asgn.type}
-                                        </Badge>
                                     </Table.Cell>
                                     <Table.Cell>
                                         <div class="flex flex-col gap-0.5">
@@ -558,7 +541,7 @@
                                             </Badge>
                                         </div>
                                     </Table.Cell>
-                                    <Table.Cell class="text-center">
+                                    <!-- <Table.Cell class="text-center">
                                         <Button
                                             variant="ghost"
                                             size="sm"
@@ -570,7 +553,7 @@
                                         >
                                             View
                                         </Button>
-                                    </Table.Cell>
+                                    </Table.Cell> -->
                                 </Table.Row>
                             {/each}
                         {/if}
