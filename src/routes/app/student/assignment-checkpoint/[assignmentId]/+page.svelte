@@ -48,6 +48,7 @@
     let isLeader = $derived(data.user?.student?.group?.isLeader ?? false);
 
     let editMode = $state(false);
+    let linkUrlError = $state("");
 
     let uploadedFiles = $state<UploadedFile[]>(
         isNotSubmitted
@@ -94,8 +95,23 @@
         }
     }
 
+    function isValidUrl(url: string): boolean {
+        try {
+            const u = new URL(url.trim());
+            return u.protocol === "http:" || u.protocol === "https:";
+        } catch {
+            return false;
+        }
+    }
+
     function addLink() {
         if (!newLinkUrl.trim()) return;
+        if (!isValidUrl(newLinkUrl)) {
+            linkUrlError =
+                "Invalid URL. Please enter a URL starting with http:// or https://";
+            return;
+        }
+        linkUrlError = "";
         links = [
             ...links,
             { title: newLinkTitle.trim(), url: newLinkUrl.trim() },
@@ -812,7 +828,13 @@
                                     <Input
                                         bind:value={newLinkUrl}
                                         placeholder="https://..."
-                                        class="flex-[3] border-stone-300 text-sm h-11"
+                                        oninput={() => {
+                                            linkUrlError = "";
+                                        }}
+                                        class="flex-[3] border-stone-300 text-sm h-11
+                                        {linkUrlError
+                                            ? 'border-red-400 focus-visible:ring-red-300'
+                                            : ''}"
                                     />
                                     <Button
                                         type="button"
@@ -825,6 +847,11 @@
                                         Add
                                     </Button>
                                 </div>
+                                {#if linkUrlError}
+                                        <p class="text-xs text-red-500 mt-1">
+                                            {linkUrlError}
+                                        </p>
+                                    {/if}
                             </div>
 
                             <!-- Notes -->

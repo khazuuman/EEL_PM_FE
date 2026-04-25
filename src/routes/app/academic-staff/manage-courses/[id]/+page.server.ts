@@ -60,7 +60,7 @@ export const actions: Actions = {
             );
         }
         return fail(400, {
-            message: deleteCourseRes?.data?.detail,
+            message: deleteCourseRes?.data?.message,
             errors: deleteCourseRes?.data?.errors
         });
     },
