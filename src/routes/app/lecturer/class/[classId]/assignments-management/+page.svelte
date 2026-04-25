@@ -198,25 +198,23 @@
                     <span
                         class="text-xs font-bold text-stone-400 bg-stone-100 border border-stone-200 rounded-full px-2.5 py-0.5"
                     >
-                        {checkpoints.length} / 4
+                        {checkpoints.length}
                     </span>
                 </div>
-                {#if checkpoints.length < 4}
-                    <Button
-                        onclick={() =>
-                            goto(
-                                checkpointType === "Outcome"
-                                    ? `/app/lecturer/class/${data.classId}/assignments-management/create?type=Outcome`
-                                    : `/app/lecturer/class/${data.classId}/assignments-management/create?type=Checkpoint`,
-                            )}
-                        class="gap-2 bg-amber-500 hover:bg-amber-600 text-white cursor-pointer"
-                    >
-                        <PlusIcon class="w-4 h-4" />
-                        Add {checkpointType === "Outcome"
-                            ? "Outcome"
-                            : "Checkpoint"}
-                    </Button>
-                {/if}
+                <Button
+                    onclick={() =>
+                        goto(
+                            checkpointType === "Outcome"
+                                ? `/app/lecturer/class/${data.classId}/assignments-management/create?type=Outcome`
+                                : `/app/lecturer/class/${data.classId}/assignments-management/create?type=Checkpoint`,
+                        )}
+                    class="gap-2 bg-amber-500 hover:bg-amber-600 text-white cursor-pointer"
+                >
+                    <PlusIcon class="w-4 h-4" />
+                    Add {checkpointType === "Outcome"
+                        ? "Outcome"
+                        : "Checkpoint"}
+                </Button>
             </div>
 
             <!-- Checkpoint Table -->
@@ -438,9 +436,8 @@
                                                             "failure"
                                                         ) {
                                                             toast.error(
-                                                                (
-                                                                    result.data as any
-                                                                )?.message ??
+                                                                (result.data
+                                                                    ?.message as any) ??
                                                                     "Delete failed.",
                                                             );
                                                         }

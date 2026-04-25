@@ -1,6 +1,6 @@
 <!-- AssignMentorDialog.svelte -->
 <script lang="ts">
-    import { enhance } from "$app/forms";
+    import { deserialize, enhance } from "$app/forms";
     import { Button } from "$lib/components/ui/button";
     import { Badge } from "$lib/components/ui/badge";
     import { Input } from "$lib/components/ui/input";
@@ -38,7 +38,12 @@
 
     // --- State ---
     let mentors = $state<any[]>([]);
-    let pagination = $state({ page: 1, limit: 20, totalItems: 0, totalPages: 0 });
+    let pagination = $state({
+        page: 1,
+        limit: 20,
+        totalItems: 0,
+        totalPages: 0,
+    });
     let isLoadingMentors = $state(false);
 
     // Form fields
@@ -157,7 +162,7 @@
         }
 
         const displayName = isManual
-            ? (manualFullName.trim() || manualEmail.trim())
+            ? manualFullName.trim() || manualEmail.trim()
             : selectedMentorName;
 
         setActions({
@@ -170,7 +175,10 @@
                 if (isManual) {
                     formData.append("mentorEmail", manualEmail.trim());
                     if (manualFullName.trim()) {
-                        formData.append("mentorFullName", manualFullName.trim());
+                        formData.append(
+                            "mentorFullName",
+                            manualFullName.trim(),
+                        );
                     }
                 } else {
                     formData.append("mentorId", String(selectedMentorId));
@@ -179,11 +187,16 @@
                 const res = await fetch("?/assignMentor", {
                     method: "POST",
                     body: formData,
+                    headers: { "x-sveltekit-action": "true" },
                 });
-                const result = await res.json();
+
+                const result = deserialize(await res.text()) as any;
 
                 if (result?.type === "failure") {
-                    toast.error(result?.data?.message ?? "Failed to assign mentor.");
+                    const message = Array.isArray(result?.data?.message)
+                        ? result.data.message[1]
+                        : (result?.data?.message ?? "Failed to assign mentor.");
+                    toast.error(message);
                     return;
                 }
 
@@ -196,7 +209,9 @@
 
     // Derived
     let canAssign = $derived(
-        mode === "manual" ? manualEmail.trim().length > 0 : selectedMentorId !== null
+        mode === "manual"
+            ? manualEmail.trim().length > 0
+            : selectedMentorId !== null,
     );
 </script>
 
@@ -213,16 +228,19 @@
 
 <Dialog.Root
     bind:open
-    onOpenChange={(v) => { if (!v) resetState(); }}
+    onOpenChange={(v) => {
+        if (!v) resetState();
+    }}
 >
     <Dialog.Content class="p-0 gap-0 overflow-hidden !max-w-[560px]">
         <div class="flex flex-col h-[620px]">
-
             <!-- Header -->
             <div class="px-5 py-4 border-b border-stone-100 shrink-0">
                 <h2 class="text-sm font-bold text-stone-900">Assign Mentor</h2>
                 <p class="text-xs text-stone-400 mt-0.5">
-                    Selecting for <span class="font-semibold text-stone-600">{groupName}</span>
+                    Selecting for <span class="font-semibold text-stone-600"
+                        >{groupName}</span
+                    >
                 </p>
             </div>
 
@@ -230,11 +248,16 @@
             <div class="flex border-b border-stone-100 shrink-0">
                 <button
                     type="button"
-                    onclick={() => { mode = "list"; selectedMentorId = null; manualEmail = ""; manualFullName = ""; }}
+                    onclick={() => {
+                        mode = "list";
+                        selectedMentorId = null;
+                        manualEmail = "";
+                        manualFullName = "";
+                    }}
                     class="flex-1 py-2.5 text-xs font-semibold transition-colors
                         {mode === 'list'
-                            ? 'text-amber-600 border-b-2 border-amber-500 bg-amber-50/40'
-                            : 'text-stone-400 hover:text-stone-600 hover:bg-stone-50'}"
+                        ? 'text-amber-600 border-b-2 border-amber-500 bg-amber-50/40'
+                        : 'text-stone-400 hover:text-stone-600 hover:bg-stone-50'}"
                 >
                     Select from List
                 </button>
@@ -243,8 +266,8 @@
                     onclick={switchToManual}
                     class="flex-1 py-2.5 text-xs font-semibold transition-colors
                         {mode === 'manual'
-                            ? 'text-amber-600 border-b-2 border-amber-500 bg-amber-50/40'
-                            : 'text-stone-400 hover:text-stone-600 hover:bg-stone-50'}"
+                        ? 'text-amber-600 border-b-2 border-amber-500 bg-amber-50/40'
+                        : 'text-stone-400 hover:text-stone-600 hover:bg-stone-50'}"
                 >
                     Enter Manually
                 </button>
@@ -252,12 +275,13 @@
 
             <!-- Body -->
             <div class="flex-1 overflow-hidden flex flex-col">
-
                 {#if mode === "list"}
                     <!-- Search -->
                     <div class="px-4 pt-3 pb-2 shrink-0">
                         <div class="relative">
-                            <SearchIcon class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-300 pointer-events-none" />
+                            <SearchIcon
+                                class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-300 pointer-events-none"
+                            />
                             <Input
                                 type="email"
                                 placeholder="Filter by email..."
@@ -268,7 +292,10 @@
                             {#if searchEmail}
                                 <button
                                     type="button"
-                                    onclick={() => { searchEmail = ""; fetchMentors(1); }}
+                                    onclick={() => {
+                                        searchEmail = "";
+                                        fetchMentors(1);
+                                    }}
                                     class="absolute right-2.5 top-1/2 -translate-y-1/2 text-stone-300 hover:text-stone-500 transition-colors"
                                 >
                                     <XIcon class="w-3.5 h-3.5" />
@@ -280,80 +307,121 @@
                     <!-- Mentor List -->
                     <div class="flex-1 overflow-y-auto px-4 pb-2 space-y-1.5">
                         {#if isLoadingMentors}
-                            <div class="flex flex-col items-center justify-center h-full gap-3 text-stone-300">
+                            <div
+                                class="flex flex-col items-center justify-center h-full gap-3 text-stone-300"
+                            >
                                 <Loader2Icon class="w-7 h-7 animate-spin" />
                                 <p class="text-xs">Loading mentors...</p>
                             </div>
                         {:else if mentors.length === 0}
-                            <div class="flex flex-col items-center justify-center h-full gap-2 text-stone-300">
+                            <div
+                                class="flex flex-col items-center justify-center h-full gap-2 text-stone-300"
+                            >
                                 <UserRoundSearchIcon class="w-9 h-9" />
-                                <p class="text-sm font-medium text-stone-400">No mentors found</p>
+                                <p class="text-sm font-medium text-stone-400">
+                                    No mentors found
+                                </p>
                                 {#if searchEmail}
                                     <p class="text-xs text-stone-400">
-                                        No results for "<span class="font-mono">{searchEmail}</span>".
+                                        No results for "<span class="font-mono"
+                                            >{searchEmail}</span
+                                        >".
                                         <button
                                             type="button"
                                             onclick={switchToManual}
                                             class="text-amber-500 hover:underline font-medium"
-                                        >Assign manually?</button>
+                                            >Assign manually?</button
+                                        >
                                     </p>
                                 {/if}
                             </div>
                         {:else}
                             {#each mentors as mentor}
                                 {@const mentorId = mentor.mentorId ?? mentor.id}
-                                {@const isSelected = selectedMentorId === mentorId}
-                                {@const isCurrent = currentMentorId != null && mentorId === currentMentorId}
+                                {@const isSelected =
+                                    selectedMentorId === mentorId}
+                                {@const isCurrent =
+                                    currentMentorId != null &&
+                                    mentorId === currentMentorId}
 
                                 <button
                                     type="button"
-                                    onclick={() => !isCurrent && selectMentor(mentor)}
+                                    onclick={() =>
+                                        !isCurrent && selectMentor(mentor)}
                                     disabled={isCurrent}
                                     class="w-full text-left rounded-xl border px-4 py-3 transition-all duration-150
                                         {isCurrent
-                                            ? 'bg-stone-50 border-stone-200 opacity-60 cursor-not-allowed'
-                                            : isSelected
-                                                ? 'bg-amber-50 border-amber-300 shadow-sm'
-                                                : 'bg-white border-stone-100 hover:border-stone-200 hover:bg-stone-50 cursor-pointer'}"
+                                        ? 'bg-stone-50 border-stone-200 opacity-60 cursor-not-allowed'
+                                        : isSelected
+                                          ? 'bg-amber-50 border-amber-300 shadow-sm'
+                                          : 'bg-white border-stone-100 hover:border-stone-200 hover:bg-stone-50 cursor-pointer'}"
                                 >
                                     <div class="flex items-start gap-3">
-                                        <div class="h-8 w-8 shrink-0 rounded-full bg-amber-100 flex items-center justify-center font-bold text-amber-700 text-sm">
+                                        <div
+                                            class="h-8 w-8 shrink-0 rounded-full bg-amber-100 flex items-center justify-center font-bold text-amber-700 text-sm"
+                                        >
                                             {mentor.fullName?.charAt(0) ?? "?"}
                                         </div>
                                         <div class="flex-1 min-w-0">
-                                            <div class="flex items-center justify-between gap-2">
-                                                <p class="text-sm font-semibold text-stone-900 truncate">
+                                            <div
+                                                class="flex items-center justify-between gap-2"
+                                            >
+                                                <p
+                                                    class="text-sm font-semibold text-stone-900 truncate"
+                                                >
                                                     {mentor.fullName ?? "—"}
                                                 </p>
                                                 {#if isCurrent}
-                                                    <Badge class="text-[10px] font-bold bg-stone-100 text-stone-400 border-stone-200 border shrink-0">
+                                                    <Badge
+                                                        class="text-[10px] font-bold bg-stone-100 text-stone-400 border-stone-200 border shrink-0"
+                                                    >
                                                         Current
                                                     </Badge>
                                                 {:else if isSelected}
-                                                    <CheckIcon class="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                                                    <CheckIcon
+                                                        class="w-3.5 h-3.5 text-amber-500 shrink-0"
+                                                    />
                                                 {:else}
-                                                    <ChevronRightIcon class="w-3.5 h-3.5 text-stone-300 shrink-0" />
+                                                    <ChevronRightIcon
+                                                        class="w-3.5 h-3.5 text-stone-300 shrink-0"
+                                                    />
                                                 {/if}
                                             </div>
-                                            <p class="text-xs text-stone-400 font-mono truncate mt-0.5">
+                                            <p
+                                                class="text-xs text-stone-400 font-mono truncate mt-0.5"
+                                            >
                                                 {mentor.email ?? "—"}
                                             </p>
-                                            <div class="flex items-center gap-2 mt-1.5 flex-wrap">
+                                            <div
+                                                class="flex items-center gap-2 mt-1.5 flex-wrap"
+                                            >
                                                 {#if mentor.currentPosition}
-                                                    <span class="flex items-center gap-1 text-xs text-stone-500">
-                                                        <UserIcon class="w-3 h-3 text-stone-300" />
+                                                    <span
+                                                        class="flex items-center gap-1 text-xs text-stone-500"
+                                                    >
+                                                        <UserIcon
+                                                            class="w-3 h-3 text-stone-300"
+                                                        />
                                                         {mentor.currentPosition}
                                                     </span>
                                                 {/if}
                                                 {#if mentor.currentCompany}
-                                                    <span class="flex items-center gap-1 text-xs text-stone-500">
-                                                        <BuildingIcon class="w-3 h-3 text-stone-300" />
+                                                    <span
+                                                        class="flex items-center gap-1 text-xs text-stone-500"
+                                                    >
+                                                        <BuildingIcon
+                                                            class="w-3 h-3 text-stone-300"
+                                                        />
                                                         {mentor.currentCompany}
                                                     </span>
                                                 {/if}
                                                 {#if mentor.fieldOfWork}
-                                                    <span class="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-100 rounded-full px-2 py-0.5">
-                                                        <LayersIcon class="w-2.5 h-2.5" />
+                                                    <span
+                                                        class="inline-flex items-center gap-1 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-100 rounded-full px-2 py-0.5"
+                                                    >
+                                                        <LayersIcon
+                                                            class="w-2.5 h-2.5"
+                                                        />
                                                         {mentor.fieldOfWork}
                                                     </span>
                                                 {/if}
@@ -367,17 +435,22 @@
 
                     <!-- Pagination -->
                     {#if pagination.totalPages > 1}
-                        <div class="flex items-center justify-between px-4 py-2.5 border-t border-stone-100 shrink-0">
+                        <div
+                            class="flex items-center justify-between px-4 py-2.5 border-t border-stone-100 shrink-0"
+                        >
                             <p class="text-xs text-stone-400">
-                                {pagination.totalItems} mentors · Page {pagination.page} of {pagination.totalPages}
+                                {pagination.totalItems} mentors · Page {pagination.page}
+                                of {pagination.totalPages}
                             </p>
                             <div class="flex items-center gap-1">
                                 <Button
                                     variant="outline"
                                     size="icon"
                                     class="h-7 w-7"
-                                    disabled={pagination.page <= 1 || isLoadingMentors}
-                                    onclick={() => fetchMentors(pagination.page - 1)}
+                                    disabled={pagination.page <= 1 ||
+                                        isLoadingMentors}
+                                    onclick={() =>
+                                        fetchMentors(pagination.page - 1)}
                                 >
                                     <ChevronLeftIcon class="w-3.5 h-3.5" />
                                 </Button>
@@ -385,24 +458,30 @@
                                     variant="outline"
                                     size="icon"
                                     class="h-7 w-7"
-                                    disabled={pagination.page >= pagination.totalPages || isLoadingMentors}
-                                    onclick={() => fetchMentors(pagination.page + 1)}
+                                    disabled={pagination.page >=
+                                        pagination.totalPages ||
+                                        isLoadingMentors}
+                                    onclick={() =>
+                                        fetchMentors(pagination.page + 1)}
                                 >
                                     <ChevronRightIcon class="w-3.5 h-3.5" />
                                 </Button>
                             </div>
                         </div>
                     {/if}
-
                 {:else}
                     <!-- Manual Entry Form -->
                     <div class="flex-1 px-6 py-5 space-y-4">
                         <p class="text-xs text-stone-400 leading-relaxed">
-                            Enter the mentor's email directly. If no account is found in the system, they will be invited.
+                            Enter the mentor's email directly. If no account is
+                            found in the system, they will be invited.
                         </p>
 
                         <div class="space-y-1.5">
-                            <Label for="manualEmail" class="text-sm font-medium text-stone-700">
+                            <Label
+                                for="manualEmail"
+                                class="text-sm font-medium text-stone-700"
+                            >
                                 Email <span class="text-red-400">*</span>
                             </Label>
                             <Input
@@ -416,8 +495,14 @@
                         </div>
 
                         <div class="space-y-1.5">
-                            <Label for="manualFullName" class="text-sm font-medium text-stone-700">
-                                Full Name <span class="text-stone-400 font-normal">(optional)</span>
+                            <Label
+                                for="manualFullName"
+                                class="text-sm font-medium text-stone-700"
+                            >
+                                Full Name <span
+                                    class="text-stone-400 font-normal"
+                                    >(optional)</span
+                                >
                             </Label>
                             <Input
                                 id="manualFullName"
@@ -428,10 +513,13 @@
                             />
                         </div>
 
-                        <div class="rounded-lg border border-amber-100 bg-amber-50/60 px-4 py-3">
+                        <div
+                            class="rounded-lg border border-amber-100 bg-amber-50/60 px-4 py-3"
+                        >
                             <p class="text-xs text-amber-700 leading-relaxed">
-                                <strong>Note:</strong> No mentor ID will be sent when assigning manually.
-                                The system will look up the mentor by email.
+                                <strong>Note:</strong> No mentor ID will be sent
+                                when assigning manually. The system will look up
+                                the mentor by email.
                             </p>
                         </div>
                     </div>
@@ -439,11 +527,15 @@
             </div>
 
             <!-- Footer -->
-            <div class="px-5 py-3.5 border-t border-stone-100 bg-white shrink-0 flex items-center justify-between gap-3">
+            <div
+                class="px-5 py-3.5 border-t border-stone-100 bg-white shrink-0 flex items-center justify-between gap-3"
+            >
                 <div class="min-w-0">
                     {#if mode === "list" && selectedMentorId}
                         <p class="text-xs text-stone-500 truncate">
-                            Selected: <span class="font-semibold text-stone-800">{selectedMentorName}</span>
+                            Selected: <span class="font-semibold text-stone-800"
+                                >{selectedMentorName}</span
+                            >
                         </p>
                     {:else if mode === "manual" && manualEmail}
                         <p class="text-xs text-stone-500 truncate font-mono">
@@ -463,7 +555,6 @@
                     Assign to {groupName}
                 </Button>
             </div>
-
         </div>
     </Dialog.Content>
 </Dialog.Root>

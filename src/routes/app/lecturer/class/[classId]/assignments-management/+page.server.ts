@@ -29,7 +29,7 @@ export const actions: Actions = {
 
         const deleteAssignmentRes = await deleteAssignment(event, assignmentId);
         if (!deleteAssignmentRes || deleteAssignmentRes.status !== 200) {
-            return fail(400, deleteAssignmentRes.data?.message ?? "Fail to delete assignment");
+            return fail(400, { message: deleteAssignmentRes.data?.message ?? "Fail to delete assignment" });
         }
         return {
             success: true,

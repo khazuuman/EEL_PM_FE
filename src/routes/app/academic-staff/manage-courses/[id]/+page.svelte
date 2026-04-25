@@ -370,7 +370,7 @@
                                     <PercentIcon class="w-3.5 h-3.5" /> Weight
                                 </div>
                             </Table.Head>
-                            <Table.Head class="text-stone-600 font-semibold text-center">Status</Table.Head>
+                            <!-- <Table.Head class="text-stone-600 font-semibold text-center">Status</Table.Head> -->
                             <Table.Head class="text-stone-600 font-semibold text-center">Actions</Table.Head>
                         </Table.Row>
                     </Table.Header>
@@ -426,7 +426,7 @@
                                         {/if}
                                     </Table.Cell>
 
-                                    <!-- Status -->
+                                    <!-- Status
                                     <Table.Cell class="text-center">
                                         {#if item.isActive}
                                             <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-100 border border-green-200 text-xs font-semibold text-green-700">
@@ -437,7 +437,7 @@
                                                 <ShieldOffIcon class="w-3 h-3" /> Inactive
                                             </span>
                                         {/if}
-                                    </Table.Cell>
+                                    </Table.Cell> -->
 
                                     <!-- Actions -->
                                     <Table.Cell class="text-center">
