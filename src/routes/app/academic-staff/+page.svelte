@@ -34,8 +34,8 @@
                 url: "/app/academic-staff/manage-topic",
             },
             {
-                name: "View Statistics",
-                url: "/app/academic-staff/view-statistics",
+                name: "View Report",
+                url: "/app/academic-staff/view-report",
             },
         ],
     };
