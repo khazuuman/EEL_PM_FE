@@ -1,6 +1,7 @@
 import { getDashboardData } from "$lib/server/dashboard";
 import { getTopTierGroup } from "$lib/server/groups";
 import { getAllSemesters } from "$lib/server/semesters";
+import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {

@@ -6,7 +6,7 @@
     import { Button } from "$lib/components/ui/button/index.js";
     import { Input } from "$lib/components/ui/input/index.js";
     import { Label } from "$lib/components/ui/label/index.js";
-    import { goto } from "$app/navigation";
+    import { goto, invalidateAll } from "$app/navigation";
     import { page } from "$app/state";
     import {
         BookOpenIcon,
@@ -21,8 +21,10 @@
         ChevronLeftIcon,
         ChevronRightIcon,
         ArrowLeftIcon,
+        DownloadIcon,
     } from "lucide-svelte";
     import * as Select from "$lib/components/ui/select/index";
+    import { toast } from "svelte-sonner";
 
     let { data }: { data: PageData } = $props();
 
@@ -42,6 +44,8 @@
     let topPercentage = $state(data.filters?.topPercentage ?? 30);
     const semesters = $derived(data.semesters ?? []);
     let semesterId = $state(data.filters?.semesterId ?? "");
+
+    let exporting = $state(false);
 
     function applyFilter() {
         const url = new URL(page.url);
@@ -165,18 +169,61 @@
             ];
         return [1, "...", current - 1, current, current + 1, "...", total];
     }
+
+    //export
+    async function handleExport() {
+        exporting = true;
+        try {
+            const params = new URLSearchParams();
+            params.set("minScore", String(minScore));
+            params.set("topPercentage", String(topPercentage));
+            if (semesterId) params.set("semesterId", semesterId);
+
+            const res = await fetch(
+                `/api/export/groups?${params.toString()}`,
+            );
+            if (!res.ok) {
+                toast.error("Failed to export groups.");
+                return;
+            }
+
+            const disposition = res.headers.get("content-disposition") ?? "";
+            const filenameMatch =
+                disposition.match(/filename\*=UTF-8''([^;\n]+)/i) ??
+                disposition.match(/filename="?([^";\n]+)"?/i);
+            const filename = filenameMatch
+                ? decodeURIComponent(filenameMatch[1])
+                : `top_tier_groups.xlsx`;
+
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            toast.success("Top tier groups exported successfully.");
+        } catch {
+            toast.error("Failed to export groups.");
+        } finally {
+            exporting = false;
+        }
+    }
 </script>
 
 <div class="w-full space-y-6 p-6 bg-white">
     <!-- Page Header -->
     <div class="flex items-center gap-3">
         <Button
-        variant="ghost"
-        onclick={() => goto(`/app/academic-staff`)}
-        class="flex items-center gap-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-50 rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer -ml-3"
-    >
-        <ArrowLeftIcon class="w-4 h-4" />
-    </Button>
+            variant="ghost"
+            onclick={() => goto(`/app/academic-staff`)}
+            class="flex items-center gap-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-50 rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer -ml-3"
+        >
+            <ArrowLeftIcon class="w-4 h-4" />
+        </Button>
         <div class="rounded-lg bg-orange-100 p-2">
             <BarChart3Icon class="h-6 w-6 text-orange-600" />
         </div>
@@ -452,6 +499,33 @@
                     >
                         <SearchIcon class="h-3.5 w-3.5" />
                         Apply
+                    </Button>
+                    <Button
+                        onclick={applyFilter}
+                        size="sm"
+                        class="h-8 gap-1.5 bg-orange-500 text-white hover:bg-orange-600"
+                    >
+                        <SearchIcon class="h-3.5 w-3.5" />
+                        Apply
+                    </Button>
+
+                    <!-- Export Button -->
+                    <Button
+                        onclick={handleExport}
+                        disabled={exporting}
+                        variant="outline"
+                        size="sm"
+                        class="h-8 gap-1.5 border-orange-200 text-orange-600 hover:bg-orange-50 hover:text-orange-700"
+                    >
+                        {#if exporting}
+                            <div
+                                class="h-3.5 w-3.5 animate-spin rounded-full border-2 border-orange-400 border-t-transparent"
+                            ></div>
+                            Exporting...
+                        {:else}
+                            <DownloadIcon class="h-3.5 w-3.5" />
+                            Export
+                        {/if}
                     </Button>
                 </div>
             </div>
