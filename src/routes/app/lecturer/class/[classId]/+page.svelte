@@ -30,7 +30,7 @@
     import { page } from "$app/state";
     import DivideIntoGroupDialog from "./components/DivideIntoGroupDialog.svelte";
     import CreateGroupDialog from "./components/CreateGroupDialog.svelte";
-    import { enhance } from "$app/forms";
+    import { deserialize, enhance } from "$app/forms";
     import SetDeadlineDialog from "./components/SetDeadlineDialog.svelte";
 
     let { data } = $props<{ data: PageData }>();
@@ -57,8 +57,8 @@
                 url: `/app/lecturer/class/${classId}/student-list`,
             },
             {
-                name: "View Unassign Student List",
-                url: `/app/lecturer/class/${classId}/view-unassign-student`,
+                name: "View Unassigned Student List",
+                url: `/app/lecturer/class/${classId}/view-unassigned-student`,
             },
         ],
     };
@@ -198,16 +198,17 @@
                     method: "POST",
                     body: formData,
                 });
-                const result = await res.json();
+                const result = deserialize(await res.text());
+                console.log(result);
                 if (result?.type === "failure") {
                     toast.error(
-                        result?.data?.message ??
+                        String(result?.data?.message) ??
                             `Failed to delete group ${groupName}.`,
                     );
                     return;
                 }
                 toast.success(
-                    result?.data?.message ??
+                    // result?.data?.message ??
                         `Group ${groupName} deleted successfully!`,
                 );
                 await invalidateAll();

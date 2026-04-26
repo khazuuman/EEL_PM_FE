@@ -64,7 +64,6 @@ export const getMyGroup = async (event: RequestEvent, studentId: any) => {
     const response = await fetcher({
         event,
         url: `/groups/Student/${studentId}`,
-        method: 'GET',
     });
     const data = await safeJsonParse(response);
     return {
@@ -91,7 +90,6 @@ export const getGroupDetail = async (event: RequestEvent, groupId: any) => {
     const response = await fetcher({
         event,
         url: `/groups/${groupId}`,
-        method: 'GET',
     });
     const data = await safeJsonParse(response);
     return {
@@ -186,7 +184,6 @@ export const getGroupRequest = async (event: RequestEvent, groupId: any) => {
     const response = await fetcher({
         event,
         url: `/groups/${groupId}/requests`,
-        method: 'GET',
     });
     const data = await safeJsonParse(response);
     return {
@@ -240,7 +237,19 @@ export const getMyJoinRequests = async (event: RequestEvent) => {
     const response = await fetcher({
         event,
         url: `/users/me/join-requests`,
-        method: 'GET'
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+}
+
+export const getTopTierGroup = async (event: RequestEvent) => {
+    const { url } = event;
+    const response = await fetcher({
+        event,
+        url: `/groups/top30?${url.searchParams.toString()}`,
     });
     const data = await safeJsonParse(response);
     return {
