@@ -8,6 +8,7 @@ export const actions: Actions = {
         const formData = await event.request.formData();
         const courseCode = formData.get("courseCode") as string;
         const courseName = formData.get("courseName") as string;
+        const courseLevel = Number(formData.get("courseLevel"));
         const credits = Number(formData.get("credits"));
         const courseDescription = formData.get("courseDescription") as string;
         const isActive = formData.get("isActive") === "true";
@@ -15,6 +16,7 @@ export const actions: Actions = {
         const createCourseRes = await createCourse(event, {
             courseCode,
             courseName,
+            courseLevel,
             courseDescription,
             credits,
             isActive

@@ -27,7 +27,7 @@
     import { toast } from "svelte-sonner";
 
     let { data }: { data: PageData } = $props();
-
+    const courses = $derived(data.courses ?? []);
     const summary = $derived(data.dashboardData?.summary);
     const topicDist = $derived(
         data.dashboardData?.topicStatusDistribution ?? {},
@@ -46,6 +46,27 @@
     let semesterId = $state(data.filters?.semesterId ?? "");
 
     let exporting = $state(false);
+
+    // Dashboard filter state
+    let dashboardSemesterId = $state(data.dashboardFilters?.semesterId ?? "");
+    let dashboardCourseId = $state(data.dashboardFilters?.courseId ?? "");
+
+    function applyDashboardFilter() {
+        const url = new URL(page.url);
+        // Chỉ set các param dashboard, giữ nguyên top tier params
+        if (dashboardSemesterId) {
+            url.searchParams.set("dashboardSemesterId", dashboardSemesterId);
+        } else {
+            url.searchParams.delete("dashboardSemesterId");
+        }
+        if (dashboardCourseId) {
+            url.searchParams.set("dashboardCourseId", dashboardCourseId);
+        } else {
+            url.searchParams.delete("dashboardCourseId");
+        }
+        // Reset về page 1 nhưng GIỮ NGUYÊN top tier filters
+        goto(url.toString(), { invalidateAll: true });
+    }
 
     function applyFilter() {
         const url = new URL(page.url);
@@ -179,9 +200,7 @@
             params.set("topPercentage", String(topPercentage));
             if (semesterId) params.set("semesterId", semesterId);
 
-            const res = await fetch(
-                `/api/export/groups?${params.toString()}`,
-            );
+            const res = await fetch(`/api/export/groups?${params.toString()}`);
             if (!res.ok) {
                 toast.error("Failed to export groups.");
                 return;
@@ -234,6 +253,77 @@
     </div>
 
     <Separator />
+
+    <!-- Dashboard Filters -->
+    <div
+        class="flex flex-wrap items-end gap-3 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3"
+    >
+        <!-- Semester -->
+        <div class="flex flex-col gap-1">
+            <Label class="text-xs text-gray-500">Semester</Label>
+            <Select.Root
+                type="single"
+                value={dashboardSemesterId}
+                onValueChange={(val) => (dashboardSemesterId = val ?? "")}
+            >
+                <Select.Trigger class="h-8 w-44 text-sm">
+                    {semesters.find(
+                        (s: any) =>
+                            String(s.semesterId) === dashboardSemesterId,
+                    )?.semesterName ?? "All Semesters"}
+                </Select.Trigger>
+                <Select.Content>
+                    <Select.Item value="">All Semesters</Select.Item>
+                    {#each semesters as semester}
+                        <Select.Item value={String(semester.semesterId)}>
+                            <div class="flex items-center gap-2">
+                                {semester.semesterName}
+                                {#if semester.isCurrent}
+                                    <Badge
+                                        class="h-4 bg-orange-100 px-1.5 text-[10px] text-orange-600"
+                                        >Current</Badge
+                                    >
+                                {/if}
+                            </div>
+                        </Select.Item>
+                    {/each}
+                </Select.Content>
+            </Select.Root>
+        </div>
+
+        <!-- Course -->
+        <div class="flex flex-col gap-1">
+            <Label class="text-xs text-gray-500">Course</Label>
+            <Select.Root
+                type="single"
+                value={dashboardCourseId}
+                onValueChange={(val) => (dashboardCourseId = val ?? "")}
+            >
+                <Select.Trigger class="h-8 w-fit text-sm">
+                    {courses.find(
+                        (c: any) => String(c.courseId) === dashboardCourseId,
+                    )?.courseName ?? "All Courses"}
+                </Select.Trigger>
+                <Select.Content>
+                    <Select.Item value="">All Courses</Select.Item>
+                    {#each courses as course}
+                        <Select.Item value={String(course.courseId)}>
+                            {course.courseName}
+                        </Select.Item>
+                    {/each}
+                </Select.Content>
+            </Select.Root>
+        </div>
+
+        <Button
+            onclick={applyDashboardFilter}
+            size="sm"
+            class="h-8 gap-1.5 bg-orange-500 text-white hover:bg-orange-600"
+        >
+            <SearchIcon class="h-3.5 w-3.5" />
+            Apply
+        </Button>
+    </div>
 
     <!-- Summary Cards -->
     <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -491,15 +581,6 @@
                             </Select.Content>
                         </Select.Root>
                     </div>
-
-                    <Button
-                        onclick={applyFilter}
-                        size="sm"
-                        class="h-8 gap-1.5 bg-orange-500 text-white hover:bg-orange-600"
-                    >
-                        <SearchIcon class="h-3.5 w-3.5" />
-                        Apply
-                    </Button>
                     <Button
                         onclick={applyFilter}
                         size="sm"

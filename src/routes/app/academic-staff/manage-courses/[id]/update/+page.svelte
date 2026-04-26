@@ -33,7 +33,11 @@
 <div
     class="flex h-screen w-screen flex-col items-center justify-center bg-stone-100"
 >
-    <form method="POST" action={`/app/academic-staff/manage-courses/${courseId}?/updateCourse`} use:enhance={handleSubmit}>
+    <form
+        method="POST"
+        action={`/app/academic-staff/manage-courses/${courseId}?/updateCourse`}
+        use:enhance={handleSubmit}
+    >
         <!-- Form body -->
         <div
             class="w-[800px] rounded-t-md border border-stone-300 bg-white p-8"
@@ -44,7 +48,9 @@
                     >Update Course</span
                 >
                 <span class="block h-px flex-1 bg-stone-300"></span>
-                <span class="whitespace-nowrap font-mono text-sm text-stone-400">
+                <span
+                    class="whitespace-nowrap font-mono text-sm text-stone-400"
+                >
                     {course.courseCode}
                 </span>
             </div>
@@ -78,7 +84,7 @@
                 </Field.Field>
             </div>
 
-            <!-- Row 2: Credits + isActive -->
+            <!-- Row 2: Credits + Course Level -->
             <div class="mt-6 flex gap-5">
                 <Field.Field class="flex-1">
                     <Field.Label for="credits">
@@ -97,16 +103,46 @@
                 </Field.Field>
 
                 <Field.Field class="flex-1">
+                    <Field.Label for="courseLevel">
+                        Course Level<span class="text-orange-500">*</span>
+                    </Field.Label>
+                    <Input
+                        type="number"
+                        name="courseLevel"
+                        id="courseLevel"
+                        placeholder="e.g. 1"
+                        min="1"
+                        value={course.courseLevel}
+                        required
+                    />
+                    <p class="mt-1 text-xs text-stone-400">
+                        Used to determine course order when syncing data from
+                        FAP.
+                    </p>
+                </Field.Field>
+            </div>
+
+            <!-- Row 3: isActive -->
+            <div class="mt-6 flex gap-5">
+                <Field.Field class="flex-1">
                     <Field.Label for="isActive">Status</Field.Label>
                     <select
                         id="isActive"
                         name="isActive"
                         class="border-input w-full rounded-md border bg-white px-3 py-2 text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none"
                     >
-                        <option value="true" selected={course.isActive === true}>Active</option>
-                        <option value="false" selected={course.isActive === false}>Inactive</option>
+                        <option value="true" selected={course.isActive === true}
+                            >Active</option
+                        >
+                        <option
+                            value="false"
+                            selected={course.isActive === false}
+                            >Inactive</option
+                        >
                     </select>
                 </Field.Field>
+
+                <div class="flex-1"></div>
             </div>
 
             <!-- Row 3: Description -->
@@ -121,7 +157,8 @@
                         placeholder="Enter course description..."
                         rows={4}
                         class="border-input w-full rounded-md border bg-white px-3 py-2 text-sm focus:border-orange-400 focus:ring-2 focus:ring-orange-400/20 focus:outline-none resize-none"
-                    >{course.courseDescription ?? ""}</textarea>
+                        >{course.courseDescription ?? ""}</textarea
+                    >
                 </Field.Field>
             </div>
         </div>

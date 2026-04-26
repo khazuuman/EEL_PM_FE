@@ -91,10 +91,10 @@ export const actions: Actions = {
     // },
     syncData: async (event) => {
         const formData = await event.request.formData();
-        const exe1CourseId = formData.get("exe1CourseId");
-        const exe2CourseId = formData.get("exe2CourseId");
+        const prevCourseId = formData.get("prevCourseId");
+        const currentCourseId = formData.get("currentCourseId");
 
-        const syncRes = await dataSynchronization(event, { exe1CourseId, exe2CourseId });
+        const syncRes = await dataSynchronization(event, { prevCourseId, currentCourseId });
         console.log("syncRes: ", syncRes);
         if (!syncRes || syncRes.status !== 200) {
             return fail(400, {

@@ -32,14 +32,14 @@
     let defaultHeaders = $state([
         "courseCode",
         "courseName",
-        "courseDescription",
+        "courseLevel",
         "credits",
         "isActive",
     ]);
     let headerValues = $state({
         courseCode: "Course Code",
         courseName: "Course Name",
-        courseDescription: "Description",
+        courseLevel: "Level",
         credits: "Credits",
         isActive: "Status",
     });

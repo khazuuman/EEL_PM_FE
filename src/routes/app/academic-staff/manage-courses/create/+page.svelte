@@ -69,7 +69,7 @@
                 </Field.Field>
             </div>
 
-            <!-- Row 2: Credits + isActive -->
+            <!-- Row 2: Credits + Course Level -->
             <div class="mt-6 flex gap-5">
                 <Field.Field class="flex-1">
                     <Field.Label for="credits">
@@ -87,6 +87,27 @@
                 </Field.Field>
 
                 <Field.Field class="flex-1">
+                    <Field.Label for="courseLevel">
+                        Course Level<span class="text-orange-500">*</span>
+                    </Field.Label>
+                    <Input
+                        type="number"
+                        name="courseLevel"
+                        id="courseLevel"
+                        placeholder="e.g. 1"
+                        min="1"
+                        required
+                    />
+                    <p class="mt-1 text-xs text-stone-400">
+                        Used to determine course order when syncing data from
+                        FAP.
+                    </p>
+                </Field.Field>
+            </div>
+
+            <!-- Row 3: isActive -->
+            <div class="mt-6 flex gap-5">
+                <Field.Field class="flex-1">
                     <Field.Label for="isActive">Status</Field.Label>
                     <select
                         id="isActive"
@@ -97,6 +118,9 @@
                         <option value="false">Inactive</option>
                     </select>
                 </Field.Field>
+
+                <!-- giữ flex-1 trống để isActive không chiếm full width -->
+                <div class="flex-1"></div>
             </div>
 
             <!-- Row 3: Description -->

@@ -22,8 +22,8 @@
     let { open, onOpenChange }: Props = $props();
 
     let courses = $state<Course[]>([]);
-    let exe1CourseId = $state<string>("");
-    let exe2CourseId = $state<string>("");
+    let prevCourseId = $state<string>("");
+    let currentCourseId = $state<string>("");
     let loading = $state(false);
     let loadingCourses = $state(false);
     let errorMessage = $state("");
@@ -34,8 +34,8 @@
     // Khi dialog mở → tự submit getAllCourses
     $effect(() => {
         if (open) {
-            exe1CourseId = "";
-            exe2CourseId = "";
+            prevCourseId = "";
+            currentCourseId = "";
             errorMessage = "";
             import("svelte").then(({ tick }) =>
                 tick().then(() => getCoursesForm?.requestSubmit()),
@@ -65,8 +65,8 @@
                     )),
                 );
             } else if (result.type === "success") {
-                exe1CourseId = "";
-                exe2CourseId = "";
+                prevCourseId = "";
+                currentCourseId = "";
                 onOpenChange(false);
                 toast.success("Sync Data successfully!");
                 await invalidateAll();
@@ -96,16 +96,16 @@
         <Dialog.Header>
             <Dialog.Title>Sync Academic Data</Dialog.Title>
             <Dialog.Description>
-                Select the subject codes to synchronize all data from the
-                external API. This process may take
-                <strong>30s – 1 minute</strong> — please do not close this page.
+                Select the course codes to synchronize all data from the
+                FAP API. This process may take
+                <strong>15 – 30 seconds</strong> — please do not close this page.
             </Dialog.Description>
         </Dialog.Header>
 
         <form method="POST" action="?/syncData" use:enhance={handleSync}>
             <!-- Hidden courseId values -->
-            <input type="hidden" name="exe1CourseId" value={exe1CourseId} />
-            <input type="hidden" name="exe2CourseId" value={exe2CourseId} />
+            <input type="hidden" name="prevCourseId" value={prevCourseId} />
+            <input type="hidden" name="currentCourseId" value={currentCourseId} />
 
             <div class="flex flex-col gap-4 py-4">
                 {#if loadingCourses}
@@ -118,15 +118,15 @@
                 {:else}
                     <!-- EXE01 -->
                     <div class="flex flex-col gap-1.5">
-                        <Label>EXE01 Subject</Label>
+                        <Label>Previous Course</Label>
                         <Select.Root
                             type="single"
-                            value={exe1CourseId}
-                            onValueChange={(v) => (exe1CourseId = v ?? "")}
+                            value={prevCourseId}
+                            onValueChange={(v) => (prevCourseId = v ?? "")}
                             disabled={loading}
                         >
                             <Select.Trigger class="w-full">
-                                {getCourseLabel(exe1CourseId)}
+                                {getCourseLabel(prevCourseId)}
                             </Select.Trigger>
                             <Select.Content>
                                 {#each courses as course}
@@ -151,15 +151,15 @@
 
                     <!-- EXE02 -->
                     <div class="flex flex-col gap-1.5">
-                        <Label>EXE02 Subject</Label>
+                        <Label>Next Course</Label>
                         <Select.Root
                             type="single"
-                            value={exe2CourseId}
-                            onValueChange={(v) => (exe2CourseId = v ?? "")}
+                            value={currentCourseId}
+                            onValueChange={(v) => (currentCourseId = v ?? "")}
                             disabled={loading}
                         >
                             <Select.Trigger class="w-full">
-                                {getCourseLabel(exe2CourseId)}
+                                {getCourseLabel(currentCourseId)}
                             </Select.Trigger>
                             <Select.Content>
                                 {#each courses as course}
@@ -200,8 +200,8 @@
                 <Button
                     type="submit"
                     disabled={loading ||
-                        !exe1CourseId ||
-                        !exe2CourseId ||
+                        !prevCourseId ||
+                        !currentCourseId ||
                         loadingCourses}
                     class="gap-2"
                 >

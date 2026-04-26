@@ -21,12 +21,14 @@ export const actions: Actions = {
         const { params } = event;
         const formData = await event.request.formData();
         const courseName = formData.get("courseName") as string;
+        const courseLevel = Number(formData.get("courseLevel"));
         const credits = Number(formData.get("credits"));
         const courseDescription = formData.get("courseDescription") as string;
         const isActive = formData.get("isActive") === "true";
 
         const body: UpdateCourse = {
             courseName,
+            courseLevel,
             courseDescription,
             credits,
             isActive

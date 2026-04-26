@@ -1,7 +1,6 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { fetcher } from "../fetcher";
 import { safeJsonParse } from "$lib/utils";
-import type { CreateSemester } from "$lib/types/semester";
 import type { CreateCourse, UpdateCourse } from "$lib/types/course";
 
 
