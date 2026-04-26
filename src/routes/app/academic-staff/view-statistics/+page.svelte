@@ -20,6 +20,7 @@
         SearchIcon,
         ChevronLeftIcon,
         ChevronRightIcon,
+        ArrowLeftIcon,
     } from "lucide-svelte";
     import * as Select from "$lib/components/ui/select/index";
 
@@ -166,9 +167,16 @@
     }
 </script>
 
-<div class="w-full space-y-6 p-6">
+<div class="w-full space-y-6 p-6 bg-white">
     <!-- Page Header -->
     <div class="flex items-center gap-3">
+        <Button
+        variant="ghost"
+        onclick={() => goto(`/app/academic-staff`)}
+        class="flex items-center gap-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-50 rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer -ml-3"
+    >
+        <ArrowLeftIcon class="w-4 h-4" />
+    </Button>
         <div class="rounded-lg bg-orange-100 p-2">
             <BarChart3Icon class="h-6 w-6 text-orange-600" />
         </div>
@@ -410,7 +418,8 @@
                         >
                             <Select.Trigger class="h-8 w-40 text-sm">
                                 {semesters.find(
-                                    (s: any) => String(s.semesterId) === semesterId,
+                                    (s: any) =>
+                                        String(s.semesterId) === semesterId,
                                 )?.semesterName ?? "All Semesters"}
                             </Select.Trigger>
                             <Select.Content>

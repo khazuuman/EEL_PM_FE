@@ -257,3 +257,17 @@ export const getTopTierGroup = async (event: RequestEvent) => {
         data: data
     };
 }
+
+export const exportTopTierGroup = async (
+    event: RequestEvent, body: any
+) => {
+    const response = await fetcher({
+        event: event,
+        url: `/export/top30-groups`,
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
