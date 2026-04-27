@@ -17,16 +17,16 @@
         "phoneNumber",
         "gender",
         "department",
-        "campusName",
+        // "campusName",
     ]);
     let headerValues = $state({
-        lecturerCode: "Mentor Code",
+        lecturerCode: "Lecturer Code",
         fullName: "Full Name",
         email: "Email",
         phoneNumber: "Phone Number",
         gender: "Gender",
         department: "Department",
-        campusName: "Campus",
+        // campusName: "Campus",
     });
 
 </script>
