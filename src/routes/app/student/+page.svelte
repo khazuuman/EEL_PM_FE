@@ -17,6 +17,7 @@
         PencilIcon,
         ReplyIcon,
         RotateCcwIcon,
+        LinkIcon,
     } from "lucide-svelte";
     import type { PageData } from "./$types";
     import { goto, invalidateAll } from "$app/navigation";
@@ -392,6 +393,32 @@
                                     data.deadlines.topicRegistrationEndDate,
                                 )}
                             </p>
+                        </div>
+                    </div>
+                {/if}
+                {#if data.classDetail?.googleMeetLink}
+                    <div
+                        class="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-3"
+                    >
+                        <div
+                            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 border border-green-200"
+                        >
+                            <LinkIcon class="w-4 h-4 text-green-600" />
+                        </div>
+                        <div class="min-w-0">
+                            <p
+                                class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
+                            >
+                                Google Meet Link
+                            </p>
+                            <a
+                                href={data.classDetail.googleMeetLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-sm font-semibold text-green-600 hover:text-green-700 hover:underline truncate block"
+                            >
+                                {data.classDetail.googleMeetLink}
+                            </a>
                         </div>
                     </div>
                 {/if}
