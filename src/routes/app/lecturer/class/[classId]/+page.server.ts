@@ -3,7 +3,7 @@ import type { PageServerLoad } from "./$types";
 import { getGroupsByClass } from "$lib/server/groups";
 import type { Actions } from "@sveltejs/kit";
 import { fail } from "@sveltejs/kit";
-import { allocateGroup, publicGroup } from "$lib/server/classes";
+import { allocateGroup, deleteMeetLink, publicGroup, updateMeetLink } from "$lib/server/classes";
 import type { AllocateGroup } from "$lib/types/group";
 import { getStudentsAvailableByClassWithoutFilter } from "$lib/server/students";
 import { createGroup, deleteGroup } from "$lib/server/groups";
@@ -84,6 +84,7 @@ export const actions: Actions = {
                 id: s.studentId,
                 name: s.fullName,
                 studentCode: s.studentCode,
+                majorName: s.majorName,
             })),
         };
     },
@@ -138,6 +139,29 @@ export const actions: Actions = {
         if (!updateTopicRegistrationDeadlineRes || updateTopicRegistrationDeadlineRes.status !== 200) {
             return fail(400, {
                 message: updateTopicRegistrationDeadlineRes?.data?.message ?? "Failed to set topic registration deadline",
+            });
+        }
+    },
+    updateMeetLink: async (event) => {
+        const formData = await event.request.formData();
+        const classId = Number(formData.get("classId"));
+        const googleMeetLink = formData.get("googleMeetLink");
+
+        const updateMeetLinkRes = await updateMeetLink(event, classId, { googleMeetLink });
+        if (!updateMeetLinkRes || updateMeetLinkRes.status !== 200) {
+            return fail(400, {
+                message: updateMeetLinkRes?.data?.message ?? "Failed to update meet link.",
+            });
+        }
+    },
+    deleteMeetLink: async (event) => {
+        const formData = await event.request.formData();
+        const classId = Number(formData.get("classId"));
+
+        const deleteMeetLinkRes = await deleteMeetLink(event, classId);
+        if (!deleteMeetLinkRes || deleteMeetLinkRes.status !== 200) {
+            return fail(400, {
+                message: deleteMeetLinkRes?.data?.message ?? "Failed to delete meet link.",
             });
         }
     },

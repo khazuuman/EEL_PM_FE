@@ -1,5 +1,5 @@
 import { APP_STAFF_MANAGE_STUDENT } from "$lib/constants/depend";
-import { importAcademicData, importMentorData } from "$lib/server/import";
+import { importMentorData } from "$lib/server/import";
 import type { Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { fail } from "@sveltejs/kit";

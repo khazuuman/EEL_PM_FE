@@ -200,7 +200,7 @@
             params.set("topPercentage", String(topPercentage));
             if (semesterId) params.set("semesterId", semesterId);
 
-            const res = await fetch(`/api/export/groups?${params.toString()}`);
+            const res = await fetch(`/api/export/top-groups?${params.toString()}`);
             if (!res.ok) {
                 toast.error("Failed to export groups.");
                 return;

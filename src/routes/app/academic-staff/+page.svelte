@@ -34,6 +34,10 @@
                 url: "/app/academic-staff/manage-topic",
             },
             {
+                name: "Manage Groups",
+                url: "/app/academic-staff/manage-groups",
+            },
+            {
                 name: "View Report",
                 url: "/app/academic-staff/view-report",
             },

@@ -10,6 +10,7 @@
 	import debounce from "lodash/debounce.js";
 	import { onMount, type Snippet } from "svelte";
 	import * as Select from "$lib/components/ui/select/index.js";
+	import { goto } from "$app/navigation";
 
 	let {
 		activeHeaders,
@@ -47,17 +48,17 @@
 		},
 	);
 
+	onMount(() => {
+		searchValue = page.url.searchParams.get("searchTerm") ?? "";
+	});
 
-onMount(() => {
-    searchValue = page.url.searchParams.get("searchTerm") ?? "";
-});
-
-$effect(() => {
-    const current = page.url.searchParams.get("searchTerm") ?? "";
-    if (searchValue !== current) {  // chỉ gọi khi user thực sự thay đổi
-        debounceSearch(searchValue);
-    }
-});
+	$effect(() => {
+		const current = page.url.searchParams.get("searchTerm") ?? "";
+		if (searchValue !== current) {
+			// chỉ gọi khi user thực sự thay đổi
+			debounceSearch(searchValue);
+		}
+	});
 	let allParamKeys = $derived.by(() => {
 		return Array.from(page.url.searchParams.keys());
 	});
@@ -113,8 +114,7 @@ $effect(() => {
 				class="w-full xl:w-auto"
 				variant={"destructive"}
 				onclick={() => {
-					resetQuery();
-					searchValue = "";
+					window.location.href = page.url.pathname;
 				}}
 			>
 				<XIcon />

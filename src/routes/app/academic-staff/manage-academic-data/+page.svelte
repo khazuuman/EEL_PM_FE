@@ -4,6 +4,7 @@
     import { Button } from "$lib/components/ui/button";
     import SyncDataDialog from "../components/SyncDataDialog.svelte";
     import { goto } from "$app/navigation";
+    import { onMount } from "svelte";
 
     const { data } = $props();
     let students = $derived(data?.students || []);
@@ -33,6 +34,21 @@
         majorCode: "Major Code",
         classCode: "Class Code",
         // campusName: "Campus Name",
+    });
+
+    onMount(() => {
+        const currentUrl = new URL(window.location.href);
+        if (
+            !currentUrl.searchParams.has("semesterId") &&
+            data?.currentSemesterId
+        ) {
+            currentUrl.searchParams.set("semesterId", data.currentSemesterId);
+            goto(currentUrl.toString(), {
+                replaceState: true,
+                noScroll: true,
+                keepFocus: true,
+            });
+        }
     });
 </script>
 

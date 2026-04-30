@@ -14,29 +14,37 @@ import { getAllCourses } from "$lib/server/course";
 export const load: PageServerLoad = async (event) => {
     const { depends, url } = event;
     depends(APP_STAFF_MANAGE_STUDENT);
+    //url default
     if (!url.searchParams.has("page")) url.searchParams.set("page", "1");
     if (!url.searchParams.has("limit")) url.searchParams.set("limit", "10");
-    const [studentsRes, majorsRes, campusesRes, classesRes, semestersRes] = await Promise.all([
+    const semesterRes = await getAllSemesters(event);
+    let currentSemesterId;
+    const semesters = (semesterRes?.data?.data?.data ?? [])
+        .map((c: any) => ({
+            label: c.semesterName,
+            value: String(c.semesterId),
+            variant: "primary",
+            isCurrent: c.isCurrent,
+        }))
+        .sort((a: any, b: any) => {
+            if (a.isCurrent) {
+                currentSemesterId = a.value;
+                return -1;
+            }
+            if (b.isCurrent) return 1;
+            return 0;
+        });
+
+    const [studentsRes, majorsRes, classesRes] = await Promise.all([
         getStudents(event),
         getAllMajors(event),
-        getAllCampuses(event),
-        getAllClasses(event),
-        getAllSemesters(event)
+        getAllClasses(event, currentSemesterId),
     ]);
     const majors = [
         { label: "All", value: "", variant: "primary" },
         ...majorsRes?.data?.data?.data.map((m: any) => ({
             label: m.majorName,
             value: String(m.majorId),
-            variant: "primary",
-        })),
-    ];
-
-    const campuses = [
-        { label: "All", value: "", variant: "primary" },
-        ...campusesRes?.data?.data?.data.map((c: any) => ({
-            label: c.campusName,
-            value: String(c.campusId),
             variant: "primary",
         })),
     ];
@@ -50,23 +58,14 @@ export const load: PageServerLoad = async (event) => {
         })),
     ];
 
-    const semesters = [
-        { label: "All", value: "", variant: "primary" },
-        ...semestersRes?.data?.data?.data.map((s: any) => ({
-            label: s.semesterName,
-            value: String(s.semesterId),
-            variant: "primary",
-        })),
-    ];
-
     return {
         students: studentsRes?.data?.data?.data ?? [],
         majors: majors ?? [],
-        campuses: campuses ?? [],
         classes: classes ?? [],
         semesters: semesters ?? [],
         pageSize: studentsRes?.data?.data?.pagination?.limit ?? 0,
-        totalCount: studentsRes?.data?.data?.pagination?.totalItems ?? 0
+        totalCount: studentsRes?.data?.data?.pagination?.totalItems ?? 0,
+        currentSemesterId: currentSemesterId ?? "",
     };
 };
 

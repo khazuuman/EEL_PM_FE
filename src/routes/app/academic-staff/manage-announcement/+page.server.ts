@@ -4,9 +4,11 @@ import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {
-    const { depends } = event;
+    const { depends, url } = event;
     depends(APP_STAFF_MANAGE_ANNOUNCEMENT);
-
+    //url default
+    if (!url.searchParams.has("page")) url.searchParams.set("page", "1");
+    if (!url.searchParams.has("limit")) url.searchParams.set("limit", "10");
     const announcementRes = await getAnnouncements(event);
     console.log('announcementRes: ', announcementRes?.data?.data?.data);
 

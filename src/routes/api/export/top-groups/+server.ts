@@ -6,21 +6,16 @@ export const GET: RequestHandler = async (event) => {
     const { url } = event;
     const sp = url.searchParams;
 
-    const searchTerm = sp.get("searchTerm");
-    const classId = sp.get("classId");
-    const semesterId = sp.get("semesterId");
+    const body: Record<string, number> = {};
+    if (sp.get("minScore")) body.minScore = Number(sp.get("minScore"));
+    if (sp.get("topPercentage")) body.topPercentage = Number(sp.get("topPercentage"));
+    if (sp.get("semesterId")) body.semesterId = Number(sp.get("semesterId"));
 
-    const params = new URLSearchParams();
-    if (searchTerm) params.set("searchTerm", searchTerm);
-    if (classId) params.set("classId", classId);
-    if (semesterId) params.set("semesterId", semesterId);
-
-    const queryString = params.toString() ? `?${params.toString()}` : "";
-    console.log("queryString: ", queryString);
     const response = await fetcher({
         event,
-        url: `/export/groups${queryString}`,
-        method: "GET",
+        url: `/export/top30-groups`,
+        method: "POST",
+        data: body,
     });
 
     if (!response.ok) {

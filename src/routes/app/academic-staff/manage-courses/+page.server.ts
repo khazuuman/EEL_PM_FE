@@ -6,8 +6,8 @@ export const load: PageServerLoad = async (event) => {
     const { depends, url } = event;
     depends(APP_STAFF_MANAGE_COURSE);
     //url default
-    // if (!url.searchParams.has("page")) url.searchParams.set("page", "1");
-    // if (!url.searchParams.has("limit")) url.searchParams.set("limit", "10");
+    if (!url.searchParams.has("page")) url.searchParams.set("page", "1");
+    if (!url.searchParams.has("limit")) url.searchParams.set("limit", "10");
 
     const coursesRes = await getCourses(event);
     console.log('coursesRes: ', coursesRes?.data?.data?.data);

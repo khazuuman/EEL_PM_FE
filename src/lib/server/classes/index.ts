@@ -32,8 +32,8 @@ export const getClassesByCampus = async (event: RequestEvent, campusId: any) => 
     };
 };
 
-export const getAllClasses = async (event: RequestEvent) => {
-    const response = await fetcher({ event, url: `/classes?limit=100` });
+export const getAllClasses = async (event: RequestEvent, semesterId: any) => {
+    const response = await fetcher({ event, url: `/classes?semesterId=${semesterId}&limit=100` });
     const data = await safeJsonParse(response);
     return {
         status: response.status,
@@ -69,6 +69,33 @@ export const publicGroup = async (event: RequestEvent, classId: any) => {
         event,
         url: `/groups/public-all/${classId}`,
         method: "POST"
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data,
+    };
+};
+
+export const updateMeetLink = async (event: RequestEvent, classId: any, body: any) => {
+    const response = await fetcher({
+        event,
+        url: `/classes/${classId}/meet-link`,
+        method: "PUT",
+        data: body
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data,
+    };
+};
+
+export const deleteMeetLink = async (event: RequestEvent, classId: any) => {
+    const response = await fetcher({
+        event,
+        url: `/classes/${classId}/meet-link`,
+        method: "DELETE",
     });
     const data = await safeJsonParse(response);
     return {

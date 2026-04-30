@@ -6,12 +6,32 @@ import { getAllSemesters } from "$lib/server/semesters";
 import { getAllCourses } from "$lib/server/course";
 
 export const load: PageServerLoad = async (event) => {
-    const { depends } = event;
+    const { depends, url } = event;
     depends(APP_STAFF_MANAGE_TOPIC);
+    //url default
+    if (!url.searchParams.has("page")) url.searchParams.set("page", "1");
+    if (!url.searchParams.has("limit")) url.searchParams.set("limit", "10");
+    const semesterRes = await getAllSemesters(event);
+    let currentSemesterId;
+    const semesters = (semesterRes?.data?.data?.data ?? [])
+        .map((c: any) => ({
+            label: c.semesterName,
+            value: String(c.semesterId),
+            variant: "primary",
+            isCurrent: c.isCurrent,
+        }))
+        .sort((a: any, b: any) => {
+            if (a.isCurrent) {
+                currentSemesterId = a.value;
+                return -1;
+            }
+            if (b.isCurrent) return 1;
+            return 0;
+        });
 
-    const [topicsRes, classesRes, semestersRes, coursesRes] = await Promise.all([
+    const [topicsRes, classesRes, coursesRes] = await Promise.all([
         getTopics(event),
-        getAllClasses(event),
+        getAllClasses(event, currentSemesterId),
         getAllSemesters(event),
         getAllCourses(event)
     ]);
@@ -33,14 +53,7 @@ export const load: PageServerLoad = async (event) => {
             variant: "primary",
         })),
     ];
-    const semesters = [
-        { label: "All", value: "", variant: "primary" },
-        ...semestersRes?.data?.data?.data.map((s: any) => ({
-            label: s.semesterName,
-            value: String(s.semesterId),
-            variant: "primary",
-        })),
-    ];
+
     const courses = [
         { label: "All", value: "", variant: "primary" },
         ...coursesRes?.data?.data?.data.map((s: any) => ({
@@ -55,6 +68,7 @@ export const load: PageServerLoad = async (event) => {
         totalCount: topicsRes?.data?.data?.pagination?.totalItems ?? 0,
         classes,
         semesters,
-        courses
+        courses,
+        currentSemesterId: currentSemesterId ?? "",
     };
 };

@@ -3,6 +3,7 @@
     import Button from "$lib/components/ui/button/button.svelte";
     import DataTable from "$lib/components/ui/data-table/data-table.svelte";
     import { ArrowLeftIcon, BookAIcon, UsersIcon } from "lucide-svelte";
+    import { onMount } from "svelte";
 
     const { data } = $props();
     let topics = $derived(data?.topics || []);
@@ -40,17 +41,27 @@
         { title: "Semesters", key: "semesterId", data: semesters },
         { title: "Courses", key: "courseId", data: courses },
     ]);
-    let defaultHeaders = $state([
-        "title",
-        "status",
-        "groupName",
-        "classCode",
-    ]);
+    let defaultHeaders = $state(["title", "status", "groupName", "classCode"]);
     let headerValues = $state({
         title: "Title",
         status: "Status",
         groupName: "Group",
         classCode: "Class",
+    });
+
+    onMount(() => {
+        const currentUrl = new URL(window.location.href);
+        if (
+            !currentUrl.searchParams.has("semesterId") &&
+            data?.currentSemesterId
+        ) {
+            currentUrl.searchParams.set("semesterId", data.currentSemesterId);
+            goto(currentUrl.toString(), {
+                replaceState: true,
+                noScroll: true,
+                keepFocus: true,
+            });
+        }
     });
 </script>
 
@@ -58,6 +69,7 @@
     <div class="flex items-center">
         <Button
             variant="ghost"
+            
             onclick={() => goto(`/app/academic-staff`)}
             class="flex items-center gap-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-50 rounded-lg px-3 py-2 text-sm font-medium transition-all cursor-pointer -ml-3"
         >

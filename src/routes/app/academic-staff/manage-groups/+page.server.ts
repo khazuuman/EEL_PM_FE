@@ -3,18 +3,33 @@ import { getAllClasses } from "$lib/server/classes";
 import type { PageServerLoad } from "./$types";
 import { getGroups } from "$lib/server/groups";
 import { getAllSemesters } from "$lib/server/semesters";
-import { getAllCampuses } from "$lib/server/campuses";
 
 export const load: PageServerLoad = async (event) => {
     const { depends, url } = event;
     depends(APP_STAFF_MANAGE_GROUP);
     if (!url.searchParams.has("page")) url.searchParams.set("page", "1");
     if (!url.searchParams.has("limit")) url.searchParams.set("limit", "10");
-    const [groupsRes, classesRes, semesterRes, campusesRes] = await Promise.all([
+    const semesterRes = await getAllSemesters(event);
+    let currentSemesterId;
+    const semesters = (semesterRes?.data?.data?.data ?? [])
+        .map((c: any) => ({
+            label: c.semesterName,
+            value: String(c.semesterId),
+            variant: "primary",
+            isCurrent: c.isCurrent,
+        }))
+        .sort((a: any, b: any) => {
+            if (a.isCurrent) {
+                currentSemesterId = a.value;
+                return -1;
+            }
+            if (b.isCurrent) return 1;
+            return 0;
+        });
+
+    const [groupsRes, classesRes] = await Promise.all([
         getGroups(event),
-        getAllClasses(event),
-        getAllSemesters(event),
-        getAllCampuses(event)
+        getAllClasses(event, currentSemesterId),
     ]);
 
     const classes = [
@@ -26,32 +41,17 @@ export const load: PageServerLoad = async (event) => {
         })),
     ];
 
-    const semesters = [
-        { label: "All", value: "", variant: "primary" },
-        ...semesterRes?.data?.data?.data.map((c: any) => ({
-            label: c.semesterName,
-            value: String(c.semesterId),
-            variant: "primary",
-        })),
-    ];
-
-    const campuses = [
-        { label: "All", value: "", variant: "primary" },
-        ...campusesRes?.data?.data?.data.map((c: any) => ({
-            label: c.campusName,
-            value: String(c.campusId),
-            variant: "primary",
-        })),
-    ];
-
-    console.log('groupsRes: ', groupsRes?.data?.data?.data);
-
     return {
         groups: groupsRes?.data?.data?.data ?? [],
         classes: classes ?? [],
         semesters: semesters ?? [],
-        campuses: campuses ?? [],
         pageSize: groupsRes?.data?.data?.pagination?.limit ?? 0,
-        totalCount: groupsRes?.data?.data?.pagination?.totalItems ?? 0
+        totalCount: groupsRes?.data?.data?.pagination?.totalItems ?? 0,
+        currentSemesterId: currentSemesterId ?? "",
+        // filters: {
+        //     searchTerm: url.searchParams.get("searchTerm"),
+        //     classId: url.searchParams.get("classId"),
+        //     semesterId: url.searchParams.get("semesterId"),
+        // }
     };
 };

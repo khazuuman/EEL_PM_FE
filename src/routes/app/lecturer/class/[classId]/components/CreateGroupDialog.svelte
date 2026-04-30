@@ -10,7 +10,12 @@
     import { Check, ChevronsUpDown } from "@lucide/svelte";
     import { cn } from "$lib/utils";
 
-    type Student = { id: number; name: string; studentCode: string };
+    type Student = {
+        id: number;
+        name: string;
+        studentCode: string;
+        majorName: string;
+    };
 
     let {
         open = $bindable(false),
@@ -72,7 +77,7 @@
                 resetForm();
                 await invalidateAll(); // reload bảng groups thay vì goto
             }
-            await update({ reset: false });
+            // await update({ reset: false });
         };
     };
 </script>
@@ -160,7 +165,7 @@
                                 <Command.Group class="max-h-64 overflow-y-auto">
                                     {#each students as student}
                                         <Command.Item
-                                            value={`${student.studentCode} ${student.name}`}
+                                            value={`${student.studentCode} ${student.name} ${student.majorName}`}
                                             onSelect={() =>
                                                 toggleStudent(student.id)}
                                             class="cursor-pointer"
@@ -175,13 +180,28 @@
                                                         : "opacity-0",
                                                 )}
                                             />
-                                            <span
-                                                class="font-mono text-xs text-stone-500 mr-2"
-                                                >{student.studentCode}</span
+                                            <div
+                                                class="flex justify-between w-full"
                                             >
-                                            <span class="text-sm text-stone-700"
-                                                >{student.name}</span
-                                            >
+                                                <div>
+                                                    <span
+                                                        class="font-mono text-xs text-stone-500 mr-2"
+                                                    >
+                                                        {student.studentCode}
+                                                    </span>
+                                                    <span
+                                                        class="text-sm text-stone-700"
+                                                    >
+                                                        {student.name}
+                                                    </span>
+                                                </div>
+
+                                                <span
+                                                    class="ml-auto text-xs text-stone-400"
+                                                >
+                                                    {student.majorName}
+                                                </span>
+                                            </div>
                                         </Command.Item>
                                     {/each}
                                 </Command.Group>
@@ -199,6 +219,9 @@
                                         >{student.studentCode}</span
                                     >
                                     <span>{student.name}</span>
+                                    <span class="text-amber-600"
+                                        >· {student.majorName}</span
+                                    >
                                     <button
                                         type="button"
                                         class="ml-0.5 text-amber-500 hover:text-amber-700"

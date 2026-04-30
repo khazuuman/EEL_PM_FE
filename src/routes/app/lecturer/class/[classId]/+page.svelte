@@ -2,19 +2,20 @@
     import {
         ArrowLeftIcon,
         UsersIcon,
-        UserRoundSearchIcon,
         FolderClockIcon,
         ExternalLinkIcon,
         ChevronLeftIcon,
         ChevronRightIcon,
-        EyeIcon,
-        PencilIcon,
         Trash2Icon,
         PlusIcon,
         GitPullRequestIcon,
         RefreshCwIcon,
         CalendarClockIcon,
         CalendarDaysIcon,
+        PencilIcon,
+        XIcon,
+        CheckIcon,
+        LinkIcon,
     } from "lucide-svelte";
     import type { PageData } from "../$types";
     import type { NavigationGroup } from "../../../+page.svelte";
@@ -62,46 +63,11 @@
             },
         ],
     };
-    // const lecturerProjectManage: NavigationGroup = {
-    //     groupLabel: "Student Project",
-    //     items: [
-    //         {
-    //             name: "View Topic List",
-    //             url: `/app/lecturer/class/${classId}/topic-list`,
-    //         },
-    //         {
-    //             name: "Review Group Topic Registration",
-    //             url: `/app/lecturer/class/${classId}/topic-registration`,
-    //         },
-    //         {
-    //             name: "View project documents",
-    //             url: `/app/lecturer/class/${classId}/project-documents`,
-    //         },
-    //     ],
-    // };
-    // const lecturerAssignmentManage: NavigationGroup = {
-    //     groupLabel: "Assignment / Checkpoint Management",
-    //     items: [
-    //         {
-    //             name: "Checkpoints Management",
-    //             url: `/app/lecturer/class/${classId}/checkpoints-management`,
-    //         },
-    //         {
-    //             name: "Assignment Management",
-    //             url: `/app/lecturer/class/${classId}/assignments-management`,
-    //         },
-    //     ],
-    // };
-    const finalNavGroups = [
-        // lecturerAssignmentManage,
-        lecturerStudentManage,
-        // lecturerProjectManage,
-    ];
+    const finalNavGroups = [lecturerStudentManage];
 
     // --- Group table ---
     let groups = $derived(data?.groups || []);
     let totalCount = $derived(data?.totalCount || 0);
-    let deadlines = $derived(data?.deadlines || null);
 
     let currentPage = $state(Number(page.url.searchParams.get("page") ?? 1));
     let limit = $state(Number(page.url.searchParams.get("limit") ?? 10));
@@ -209,7 +175,7 @@
                 }
                 toast.success(
                     // result?.data?.message ??
-                        `Group ${groupName} deleted successfully!`,
+                    `Group ${groupName} deleted successfully!`,
                 );
                 await invalidateAll();
             },
@@ -236,10 +202,10 @@
 
     const groupDeadline = $derived(
         data?.deadlines?.groupFormationEndDate ?? null,
-    ); // Date string | null
+    );
     const topicDeadline = $derived(
         data?.deadlines?.topicRegistrationEndDate ?? null,
-    ); // Date string | null
+    );
 
     function formatDeadline(dateStr: string | null): string {
         if (!dateStr) return "Not set";
@@ -256,6 +222,92 @@
     function isExpired(dateStr: string | null): boolean {
         if (!dateStr) return false;
         return new Date(dateStr) < new Date();
+    }
+
+    // --- Meet Link ---
+    let meetLink = $derived(data?.classDetails?.googleMeetLink ?? null);
+    let isEditingMeetLink = $state(false);
+    let meetLinkInput = $state("");
+    let isSubmittingMeetLink = $state(false);
+
+    function startEditMeetLink() {
+        meetLinkInput = meetLink ?? "";
+        isEditingMeetLink = true;
+    }
+
+    function cancelEditMeetLink() {
+        isEditingMeetLink = false;
+        meetLinkInput = "";
+    }
+
+    async function submitUpdateMeetLink() {
+        const trimmed = meetLinkInput.trim();
+        if (!trimmed) return;
+
+        // Validate URL format
+        try {
+            const url = new URL(trimmed);
+            if (url.protocol !== "http:" && url.protocol !== "https:") {
+                toast.error("Meet link must start with http:// or https://");
+                return;
+            }
+            if (!url.hostname.includes("meet.google.com")) {
+                toast.error(
+                    "Please enter a valid Google Meet link (meet.google.com)",
+                );
+                return;
+            }
+        } catch {
+            toast.error("Invalid URL format. Please enter a valid link.");
+            return;
+        }
+
+        isSubmittingMeetLink = true;
+        const formData = new FormData();
+        formData.append("classId", String(classId));
+        formData.append("googleMeetLink", trimmed);
+        const res = await fetch("?/updateMeetLink", {
+            method: "POST",
+            body: formData,
+        });
+        const result = deserialize(await res.text());
+        if (result?.type === "failure") {
+            toast.error(
+                String((result?.data as any)?.message) ??
+                    "Failed to update meet link.",
+            );
+        } else {
+            toast.success("Meet link updated successfully!");
+            isEditingMeetLink = false;
+            await invalidateAll();
+        }
+        isSubmittingMeetLink = false;
+    }
+
+    function handleDeleteMeetLink() {
+        setActions({
+            active: true,
+            description:
+                "Are you sure you want to remove the Google Meet link for this class?",
+            cb: async () => {
+                const formData = new FormData();
+                formData.append("classId", String(classId));
+                const res = await fetch("?/deleteMeetLink", {
+                    method: "POST",
+                    body: formData,
+                });
+                const result = deserialize(await res.text());
+                if (result?.type === "failure") {
+                    toast.error(
+                        String((result?.data as any)?.message) ??
+                            "Failed to delete meet link.",
+                    );
+                    return;
+                }
+                toast.success("Meet link removed.");
+                await invalidateAll();
+            },
+        });
     }
 </script>
 
@@ -350,11 +402,11 @@
 
     <!-- Scrollable body -->
     <div class="flex-1 overflow-y-auto px-8 py-6 flex flex-col gap-10">
-        <!-- ─── Deadline Cards ──────────────────────────────────────────── -->
-        <div class="flex flex-col sm:flex-row gap-3">
-            <!-- Group Formation Deadline -->
+        <!-- ─── Deadline Cards + Meet Link ──────────────────────────────── -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- [Row 1, Col 1] Group Formation Deadline -->
             <div
-                class="flex-1 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-4 flex items-center justify-between gap-4"
+                class="rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-4 flex items-center justify-between gap-4"
             >
                 <div class="flex items-center gap-3 min-w-0">
                     <div
@@ -397,9 +449,9 @@
                 </Button>
             </div>
 
-            <!-- Topic Registration Deadline -->
+            <!-- [Row 1, Col 2] Topic Registration Deadline -->
             <div
-                class="flex-1 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-4 flex items-center justify-between gap-4"
+                class="rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-4 flex items-center justify-between gap-4"
             >
                 <div class="flex items-center gap-3 min-w-0">
                     <div
@@ -441,6 +493,101 @@
                     {topicDeadline ? "Update" : "Set Deadline"}
                 </Button>
             </div>
+
+            <!-- [Row 2, Col 1] Meet Link -->
+            <div
+                class="rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-4 flex items-center justify-between gap-4"
+            >
+                <div class="flex items-center gap-3 min-w-0 flex-1">
+                    <div
+                        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-green-100 border border-green-200"
+                    >
+                        <LinkIcon class="w-4 h-4 text-green-600" />
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p
+                            class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
+                        >
+                            Google Meet Link
+                        </p>
+
+                        {#if isEditingMeetLink}
+                            <div class="flex items-center gap-2 mt-1">
+                                <input
+                                    type="url"
+                                    bind:value={meetLinkInput}
+                                    placeholder="https://meet.google.com/xxx-xxxx-xxx"
+                                    class="flex-1 h-8 text-sm px-2.5 rounded-md border border-stone-300 focus:border-green-400 focus:ring-1 focus:ring-green-300 outline-none bg-white min-w-0"
+                                />
+                                <Button
+                                    size="icon"
+                                    class="h-8 w-8 bg-green-600 hover:bg-green-700 text-white shrink-0"
+                                    disabled={isSubmittingMeetLink ||
+                                        !meetLinkInput.trim()}
+                                    onclick={submitUpdateMeetLink}
+                                >
+                                    {#if isSubmittingMeetLink}
+                                        <span
+                                            class="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white border-t-transparent"
+                                        ></span>
+                                    {:else}
+                                        <CheckIcon class="w-3.5 h-3.5" />
+                                    {/if}
+                                </Button>
+                                <Button
+                                    size="icon"
+                                    variant="outline"
+                                    class="h-8 w-8 border-stone-200 text-stone-500 shrink-0"
+                                    onclick={cancelEditMeetLink}
+                                >
+                                    <XIcon class="w-3.5 h-3.5" />
+                                </Button>
+                            </div>
+                        {:else if meetLink}
+                            <a
+                                href={meetLink}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="text-sm font-semibold text-green-600 hover:underline truncate block max-w-xs"
+                            >
+                                {meetLink}
+                            </a>
+                        {:else}
+                            <p
+                                class="text-sm font-semibold text-stone-400 italic"
+                            >
+                                Not set
+                            </p>
+                        {/if}
+                    </div>
+                </div>
+
+                {#if !isEditingMeetLink}
+                    <div class="flex items-center gap-2 shrink-0">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            class="h-8 px-3 text-xs border-green-200 text-green-700 bg-green-50 hover:bg-green-100 cursor-pointer"
+                            onclick={startEditMeetLink}
+                        >
+                            <PencilIcon class="w-3.5 h-3.5 mr-1" />
+                            {meetLink ? "Update" : "Set Link"}
+                        </Button>
+                        {#if meetLink}
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                class="h-8 px-3 text-xs border-red-200 text-red-600 bg-red-50 hover:bg-red-100 cursor-pointer"
+                                onclick={handleDeleteMeetLink}
+                            >
+                                <Trash2Icon class="w-3.5 h-3.5" />
+                            </Button>
+                        {/if}
+                    </div>
+                {/if}
+            </div>
+
+            <!-- [Row 2, Col 2] — trống, có thể thêm card khác sau -->
         </div>
         <!-- Group Table -->
         <div>
