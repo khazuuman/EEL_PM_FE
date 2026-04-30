@@ -344,12 +344,12 @@
                     name="message"
                     bind:value={joinMessage}
                     rows={5}
-                    placeholder="Giới thiệu bản thân và lý do bạn muốn tham gia nhóm này..."
+                    placeholder="Introduce yourself and explain why you want to join this group..."
                     class="resize-none text-sm bg-stone-50 border-stone-200 focus:bg-white focus:border-amber-400 transition-colors rounded-lg"
                     required
                 />
                 <p class="text-xs text-stone-400">
-                    Leader sẽ xem xét yêu cầu của bạn trước khi chấp nhận.
+                    The leader will review your request before accepting it.
                 </p>
             </div>
 

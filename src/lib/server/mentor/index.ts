@@ -118,3 +118,29 @@ export const deleteMentor = async (event: RequestEvent, id: any) => {
         data: data
     };
 };
+
+export const configMaxGroupsPerMentor = async (event: RequestEvent, body: any) => {
+    const response = await fetcher({
+        event,
+        url: `/system-settings/mentor`,
+        method: 'PUT',
+        data: body
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};
+
+export const getConfigMaxGroupsPerMentor = async (event: RequestEvent) => {
+    const response = await fetcher({
+        event,
+        url: `/system-settings/mentor`,
+    });
+    const data = await safeJsonParse(response);
+    return {
+        status: response.status,
+        data: data
+    };
+};

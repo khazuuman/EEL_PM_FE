@@ -8,7 +8,6 @@
     import { Button } from "$lib/components/ui/button";
     import {
         ClockIcon,
-        MailIcon,
         InboxIcon,
         ArrowLeftIcon,
         IdCardIcon,
@@ -200,7 +199,6 @@
                         <!-- Table Header -->
                         <div class="grid grid-cols-[2fr_1.5fr_1fr_1fr_auto] gap-4 border-b border-gray-100 bg-gray-50 px-5 py-3 text-xs font-bold uppercase tracking-widest text-gray-400">
                             <span>Student</span>
-                            <span>Message</span>
                             <span>Sent At</span>
                             <span>Status</span>
                             <span class="w-32 text-right">Action</span>
@@ -226,17 +224,6 @@
                                             {inv.student.studentCode}
                                         </p>
                                     </div>
-                                </div>
-
-                                <!-- Message -->
-                                <div class="min-w-0">
-                                    {#if inv.message}
-                                        <p class="truncate text-sm italic text-gray-500">
-                                            "{inv.message}"
-                                        </p>
-                                    {:else}
-                                        <span class="text-xs italic text-gray-300">No message</span>
-                                    {/if}
                                 </div>
 
                                 <!-- Sent At -->
@@ -304,10 +291,8 @@
                             <!-- Table Header -->
                             <div class="grid grid-cols-[2fr_1.5fr_1fr_1fr_1.5fr] gap-4 border-b border-gray-100 bg-gray-50 px-5 py-3 text-xs font-bold uppercase tracking-widest text-gray-400">
                                 <span>Student</span>
-                                <span>Your Message</span>
                                 <span>Sent At</span>
                                 <span>Status</span>
-                                <span>Response</span>
                             </div>
 
                             {#each resolvedList as inv (inv.requestId)}
@@ -331,17 +316,6 @@
                                         </div>
                                     </div>
 
-                                    <!-- Your Message -->
-                                    <div class="min-w-0">
-                                        {#if inv.message}
-                                            <p class="truncate text-sm italic text-gray-400">
-                                                "{inv.message}"
-                                            </p>
-                                        {:else}
-                                            <span class="text-xs italic text-gray-300">No message</span>
-                                        {/if}
-                                    </div>
-
                                     <!-- Sent At -->
                                     <div class="flex items-center gap-1.5 text-xs text-gray-400">
                                         <ClockIcon class="h-3.5 w-3.5 shrink-0" />
@@ -355,20 +329,6 @@
                                         >
                                             {statusConfig[inv.status]?.label ?? inv.status}
                                         </Badge>
-                                    </div>
-
-                                    <!-- Response Message -->
-                                    <div class="min-w-0">
-                                        {#if inv.responseMessage}
-                                            <div class="flex items-start gap-1.5">
-                                                <MessageSquareIcon class="h-3.5 w-3.5 shrink-0 mt-0.5 text-gray-400" />
-                                                <p class="truncate text-xs text-gray-500 italic">
-                                                    {inv.responseMessage}
-                                                </p>
-                                            </div>
-                                        {:else}
-                                            <span class="text-xs italic text-gray-300">No response</span>
-                                        {/if}
                                     </div>
                                 </div>
                             {/each}

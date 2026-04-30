@@ -61,12 +61,19 @@
         };
     };
 
+    function normalize(str: string): string {
+        return str
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase();
+    }
+
     const filtered = $derived(
         students.filter(
             (s) =>
-                s.fullName.toLowerCase().includes(search.toLowerCase()) ||
-                s.studentCode.toLowerCase().includes(search.toLowerCase()) ||
-                s.majorName.toLowerCase().includes(search.toLowerCase()),
+                normalize(s.fullName).includes(normalize(search)) ||
+                normalize(s.studentCode).includes(normalize(search)) ||
+                normalize(s.majorName).includes(normalize(search)),
         ),
     );
 

@@ -117,7 +117,6 @@
                     <div class="grid grid-cols-[2fr_1.5fr_1.2fr_1fr_auto] gap-3 border-b border-gray-100 bg-gray-50 px-5 py-3 text-xs font-bold uppercase tracking-widest text-gray-500">
                         <span>Invited By</span>
                         <span>Group</span>
-                        <span>Message</span>
                         <span>Received</span>
                         <span class="w-44 text-right">Actions</span>
                     </div>
@@ -157,15 +156,6 @@
                                         <span class="truncate">{inv.group.className}</span>
                                     {/if}
                                 </div>
-                            </div>
-
-                            <!-- Message -->
-                            <div class="min-w-0">
-                                {#if inv.message}
-                                    <p class="truncate text-sm italic text-gray-500">"{inv.message}"</p>
-                                {:else}
-                                    <span class="text-sm italic text-gray-300">No message</span>
-                                {/if}
                             </div>
 
                             <!-- Received At -->
