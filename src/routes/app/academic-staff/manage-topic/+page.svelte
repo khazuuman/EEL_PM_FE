@@ -2,7 +2,7 @@
     import { goto } from "$app/navigation";
     import Button from "$lib/components/ui/button/button.svelte";
     import DataTable from "$lib/components/ui/data-table/data-table.svelte";
-    import { ArrowLeftIcon, BookAIcon, UsersIcon } from "lucide-svelte";
+    import { ArrowLeftIcon, BookAIcon } from "lucide-svelte";
     import { onMount } from "svelte";
 
     const { data } = $props();

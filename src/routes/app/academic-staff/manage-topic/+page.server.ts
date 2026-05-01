@@ -29,7 +29,7 @@ export const load: PageServerLoad = async (event) => {
             return 0;
         });
 
-    const [topicsRes, classesRes, coursesRes] = await Promise.all([
+    const [topicsRes, classesRes, semestersRes, coursesRes] = await Promise.all([
         getTopics(event),
         getAllClasses(event, currentSemesterId),
         getAllSemesters(event),
@@ -57,11 +57,12 @@ export const load: PageServerLoad = async (event) => {
     const courses = [
         { label: "All", value: "", variant: "primary" },
         ...coursesRes?.data?.data?.data.map((s: any) => ({
-            label: s.courseCode,
+            label: s.courseName,
             value: String(s.courseId),
             variant: "primary",
         })),
     ];
+
     return {
         topics,
         pageSize: topicsRes?.data?.data?.pagination?.limit ?? 0,

@@ -27,9 +27,11 @@ export const load: PageServerLoad = async (event) => {
             return 0;
         });
 
+    const selectedSemesterId = url.searchParams.get("semesterId") ?? currentSemesterId;
+
     const [groupsRes, classesRes] = await Promise.all([
         getGroups(event),
-        getAllClasses(event, currentSemesterId),
+        getAllClasses(event, selectedSemesterId),
     ]);
 
     const classes = [
