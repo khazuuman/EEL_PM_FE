@@ -22,7 +22,7 @@ export const load: PageServerLoad = async (event) => {
         getDeadlines(event, user.student?.classId),
         getClassDetails(event, user?.student?.classId)
     ]);
-    // console.log("classDetailRes?.data?.data: ", classDetailRes);
+    console.log("classDetailRes?.data?.data: ", classDetailRes?.data?.data);
     //leader get join request
     let joinRequests;
     if (user.student?.group?.isLeader === true) {
@@ -51,7 +51,7 @@ export const load: PageServerLoad = async (event) => {
         announcements: announcementRes.data?.data?.data || [],
         deadlines: deadlineRes?.data?.data,
         currentUser: user,
-        classDetail: classDetailRes?.data?.data?.data,
+        classDetail: classDetailRes?.data?.data,
     };
 };
 

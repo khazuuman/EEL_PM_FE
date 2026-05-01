@@ -347,83 +347,81 @@
     <!-- Scrollable body -->
     <div class="flex-1 px-8 py-6 flex flex-col gap-6">
         <!-- Deadlines -->
-        {#if data.deadlines}
-            <div class="flex flex-wrap gap-3">
-                {#if data.deadlines.groupFormationEndDate}
+        <div class="flex flex-wrap gap-3">
+            {#if data.deadlines?.groupFormationEndDate}
+                <div
+                    class="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-3"
+                >
                     <div
-                        class="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-3"
+                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 border border-blue-200"
                     >
-                        <div
-                            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 border border-blue-200"
-                        >
-                            <UsersIcon class="w-4 h-4 text-blue-600" />
-                        </div>
-                        <div>
-                            <p
-                                class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
-                            >
-                                Group Formation Deadline
-                            </p>
-                            <p class="text-sm font-semibold text-stone-800">
-                                {formatDeadline(
-                                    data.deadlines.groupFormationEndDate,
-                                )}
-                            </p>
-                        </div>
+                        <UsersIcon class="w-4 h-4 text-blue-600" />
                     </div>
-                {/if}
+                    <div>
+                        <p
+                            class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
+                        >
+                            Group Formation Deadline
+                        </p>
+                        <p class="text-sm font-semibold text-stone-800">
+                            {formatDeadline(
+                                data.deadlines.groupFormationEndDate,
+                            )}
+                        </p>
+                    </div>
+                </div>
+            {/if}
 
-                {#if data.deadlines.topicRegistrationEndDate}
+            {#if data.deadlines?.topicRegistrationEndDate}
+                <div
+                    class="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-3"
+                >
                     <div
-                        class="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-3"
+                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 border border-amber-200"
                     >
-                        <div
-                            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 border border-amber-200"
-                        >
-                            <BookOpenIcon class="w-4 h-4 text-amber-600" />
-                        </div>
-                        <div>
-                            <p
-                                class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
-                            >
-                                Topic Registration Deadline
-                            </p>
-                            <p class="text-sm font-semibold text-stone-800">
-                                {formatDeadline(
-                                    data.deadlines.topicRegistrationEndDate,
-                                )}
-                            </p>
-                        </div>
+                        <BookOpenIcon class="w-4 h-4 text-amber-600" />
                     </div>
-                {/if}
-                {#if data.classDetail?.googleMeetLink}
+                    <div>
+                        <p
+                            class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
+                        >
+                            Topic Registration Deadline
+                        </p>
+                        <p class="text-sm font-semibold text-stone-800">
+                            {formatDeadline(
+                                data.deadlines.topicRegistrationEndDate,
+                            )}
+                        </p>
+                    </div>
+                </div>
+            {/if}
+            {#if data.classDetail?.googleMeetLink}
+                <div
+                    class="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-3"
+                >
                     <div
-                        class="flex items-center gap-3 rounded-xl border border-stone-200 bg-stone-50/60 px-5 py-3"
+                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 border border-green-200"
                     >
-                        <div
-                            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-green-100 border border-green-200"
-                        >
-                            <LinkIcon class="w-4 h-4 text-green-600" />
-                        </div>
-                        <div class="min-w-0">
-                            <p
-                                class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
-                            >
-                                Google Meet Link
-                            </p>
-                            <a
-                                href={data.classDetail.googleMeetLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="text-sm font-semibold text-green-600 hover:text-green-700 hover:underline truncate block"
-                            >
-                                {data.classDetail.googleMeetLink}
-                            </a>
-                        </div>
+                        <LinkIcon class="w-4 h-4 text-green-600" />
                     </div>
-                {/if}
-            </div>
-        {/if}
+                    <div class="min-w-0">
+                        <p
+                            class="text-[10px] font-bold uppercase tracking-widest text-stone-400 leading-none mb-0.5"
+                        >
+                            Google Meet Link
+                        </p>
+                        <a
+                            href={data.classDetail.googleMeetLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-sm font-semibold text-green-600 hover:text-green-700 hover:underline truncate block"
+                        >
+                            {data.classDetail.googleMeetLink}
+                        </a>
+                    </div>
+                </div>
+            {/if}
+        </div>
         <!-- Stats Row -->
         {#if data.announcements?.length > 0}
             <div class="rounded-lg border border-red-200 bg-red-50">
