@@ -1,5 +1,4 @@
 import { APP_STAFF_MANAGE_STUDENT } from "$lib/constants/depend";
-import { getAllCampuses } from "$lib/server/campuses";
 import { getAllClasses } from "$lib/server/classes";
 import { getAllMajors } from "$lib/server/majors";
 import { getAllSemesters } from "$lib/server/semesters";

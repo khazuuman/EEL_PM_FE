@@ -332,7 +332,7 @@
                         {/if}
                     </div>
 
-                    <div class="flex items-center gap-2 shrink-0">
+                    <!-- <div class="flex items-center gap-2 shrink-0">
                         <Button
                             variant="outline"
                             size="sm"
@@ -355,7 +355,7 @@
                             <EyeIcon class="h-4 w-4 mr-1.5" />
                             View Detail
                         </Button>
-                    </div>
+                    </div> -->
                 </div>
             {:else}
                 <div

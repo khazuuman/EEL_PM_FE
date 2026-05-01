@@ -33,7 +33,11 @@ export const getClassesByCampus = async (event: RequestEvent, campusId: any) => 
 };
 
 export const getAllClasses = async (event: RequestEvent, semesterId: any) => {
-    const response = await fetcher({ event, url: `/classes?semesterId=${semesterId}&limit=100` });
+    const url = (semesterId != null || semesterId != undefined) 
+        ? `/classes?semesterId=${semesterId}&limit=100`
+        : `/classes?limit=100`;
+
+    const response = await fetcher({ event, url });
     const data = await safeJsonParse(response);
     return {
         status: response.status,
