@@ -1,8 +1,7 @@
 <script lang="ts">
     import DataTable from "$lib/components/ui/data-table/data-table.svelte";
-    import { ArrowLeftIcon, RefreshCwIcon, UsersIcon } from "lucide-svelte";
+    import { ArrowLeftIcon, UsersIcon } from "lucide-svelte";
     import { Button } from "$lib/components/ui/button";
-    import SyncDataDialog from "../components/SyncDataDialog.svelte";
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
 
@@ -10,14 +9,14 @@
     let students = $derived(data?.students || []);
     let majors = $derived(data?.majors || []);
     let classes = $derived(data?.classes || []);
+    let semesters = $derived(data?.semesters || []);
     let totalCount = $derived(data?.totalCount || 0);
     const cacheKeyName = "staff-student-management";
-
-    // let syncOpen = $state(false);
 
     let filters = $derived([
         { title: "Majors", key: "majorId", data: majors },
         { title: "Classes", key: "classId", data: classes },
+        { title: "Semesters", key: "semesterId", data: semesters },
     ]);
     let defaultHeaders = $state([
         "studentCode",
@@ -25,7 +24,6 @@
         "email",
         "majorCode",
         "classCode",
-        // "campusName",
     ]);
     let headerValues = $state({
         studentCode: "Student Code",
@@ -33,7 +31,6 @@
         email: "Email",
         majorCode: "Major Code",
         classCode: "Class Code",
-        // campusName: "Campus Name",
     });
 
     onMount(() => {

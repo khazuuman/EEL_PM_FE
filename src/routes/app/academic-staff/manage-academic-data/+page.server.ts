@@ -34,11 +34,14 @@ export const load: PageServerLoad = async (event) => {
             return 0;
         });
 
+    const selectedSemesterId = url.searchParams.get("semesterId") ?? currentSemesterId;
+
     const [studentsRes, majorsRes, classesRes] = await Promise.all([
         getStudents(event),
         getAllMajors(event),
-        getAllClasses(event, currentSemesterId),
+        getAllClasses(event, selectedSemesterId),
     ]);
+
     const majors = [
         { label: "All", value: "", variant: "primary" },
         ...majorsRes?.data?.data?.data.map((m: any) => ({
