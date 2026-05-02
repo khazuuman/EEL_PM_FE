@@ -22,6 +22,8 @@ export const load: PageServerLoad = async (event) => {
         getAllCourses(event)
     ]);
 
+    console.log("dashboardDataRes?.data?.data: ", dashboardDataRes?.data?.data);
+
     return {
         dashboardData: dashboardDataRes?.data?.data,
         topTierGroups: topTierGroupRes?.data?.data?.data,

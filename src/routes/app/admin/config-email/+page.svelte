@@ -22,20 +22,12 @@
         Loader2,
         ArrowLeftIcon,
     } from "lucide-svelte";
-    import { goto } from "$app/navigation";
+    import { goto, invalidateAll } from "$app/navigation";
 
     let { data, form }: { data: PageData; form: ActionData } = $props();
 
     let showPassword = $state(false);
     let isSubmitting = $state(false);
-
-    $effect(() => {
-        if (form?.success) {
-            toast.success("Email configuration updated successfully!");
-        } else if (form?.message) {
-            toast.error(form.message);
-        }
-    });
 </script>
 
 <div class="space-y-6 p-10">
@@ -89,7 +81,9 @@
                             <Server class="h-4 w-4 text-primary" />
                         </div>
                         <div>
-                            <Card.Title class="text-base">SMTP Settings</Card.Title>
+                            <Card.Title class="text-base"
+                                >SMTP Settings</Card.Title
+                            >
                             <Card.Description class="text-xs">
                                 Outgoing mail server configuration
                             </Card.Description>
@@ -102,9 +96,21 @@
                         action="?/updateEmailSetting"
                         use:enhance={() => {
                             isSubmitting = true;
-                            return async ({ update }) => {
-                                await update();
+                            return async ({ result, update }) => {
+                                await update({ reset: false });
                                 isSubmitting = false;
+
+                                if (result.type === "success") {
+                                    toast.success(
+                                        "Email configuration updated successfully!",
+                                    );
+                                    await invalidateAll();
+                                } else if (
+                                    result.type === "failure" &&
+                                    result.data?.message
+                                ) {
+                                    toast.error(result.data.message as string);
+                                }
                             };
                         }}
                         class="space-y-5"
@@ -116,7 +122,9 @@
                                     for="smtpHost"
                                     class="text-sm font-medium flex items-center gap-1.5"
                                 >
-                                    <Server class="h-3.5 w-3.5 text-muted-foreground" />
+                                    <Server
+                                        class="h-3.5 w-3.5 text-muted-foreground"
+                                    />
                                     SMTP Host
                                 </Label>
                                 <Input
@@ -130,7 +138,10 @@
                                 />
                             </div>
                             <div class="space-y-1.5">
-                                <Label for="smtpPort" class="text-sm font-medium">
+                                <Label
+                                    for="smtpPort"
+                                    class="text-sm font-medium"
+                                >
                                     Port
                                 </Label>
                                 <Input
@@ -149,14 +160,19 @@
 
                         <!-- Sender Info -->
                         <div class="space-y-4">
-                            <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                            <p
+                                class="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5"
+                            >
                                 <User class="h-3 w-3" />
                                 Sender Information
                             </p>
 
                             <div class="grid gap-4 sm:grid-cols-2">
                                 <div class="space-y-1.5">
-                                    <Label for="senderName" class="text-sm font-medium">
+                                    <Label
+                                        for="senderName"
+                                        class="text-sm font-medium"
+                                    >
                                         Display Name
                                     </Label>
                                     <Input
@@ -164,7 +180,8 @@
                                         name="senderName"
                                         type="text"
                                         placeholder="EELPM-FPT System"
-                                        value={data.emailSetting?.senderName ?? ""}
+                                        value={data.emailSetting?.senderName ??
+                                            ""}
                                         required
                                     />
                                 </div>
@@ -173,7 +190,9 @@
                                         for="senderEmail"
                                         class="text-sm font-medium flex items-center gap-1.5"
                                     >
-                                        <Mail class="h-3.5 w-3.5 text-muted-foreground" />
+                                        <Mail
+                                            class="h-3.5 w-3.5 text-muted-foreground"
+                                        />
                                         Sender Email
                                     </Label>
                                     <Input
@@ -181,7 +200,8 @@
                                         name="senderEmail"
                                         type="email"
                                         placeholder="noreply@example.com"
-                                        value={data.emailSetting?.senderEmail ?? ""}
+                                        value={data.emailSetting?.senderEmail ??
+                                            ""}
                                         required
                                         class="font-mono text-sm"
                                     />
@@ -194,10 +214,15 @@
                                     for="senderPassword"
                                     class="text-sm font-medium flex items-center gap-1.5"
                                 >
-                                    <Lock class="h-3.5 w-3.5 text-muted-foreground" />
+                                    <Lock
+                                        class="h-3.5 w-3.5 text-muted-foreground"
+                                    />
                                     App Password
                                     {#if data.emailSetting?.hasSenderPassword}
-                                        <Badge variant="secondary" class="text-xs font-normal ml-1">
+                                        <Badge
+                                            variant="secondary"
+                                            class="text-xs font-normal ml-1"
+                                        >
                                             Set
                                         </Badge>
                                     {/if}
@@ -206,15 +231,19 @@
                                     <Input
                                         id="senderPassword"
                                         name="senderPassword"
-                                        type={showPassword ? "text" : "password"}
-                                        placeholder={data.emailSetting?.hasSenderPassword
+                                        type={showPassword
+                                            ? "text"
+                                            : "password"}
+                                        placeholder={data.emailSetting
+                                            ?.hasSenderPassword
                                             ? "••••••••••••••••"
                                             : "Enter App Password"}
                                         class="pr-10 font-mono text-sm"
                                     />
                                     <button
                                         type="button"
-                                        onclick={() => (showPassword = !showPassword)}
+                                        onclick={() =>
+                                            (showPassword = !showPassword)}
                                         class="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                                         aria-label="Toggle password visibility"
                                     >
@@ -227,7 +256,8 @@
                                 </div>
                                 {#if data.emailSetting?.hasSenderPassword}
                                     <p class="text-xs text-muted-foreground">
-                                        Leave blank to keep the current password unchanged
+                                        Leave blank to keep the current password
+                                        unchanged
                                     </p>
                                 {/if}
                             </div>
@@ -245,9 +275,15 @@
 
                         <!-- Submit Button -->
                         <div class="flex justify-end pt-1">
-                            <Button type="submit" disabled={isSubmitting} class="min-w-32">
+                            <Button
+                                type="submit"
+                                disabled={isSubmitting}
+                                class="min-w-32"
+                            >
                                 {#if isSubmitting}
-                                    <Loader2 class="h-4 w-4 mr-2 animate-spin" />
+                                    <Loader2
+                                        class="h-4 w-4 mr-2 animate-spin"
+                                    />
                                     Saving...
                                 {:else}
                                     <CheckCircle class="h-4 w-4 mr-2" />
@@ -272,36 +308,50 @@
                     </Card.Header>
                     <Card.Content class="space-y-2.5 text-sm">
                         <div class="flex justify-between items-center gap-2">
-                            <span class="text-muted-foreground shrink-0">Host</span>
+                            <span class="text-muted-foreground shrink-0"
+                                >Host</span
+                            >
                             <span class="font-mono text-xs truncate">
                                 {data.emailSetting.smtpHost}
                             </span>
                         </div>
                         <div class="flex justify-between items-center gap-2">
-                            <span class="text-muted-foreground shrink-0">Port</span>
+                            <span class="text-muted-foreground shrink-0"
+                                >Port</span
+                            >
                             <Badge variant="outline" class="font-mono text-xs">
                                 {data.emailSetting.smtpPort}
                             </Badge>
                         </div>
                         <div class="flex justify-between items-center gap-2">
-                            <span class="text-muted-foreground shrink-0">Email</span>
+                            <span class="text-muted-foreground shrink-0"
+                                >Email</span
+                            >
                             <span class="font-mono text-xs truncate">
                                 {data.emailSetting.senderEmail}
                             </span>
                         </div>
                         <div class="flex justify-between items-center gap-2">
-                            <span class="text-muted-foreground shrink-0">Name</span>
-                            <span class="text-xs">{data.emailSetting.senderName}</span>
+                            <span class="text-muted-foreground shrink-0"
+                                >Name</span
+                            >
+                            <span class="text-xs"
+                                >{data.emailSetting.senderName}</span
+                            >
                         </div>
                         <div class="flex justify-between items-center gap-2">
-                            <span class="text-muted-foreground shrink-0">Password</span>
+                            <span class="text-muted-foreground shrink-0"
+                                >Password</span
+                            >
                             <Badge
                                 variant={data.emailSetting.hasSenderPassword
                                     ? "secondary"
                                     : "outline"}
                                 class="text-xs"
                             >
-                                {data.emailSetting.hasSenderPassword ? "Set" : "Not set"}
+                                {data.emailSetting.hasSenderPassword
+                                    ? "Set"
+                                    : "Not set"}
                             </Badge>
                         </div>
                     </Card.Content>
@@ -313,7 +363,9 @@
                 class="bg-blue-50/50 border-blue-100 dark:bg-blue-950/20 dark:border-blue-900"
             >
                 <Card.Header class="pb-2">
-                    <Card.Title class="text-sm text-blue-700 dark:text-blue-400">
+                    <Card.Title
+                        class="text-sm text-blue-700 dark:text-blue-400"
+                    >
                         💡 Gmail Setup Guide
                     </Card.Title>
                 </Card.Header>
@@ -323,13 +375,21 @@
                     <p>To use Gmail as your SMTP provider:</p>
                     <ol class="list-decimal list-inside space-y-1">
                         <li>Enable <strong>2-Factor Authentication</strong></li>
-                        <li>Go to <strong>App Passwords</strong> in your Google Account</li>
+                        <li>
+                            Go to <strong>App Passwords</strong> in your Google Account
+                        </li>
                         <li>Generate a new App Password for this app</li>
-                        <li>Use the App Password instead of your Gmail password</li>
+                        <li>
+                            Use the App Password instead of your Gmail password
+                        </li>
                     </ol>
-                    <div class="mt-2 pt-2 border-t border-blue-200 dark:border-blue-800">
+                    <div
+                        class="mt-2 pt-2 border-t border-blue-200 dark:border-blue-800"
+                    >
                         <p class="font-medium">Recommended settings:</p>
-                        <p>Host: <code class="font-mono">smtp.gmail.com</code></p>
+                        <p>
+                            Host: <code class="font-mono">smtp.gmail.com</code>
+                        </p>
                         <p>Port: <code class="font-mono">587</code> (TLS)</p>
                     </div>
                 </Card.Content>

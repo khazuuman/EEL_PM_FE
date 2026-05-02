@@ -1,8 +1,9 @@
 import { APP_STAFF_MANAGE_GROUP } from "$lib/constants/depend";
 import { getAllClasses } from "$lib/server/classes";
 import type { PageServerLoad } from "./$types";
-import { getGroups } from "$lib/server/groups";
+import { getGroups, getGroupsBySemester } from "$lib/server/groups";
 import { getAllSemesters } from "$lib/server/semesters";
+import { redirect } from "@sveltejs/kit";
 
 export const load: PageServerLoad = async (event) => {
     const { depends, url } = event;
@@ -27,10 +28,15 @@ export const load: PageServerLoad = async (event) => {
             return 0;
         });
 
+    if (!url.searchParams.has("semesterId") && currentSemesterId) {
+        url.searchParams.set("semesterId", currentSemesterId);
+        redirect(302, url.toString());
+    }
+
     const selectedSemesterId = url.searchParams.get("semesterId") ?? currentSemesterId;
 
     const [groupsRes, classesRes] = await Promise.all([
-        getGroups(event),
+        getGroupsBySemester(event, selectedSemesterId),
         getAllClasses(event, selectedSemesterId),
     ]);
 

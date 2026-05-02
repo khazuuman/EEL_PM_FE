@@ -346,6 +346,59 @@
 
     <!-- Scrollable body -->
     <div class="flex-1 px-8 py-6 flex flex-col gap-6">
+        <!-- Stats Row -->
+        {#if data.announcements?.length > 0}
+            <div class="rounded-lg border border-red-200 bg-red-50">
+                <!-- Header -->
+                <button
+                    type="button"
+                    class="w-full flex items-center gap-2 px-4 py-3 cursor-pointer hover:bg-red-100/50 transition-colors rounded-lg"
+                    onclick={() =>
+                        (announcementsCollapsed = !announcementsCollapsed)}
+                >
+                    <BellIcon class="w-4 h-4 text-red-500 shrink-0" />
+                    <p class="text-sm font-semibold text-red-600">
+                        Announcements
+                    </p>
+                    <span
+                        class="text-xs font-medium text-red-400 bg-red-100 border border-red-200 rounded-full px-2 py-0.5"
+                    >
+                        {data.announcements.length}
+                    </span>
+                    <span
+                        class="ml-auto text-xs text-red-400 transition-transform duration-200 {announcementsCollapsed
+                            ? 'rotate-0'
+                            : 'rotate-180'}"
+                    >
+                        ▼
+                    </span>
+                </button>
+
+                <!-- List -->
+                {#if !announcementsCollapsed}
+                    <div
+                        transition:slide={{ duration: 200 }}
+                        class="border-t border-red-200 overflow-y-auto max-h-48 px-4 py-3"
+                    >
+                        <ul
+                            class="flex flex-col gap-1.5 pl-6 list-disc marker:text-red-300"
+                        >
+                            {#each data.announcements as announcement}
+                                <li>
+                                    <span
+                                        class="text-sm font-medium text-red-600"
+                                        >{announcement.title}</span
+                                    >
+                                    <span class="text-sm text-red-400 ml-1.5"
+                                        >— {announcement.content}</span
+                                    >
+                                </li>
+                            {/each}
+                        </ul>
+                    </div>
+                {/if}
+            </div>
+        {/if}
         <!-- Deadlines -->
         <div class="flex flex-wrap gap-3">
             {#if data.deadlines?.groupFormationEndDate}
@@ -422,59 +475,6 @@
                 </div>
             {/if}
         </div>
-        <!-- Stats Row -->
-        {#if data.announcements?.length > 0}
-            <div class="rounded-lg border border-red-200 bg-red-50">
-                <!-- Header -->
-                <button
-                    type="button"
-                    class="w-full flex items-center gap-2 px-4 py-3 cursor-pointer hover:bg-red-100/50 transition-colors rounded-lg"
-                    onclick={() =>
-                        (announcementsCollapsed = !announcementsCollapsed)}
-                >
-                    <BellIcon class="w-4 h-4 text-red-500 shrink-0" />
-                    <p class="text-sm font-semibold text-red-600">
-                        Announcements
-                    </p>
-                    <span
-                        class="text-xs font-medium text-red-400 bg-red-100 border border-red-200 rounded-full px-2 py-0.5"
-                    >
-                        {data.announcements.length}
-                    </span>
-                    <span
-                        class="ml-auto text-xs text-red-400 transition-transform duration-200 {announcementsCollapsed
-                            ? 'rotate-0'
-                            : 'rotate-180'}"
-                    >
-                        ▼
-                    </span>
-                </button>
-
-                <!-- List -->
-                {#if !announcementsCollapsed}
-                    <div
-                        transition:slide={{ duration: 200 }}
-                        class="border-t border-red-200 overflow-y-auto max-h-48 px-4 py-3"
-                    >
-                        <ul
-                            class="flex flex-col gap-1.5 pl-6 list-disc marker:text-red-300"
-                        >
-                            {#each data.announcements as announcement}
-                                <li>
-                                    <span
-                                        class="text-sm font-medium text-red-600"
-                                        >{announcement.title}</span
-                                    >
-                                    <span class="text-sm text-red-400 ml-1.5"
-                                        >— {announcement.content}</span
-                                    >
-                                </li>
-                            {/each}
-                        </ul>
-                    </div>
-                {/if}
-            </div>
-        {/if}
         {#if data.group}
             <div class="flex flex-col sm:flex-row gap-3">
                 <!-- Members stat -->

@@ -10,6 +10,7 @@
         UserRoundSearchIcon,
         CheckIcon,
         UserIcon,
+        UsersIcon,
         BuildingIcon,
         LayersIcon,
         Loader2Icon,
@@ -52,6 +53,7 @@
     let selectedMentorName = $state("");
     let manualEmail = $state("");
     let manualFullName = $state("");
+    let manualCode = $state("");
 
     // Mode: "list" | "manual"
     let mode = $state<"list" | "manual">("list");
@@ -64,13 +66,11 @@
     // Debounce search
     let searchTimeout: ReturnType<typeof setTimeout>;
 
-    // --- FIX: Chỉ trigger khi open thay đổi từ false → true ---
     let prevOpen = $state(false);
 
     $effect(() => {
         if (open && !prevOpen) {
             resetState();
-            // Dùng tick để đảm bảo DOM đã render form trước khi submit
             setTimeout(() => fetchMentors(1), 0);
         }
         prevOpen = open;
@@ -84,6 +84,7 @@
         selectedMentorName = "";
         manualEmail = "";
         manualFullName = "";
+        manualCode = "";
         mode = "list";
     }
 
@@ -94,10 +95,8 @@
             await update({ reset: false });
             if (result.type === "success") {
                 mentors = (result.data as any)?.mentors ?? [];
-                // FIX: Cập nhật pagination mà không trigger $effect
                 const newPagination = (result.data as any)?.pagination;
                 if (newPagination) {
-                    // Giữ lại page hiện tại vì server trả về đúng
                     pagination = {
                         page: newPagination.page ?? pagination.page,
                         limit: newPagination.limit ?? pagination.limit,
@@ -110,7 +109,6 @@
         };
     };
 
-    // FIX: fetchMentors không cập nhật pagination.page (tránh trigger $effect)
     function fetchMentors(page: number) {
         if (pageInput) pageInput.value = String(page);
         if (searchInput) searchInput.value = searchEmail;
@@ -135,6 +133,7 @@
             mode = "list";
             manualEmail = "";
             manualFullName = "";
+            manualCode = "";
         }
     }
 
@@ -175,10 +174,10 @@
                 if (isManual) {
                     formData.append("mentorEmail", manualEmail.trim());
                     if (manualFullName.trim()) {
-                        formData.append(
-                            "mentorFullName",
-                            manualFullName.trim(),
-                        );
+                        formData.append("mentorFullName", manualFullName.trim());
+                    }
+                    if (manualCode.trim()) {
+                        formData.append("mentorCode", manualCode.trim());
                     }
                 } else {
                     formData.append("mentorId", String(selectedMentorId));
@@ -253,6 +252,7 @@
                         selectedMentorId = null;
                         manualEmail = "";
                         manualFullName = "";
+                        manualCode = "";
                     }}
                     class="flex-1 py-2.5 text-xs font-semibold transition-colors
                         {mode === 'list'
@@ -425,6 +425,16 @@
                                                         {mentor.fieldOfWork}
                                                     </span>
                                                 {/if}
+                                                <span
+                                                    class="inline-flex items-center gap-1 text-xs font-medium rounded-full px-2 py-0.5
+                                                        {(mentor.activeGroupCount ?? 0) === 0
+                                                            ? 'text-stone-400 bg-stone-100 border border-stone-200'
+                                                            : 'text-blue-600 bg-blue-50 border border-blue-100'}"
+                                                >
+                                                    <UsersIcon class="w-2.5 h-2.5" />
+                                                    {mentor.activeGroupCount ?? 0}
+                                                    {(mentor.activeGroupCount ?? 0) === 1 ? "group" : "groups"}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -510,6 +520,25 @@
                                 placeholder="e.g. John Doe"
                                 bind:value={manualFullName}
                                 class="text-sm"
+                            />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <Label
+                                for="manualCode"
+                                class="text-sm font-medium text-stone-700"
+                            >
+                                Mentor Code <span
+                                    class="text-stone-400 font-normal"
+                                    >(optional)</span
+                                >
+                            </Label>
+                            <Input
+                                id="manualCode"
+                                type="text"
+                                placeholder="e.g. MTR001"
+                                bind:value={manualCode}
+                                class="font-mono text-sm"
                             />
                         </div>
 

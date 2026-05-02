@@ -49,20 +49,20 @@
         classCode: "Class",
     });
 
-    onMount(() => {
-        const currentUrl = new URL(window.location.href);
-        if (
-            !currentUrl.searchParams.has("semesterId") &&
-            data?.currentSemesterId
-        ) {
-            currentUrl.searchParams.set("semesterId", data.currentSemesterId);
-            goto(currentUrl.toString(), {
-                replaceState: true,
-                noScroll: true,
-                keepFocus: true,
-            });
-        }
-    });
+    // onMount(() => {
+    //     const currentUrl = new URL(window.location.href);
+    //     if (
+    //         !currentUrl.searchParams.has("semesterId") &&
+    //         data?.currentSemesterId
+    //     ) {
+    //         currentUrl.searchParams.set("semesterId", data.currentSemesterId);
+    //         goto(currentUrl.toString(), {
+    //             replaceState: true,
+    //             noScroll: true,
+    //             keepFocus: true,
+    //         });
+    //     }
+    // });
 </script>
 
 <div class="bg-white w-full pt-5 px-5 rounded-md h-screen overflow-hidden">

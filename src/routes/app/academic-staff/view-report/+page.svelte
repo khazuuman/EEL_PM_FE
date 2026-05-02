@@ -28,14 +28,46 @@
 
     let { data }: { data: PageData } = $props();
     const courses = $derived(data.courses ?? []);
-    const summary = $derived(data.dashboardData?.summary);
-    const topicDist = $derived(
-        data.dashboardData?.topicStatusDistribution ?? {},
-    );
-    const submissionStats = $derived(data.dashboardData?.submissionStats);
-    const gradeRange = $derived(
-        data.dashboardData?.gradeRangeDistribution ?? {},
-    );
+
+    // New courseStats structure: { totalCourses, courseStats: { [courseCode]: {...} } }
+    const dashboardData = $derived(data.dashboardData);
+    const totalCourses = $derived(dashboardData?.totalCourses ?? 0);
+    const courseStats = $derived(dashboardData?.courseStats ?? {});
+
+    // Aggregate summary across all courses for the top summary cards
+    const aggregatedSummary = $derived(() => {
+        const entries = Object.values(courseStats) as any[];
+        if (entries.length === 0) return null;
+        return {
+            totalClasses: entries.reduce(
+                (s, c) => s + (c.summary?.totalClasses ?? 0),
+                0,
+            ),
+            totalCourses,
+            totalGroups: entries.reduce(
+                (s, c) => s + (c.summary?.totalGroups ?? 0),
+                0,
+            ),
+            totalTopics: entries.reduce(
+                (s, c) => s + (c.summary?.totalTopics ?? 0),
+                0,
+            ),
+            averageGrade:
+                entries.length > 0
+                    ? entries.reduce(
+                          (s, c) => s + (c.summary?.averageGrade ?? 0),
+                          0,
+                      ) / entries.length
+                    : 0,
+            highestGrade: Math.max(
+                ...entries.map((c) => c.summary?.highestGrade ?? 0),
+            ),
+            lowestGrade: Math.min(
+                ...entries.map((c) => c.summary?.lowestGrade ?? 0),
+            ),
+        };
+    });
+
     const topGroups = $derived(data.topTierGroups ?? []);
     const pagination = $derived(data.topTierGroupPagination);
 
@@ -51,9 +83,21 @@
     let dashboardSemesterId = $state(data.dashboardFilters?.semesterId ?? "");
     let dashboardCourseId = $state(data.dashboardFilters?.courseId ?? "");
 
+    // Active course tab for per-course stats
+    let activeCourseTab = $state<string>("");
+    $effect(() => {
+        const keys = Object.keys(courseStats);
+        if (keys.length > 0 && !activeCourseTab) {
+            activeCourseTab = keys[0];
+        }
+    });
+
+    const activeCourseData = $derived(
+        activeCourseTab ? (courseStats[activeCourseTab] as any) : null,
+    );
+
     function applyDashboardFilter() {
         const url = new URL(page.url);
-        // Chỉ set các param dashboard, giữ nguyên top tier params
         if (dashboardSemesterId) {
             url.searchParams.set("dashboardSemesterId", dashboardSemesterId);
         } else {
@@ -64,7 +108,6 @@
         } else {
             url.searchParams.delete("dashboardCourseId");
         }
-        // Reset về page 1 nhưng GIỮ NGUYÊN top tier filters
         goto(url.toString(), { invalidateAll: true });
     }
 
@@ -97,52 +140,31 @@
     const summaryCards = $derived([
         {
             label: "Total Classes",
-            value: summary?.totalClasses ?? 0,
+            value: aggregatedSummary()?.totalClasses ?? 0,
             icon: LayersIcon,
             color: "text-orange-500",
             bg: "bg-orange-50",
         },
         {
             label: "Total Courses",
-            value: summary?.totalCourses ?? 0,
+            value: totalCourses,
             icon: BookOpenIcon,
             color: "text-blue-500",
             bg: "bg-blue-50",
         },
         {
             label: "Total Groups",
-            value: summary?.totalGroups ?? 0,
+            value: aggregatedSummary()?.totalGroups ?? 0,
             icon: UsersIcon,
             color: "text-green-500",
             bg: "bg-green-50",
         },
         {
             label: "Total Topics",
-            value: summary?.totalTopics ?? 0,
+            value: aggregatedSummary()?.totalTopics ?? 0,
             icon: FileTextIcon,
             color: "text-purple-500",
             bg: "bg-purple-50",
-        },
-    ]);
-
-    const gradeCards = $derived([
-        {
-            label: "Average Grade",
-            value: summary?.averageGrade?.toFixed(1) ?? "0.0",
-            icon: BarChart3Icon,
-            color: "text-orange-500",
-        },
-        {
-            label: "Highest Grade",
-            value: summary?.highestGrade?.toFixed(1) ?? "0.0",
-            icon: TrendingUpIcon,
-            color: "text-green-500",
-        },
-        {
-            label: "Lowest Grade",
-            value: summary?.lowestGrade?.toFixed(1) ?? "0.0",
-            icon: AwardIcon,
-            color: "text-red-500",
         },
     ]);
 
@@ -158,8 +180,6 @@
         Pending: "bg-yellow-100 text-yellow-700 border-yellow-200",
         Rejected: "bg-red-100 text-red-700 border-red-200",
     };
-
-    const totalGroups = $derived(summary?.totalGroups ?? 1);
 
     // Pagination helpers
     const currentPage = $derived(pagination?.page ?? 1);
@@ -191,7 +211,6 @@
         return [1, "...", current - 1, current, current + 1, "...", total];
     }
 
-    //export
     async function handleExport() {
         exporting = true;
         try {
@@ -200,7 +219,9 @@
             params.set("topPercentage", String(topPercentage));
             if (semesterId) params.set("semesterId", semesterId);
 
-            const res = await fetch(`/api/export/top-groups?${params.toString()}`);
+            const res = await fetch(
+                `/api/export/top-groups?${params.toString()}`,
+            );
             if (!res.ok) {
                 toast.error("Failed to export groups.");
                 return;
@@ -258,7 +279,6 @@
     <div
         class="flex flex-wrap items-end gap-3 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3"
     >
-        <!-- Semester -->
         <div class="flex flex-col gap-1">
             <Label class="text-xs text-gray-500">Semester</Label>
             <Select.Root
@@ -291,7 +311,6 @@
             </Select.Root>
         </div>
 
-        <!-- Course -->
         <div class="flex flex-col gap-1">
             <Label class="text-xs text-gray-500">Course</Label>
             <Select.Root
@@ -325,7 +344,7 @@
         </Button>
     </div>
 
-    <!-- Summary Cards -->
+    <!-- Summary Cards (aggregated across all courses) -->
     <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {#each summaryCards as card}
             <Card.Root class="border border-gray-100 shadow-sm">
@@ -349,157 +368,227 @@
         {/each}
     </div>
 
-    <!-- Grade Stats + Topic Distribution + Submission -->
-    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <!-- Per-Course Stats with Tabs -->
+    {#if Object.keys(courseStats).length > 0}
         <Card.Root class="border border-gray-100 shadow-sm">
-            <Card.Header class="pb-2">
+            <Card.Header class="pb-3">
                 <Card.Title
                     class="flex items-center gap-2 text-base font-semibold"
                 >
-                    <TrendingUpIcon class="h-4 w-4 text-orange-500" />
-                    Grade Statistics
+                    <BookOpenIcon class="h-4 w-4 text-orange-500" />
+                    Course Statistics
                 </Card.Title>
+                <Card.Description class="text-xs text-gray-400">
+                    Detailed breakdown per course
+                </Card.Description>
             </Card.Header>
-            <Card.Content class="space-y-4">
-                {#each gradeCards as g}
-                    <div
-                        class="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3"
-                    >
-                        <div class="flex items-center gap-2">
-                            <svelte:component
-                                this={g.icon}
-                                class="h-4 w-4 {g.color}"
-                            />
-                            <span class="text-sm text-gray-600">{g.label}</span>
-                        </div>
-                        <span class="text-xl font-bold {g.color}"
-                            >{g.value}</span
-                        >
-                    </div>
-                {/each}
-            </Card.Content>
-        </Card.Root>
 
-        <Card.Root class="border border-gray-100 shadow-sm">
-            <Card.Header class="pb-2">
-                <Card.Title
-                    class="flex items-center gap-2 text-base font-semibold"
-                >
-                    <FileTextIcon class="h-4 w-4 text-orange-500" />
-                    Topic Status
-                </Card.Title>
-            </Card.Header>
-            <Card.Content class="space-y-3">
-                {#if Object.keys(topicDist).length === 0}
-                    <p class="text-sm text-gray-400">No data available.</p>
-                {:else}
-                    {#each Object.entries(topicDist) as [status, count]}
-                        <div class="flex items-center justify-between">
-                            <Badge
-                                variant="outline"
-                                class="text-xs font-medium {topicStatusColors[
-                                    status
-                                ] ?? 'bg-gray-100 text-gray-600'}"
-                            >
-                                {status}
-                            </Badge>
-                            <span class="text-lg font-semibold text-gray-800"
-                                >{count}</span
-                            >
-                        </div>
+            <!-- Course Tabs -->
+            <div class="px-6">
+                <div class="flex gap-2 border-b border-gray-100">
+                    {#each Object.keys(courseStats) as courseCode}
+                        <button
+                            onclick={() => (activeCourseTab = courseCode)}
+                            class="px-4 py-2 text-sm font-medium transition-all border-b-2 -mb-px {activeCourseTab ===
+                            courseCode
+                                ? 'border-orange-500 text-orange-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700'}"
+                        >
+                            {courseCode}
+                        </button>
                     {/each}
-                {/if}
-            </Card.Content>
-        </Card.Root>
-
-        <Card.Root class="border border-gray-100 shadow-sm">
-            <Card.Header class="pb-2">
-                <Card.Title
-                    class="flex items-center gap-2 text-base font-semibold"
-                >
-                    <LayersIcon class="h-4 w-4 text-orange-500" />
-                    Submission Stats
-                </Card.Title>
-            </Card.Header>
-            <Card.Content class="space-y-3">
-                <div
-                    class="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3"
-                >
-                    <span class="text-sm text-gray-600"
-                        >Groups with Submissions</span
-                    >
-                    <span class="font-bold text-gray-800">
-                        {submissionStats?.groupsWithSubmissions ?? 0} / {submissionStats?.totalGroups ??
-                            0}
-                    </span>
                 </div>
-                <div
-                    class="flex items-center justify-between rounded-lg bg-gray-50 px-4 py-3"
-                >
-                    <span class="text-sm text-gray-600">Total Submissions</span>
-                    <span class="font-bold text-orange-600"
-                        >{submissionStats?.totalSubmissions ?? 0}</span
-                    >
-                </div>
-                {#if submissionStats && Object.keys(submissionStats.statusDistribution ?? {}).length > 0}
-                    <Separator />
-                    {#each Object.entries(submissionStats.statusDistribution) as [status, count]}
-                        <div class="flex items-center justify-between px-1">
-                            <span class="text-xs text-gray-500">{status}</span>
-                            <Badge variant="secondary" class="text-xs"
-                                >{count}</Badge
-                            >
-                        </div>
-                    {/each}
-                {/if}
-            </Card.Content>
-        </Card.Root>
-    </div>
-
-    <!-- Grade Range Distribution -->
-    <Card.Root class="border border-gray-100 shadow-sm">
-        <Card.Header class="pb-2">
-            <Card.Title class="flex items-center gap-2 text-base font-semibold">
-                <BarChart3Icon class="h-4 w-4 text-orange-500" />
-                Grade Range Distribution
-            </Card.Title>
-            <Card.Description class="text-xs text-gray-400">
-                Number of groups per grade range
-            </Card.Description>
-        </Card.Header>
-        <Card.Content>
-            <div class="space-y-3">
-                {#each Object.entries(gradeRange) as [range, count]}
-                    {@const pct =
-                        totalGroups > 0
-                            ? Math.round(
-                                  ((count as number) / totalGroups) * 100,
-                              )
-                            : 0}
-                    <div class="flex items-center gap-3">
-                        <span
-                            class="w-24 text-right text-sm font-medium text-gray-600"
-                            >{range}</span
-                        >
-                        <div
-                            class="flex-1 overflow-hidden rounded-full bg-gray-100"
-                        >
-                            <div
-                                class="h-3 rounded-full transition-all duration-500 {gradeRangeColors[
-                                    range
-                                ] ?? 'bg-gray-400'}"
-                                style="width: {pct}%"
-                            ></div>
-                        </div>
-                        <span
-                            class="w-8 text-right text-sm font-semibold text-gray-700"
-                            >{count as number}</span
-                        >
-                    </div>
-                {/each}
             </div>
-        </Card.Content>
-    </Card.Root>
+
+            <Card.Content class="pt-4">
+                {#if activeCourseData}
+                    <!-- Mini Summary for active course -->
+                    <div class="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+                        {#each [{ label: "Classes", value: activeCourseData.summary?.totalClasses ?? 0, color: "text-orange-500", bg: "bg-orange-50" }, { label: "Groups", value: activeCourseData.summary?.totalGroups ?? 0, color: "text-green-500", bg: "bg-green-50" }, { label: "Topics", value: activeCourseData.summary?.totalTopics ?? 0, color: "text-purple-500", bg: "bg-purple-50" }, { label: "Avg Grade", value: (activeCourseData.summary?.averageGrade ?? 0).toFixed(1), color: "text-blue-500", bg: "bg-blue-50" }] as mini}
+                            <div
+                                class="flex items-center gap-3 rounded-lg {mini.bg} px-4 py-3"
+                            >
+                                <div>
+                                    <p class="text-xs text-gray-500">
+                                        {mini.label}
+                                    </p>
+                                    <p class="text-xl font-bold {mini.color}">
+                                        {mini.value}
+                                    </p>
+                                </div>
+                            </div>
+                        {/each}
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                        <!-- Grade Statistics -->
+                        <div class="rounded-lg border border-gray-100 p-4">
+                            <p
+                                class="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-700"
+                            >
+                                <TrendingUpIcon
+                                    class="h-4 w-4 text-orange-500"
+                                />
+                                Grade Statistics
+                            </p>
+                            <div class="space-y-2">
+                                {#each [{ label: "Average", value: (activeCourseData.summary?.averageGrade ?? 0).toFixed(1), color: "text-orange-500" }, { label: "Highest", value: (activeCourseData.summary?.highestGrade ?? 0).toFixed(1), color: "text-green-500" }, { label: "Lowest", value: (activeCourseData.summary?.lowestGrade ?? 0).toFixed(1), color: "text-red-500" }] as g}
+                                    <div
+                                        class="flex items-center justify-between rounded bg-gray-50 px-3 py-2"
+                                    >
+                                        <span class="text-sm text-gray-500"
+                                            >{g.label}</span
+                                        >
+                                        <span
+                                            class="text-lg font-bold {g.color}"
+                                            >{g.value}</span
+                                        >
+                                    </div>
+                                {/each}
+                            </div>
+                        </div>
+
+                        <!-- Topic Status -->
+                        <div class="rounded-lg border border-gray-100 p-4">
+                            <p
+                                class="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-700"
+                            >
+                                <FileTextIcon class="h-4 w-4 text-orange-500" />
+                                Topic Status
+                            </p>
+                            <div class="space-y-2">
+                                {#if Object.keys(activeCourseData.topicStatusDistribution ?? {}).length === 0}
+                                    <p class="text-sm text-gray-400">
+                                        No data available.
+                                    </p>
+                                {:else}
+                                    {#each Object.entries(activeCourseData.topicStatusDistribution ?? {}) as [status, count]}
+                                        <div
+                                            class="flex items-center justify-between"
+                                        >
+                                            <Badge
+                                                variant="outline"
+                                                class="text-xs font-medium {topicStatusColors[
+                                                    status
+                                                ] ??
+                                                    'bg-gray-100 text-gray-600'}"
+                                            >
+                                                {status}
+                                            </Badge>
+                                            <span
+                                                class="text-lg font-semibold text-gray-800"
+                                                >{count}</span
+                                            >
+                                        </div>
+                                    {/each}
+                                {/if}
+                            </div>
+                        </div>
+
+                        <!-- Submission Stats -->
+                        <div class="rounded-lg border border-gray-100 p-4">
+                            <p
+                                class="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-700"
+                            >
+                                <LayersIcon class="h-4 w-4 text-orange-500" />
+                                Submission Stats
+                            </p>
+                            <div class="space-y-2">
+                                <div
+                                    class="flex items-center justify-between rounded bg-gray-50 px-3 py-2"
+                                >
+                                    <span class="text-xs text-gray-600"
+                                        >With Submissions</span
+                                    >
+                                    <span class="font-bold text-gray-800">
+                                        {activeCourseData.submissionStats
+                                            ?.groupsWithSubmissions ?? 0} / {activeCourseData
+                                            .submissionStats?.totalGroups ?? 0}
+                                    </span>
+                                </div>
+                                <div
+                                    class="flex items-center justify-between rounded bg-gray-50 px-3 py-2"
+                                >
+                                    <span class="text-xs text-gray-600"
+                                        >Total Submissions</span
+                                    >
+                                    <span class="font-bold text-orange-600"
+                                        >{activeCourseData.submissionStats
+                                            ?.totalSubmissions ?? 0}</span
+                                    >
+                                </div>
+                                {#if Object.keys(activeCourseData.submissionStats?.statusDistribution ?? {}).length > 0}
+                                    <Separator />
+                                    {#each Object.entries(activeCourseData.submissionStats.statusDistribution) as [status, count]}
+                                        <div
+                                            class="flex items-center justify-between px-1"
+                                        >
+                                            <span class="text-xs text-gray-500"
+                                                >{status}</span
+                                            >
+                                            <Badge
+                                                variant="secondary"
+                                                class="text-xs">{count}</Badge
+                                            >
+                                        </div>
+                                    {/each}
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Grade Range Distribution for active course -->
+                    <div class="mt-4 rounded-lg border border-gray-100 p-4">
+                        <p
+                            class="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-700"
+                        >
+                            <BarChart3Icon class="h-4 w-4 text-orange-500" />
+                            Grade Range Distribution
+                        </p>
+                        <div class="space-y-3">
+                            {#each Object.entries(activeCourseData.gradeRangeDistribution ?? {}) as [range, count]}
+                                {@const totalG =
+                                    activeCourseData.summary?.totalGroups ?? 1}
+                                {@const pct =
+                                    totalG > 0
+                                        ? Math.round(
+                                              ((count as number) / totalG) *
+                                                  100,
+                                          )
+                                        : 0}
+                                <div class="flex items-center gap-3">
+                                    <span
+                                        class="w-24 text-right text-sm font-medium text-gray-600"
+                                        >{range}</span
+                                    >
+                                    <div
+                                        class="flex-1 overflow-hidden rounded-full bg-gray-100"
+                                    >
+                                        <div
+                                            class="h-3 rounded-full transition-all duration-500 {gradeRangeColors[
+                                                range
+                                            ] ?? 'bg-gray-400'}"
+                                            style="width: {pct}%"
+                                        ></div>
+                                    </div>
+                                    <span
+                                        class="w-8 text-right text-sm font-semibold text-gray-700"
+                                        >{count as number}</span
+                                    >
+                                </div>
+                            {/each}
+                        </div>
+                    </div>
+                {/if}
+            </Card.Content>
+        </Card.Root>
+    {:else}
+        <Card.Root class="border border-gray-100 shadow-sm">
+            <Card.Content class="py-10 text-center text-sm text-gray-400">
+                No course data available.
+            </Card.Content>
+        </Card.Root>
+    {/if}
 
     <!-- Top Tier Groups -->
     <Card.Root class="border border-gray-100 shadow-sm">
@@ -519,7 +608,6 @@
                     </Card.Description>
                 </div>
 
-                <!-- Filter -->
                 <div class="flex flex-wrap items-end gap-3">
                     <div class="flex flex-col gap-1">
                         <Label class="text-xs text-gray-500">Min Score</Label>
@@ -544,8 +632,6 @@
                             class="h-8 w-24 text-sm"
                         />
                     </div>
-
-                    <!-- Semester Dropdown -->
                     <div class="flex flex-col gap-1">
                         <Label class="text-xs text-gray-500">Semester</Label>
                         <Select.Root
@@ -571,9 +657,8 @@
                                             {#if semester.isCurrent}
                                                 <Badge
                                                     class="h-4 bg-orange-100 px-1.5 text-[10px] text-orange-600"
+                                                    >Current</Badge
                                                 >
-                                                    Current
-                                                </Badge>
                                             {/if}
                                         </div>
                                     </Select.Item>
@@ -589,8 +674,6 @@
                         <SearchIcon class="h-3.5 w-3.5" />
                         Apply
                     </Button>
-
-                    <!-- Export Button -->
                     <Button
                         onclick={handleExport}
                         disabled={exporting}
@@ -663,9 +746,8 @@
                                     </td>
                                     <td
                                         class="max-w-[200px] truncate py-3 pr-4 text-gray-600"
+                                        >{group.topicTitle}</td
                                     >
-                                        {group.topicTitle}
-                                    </td>
                                     <td class="py-3 pr-4">
                                         <Badge
                                             variant="outline"
@@ -708,7 +790,6 @@
                             >{totalItems}</span
                         > groups
                     </p>
-
                     <div class="flex items-center gap-1">
                         <Button
                             variant="outline"
@@ -719,7 +800,6 @@
                         >
                             <ChevronLeftIcon class="h-4 w-4" />
                         </Button>
-
                         {#each getPageNumbers(currentPage, totalPages) as p}
                             {#if p === "..."}
                                 <span class="px-1 text-gray-400">…</span>
@@ -738,7 +818,6 @@
                                 </Button>
                             {/if}
                         {/each}
-
                         <Button
                             variant="outline"
                             size="icon"

@@ -6,6 +6,7 @@
     import { goto } from "$app/navigation";
     import { onMount } from "svelte";
     import { toast } from "svelte-sonner";
+    import { page } from "$app/state";
 
     const { data } = $props();
     let groups = $derived(data?.groups || []);
@@ -98,20 +99,34 @@
         semesterCode: "Semester",
     });
 
-    onMount(() => {
-        const currentUrl = new URL(window.location.href);
-        if (
-            !currentUrl.searchParams.has("semesterId") &&
-            data?.currentSemesterId
-        ) {
-            currentUrl.searchParams.set("semesterId", data.currentSemesterId);
-            goto(currentUrl.toString(), {
-                replaceState: true,
-                noScroll: true,
-                keepFocus: true,
-            });
-        }
-    });
+    // onMount(() => {
+    //     const currentUrl = new URL(window.location.href);
+    //     if (
+    //         !currentUrl.searchParams.has("semesterId") &&
+    //         data?.currentSemesterId
+    //     ) {
+    //         currentUrl.searchParams.set("semesterId", data.currentSemesterId);
+    //         goto(currentUrl.toString(), {
+    //             replaceState: true,
+    //             noScroll: true,
+    //             keepFocus: true,
+    //         });
+    //     }
+    // });
+    // $effect(() => {
+    //     const currentSemesterId = data?.currentSemesterId;
+    //     if (!currentSemesterId) return;
+
+    //     const currentUrl = new URL(page.url);
+    //     if (!currentUrl.searchParams.has("semesterId")) {
+    //         currentUrl.searchParams.set("semesterId", currentSemesterId);
+    //         goto(currentUrl.toString(), {
+    //             replaceState: true,
+    //             noScroll: true,
+    //             keepFocus: true,
+    //         });
+    //     }
+    // });
 </script>
 
 <div class="bg-white w-full px-10 rounded-md pt-5 overflow-x-hidden pb-10 z-10">

@@ -4,6 +4,7 @@ import type { PageServerLoad } from "./$types";
 import { getAllClasses } from "$lib/server/classes";
 import { getAllSemesters } from "$lib/server/semesters";
 import { getAllCourses } from "$lib/server/course";
+import { redirect } from "@sveltejs/kit";
 
 export const load: PageServerLoad = async (event) => {
     const { depends, url } = event;
@@ -29,10 +30,16 @@ export const load: PageServerLoad = async (event) => {
             return 0;
         });
 
-    const [topicsRes, classesRes, semestersRes, coursesRes] = await Promise.all([
+    if (!url.searchParams.has("semesterId") && currentSemesterId) {
+        url.searchParams.set("semesterId", currentSemesterId);
+        redirect(302, url.toString());
+    }
+
+    const selectedSemesterId = url.searchParams.get("semesterId") ?? currentSemesterId;
+
+    const [topicsRes, classesRes, coursesRes] = await Promise.all([
         getTopics(event),
-        getAllClasses(event, currentSemesterId),
-        getAllSemesters(event),
+        getAllClasses(event, selectedSemesterId),
         getAllCourses(event)
     ]);
 
