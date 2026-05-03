@@ -65,19 +65,14 @@
         Rejected: "bg-red-100 text-red-700 border-red-200",
     };
 
+    // Submission: chỉ Submitted mới xanh lá, còn lại default stone
     const submissionStatusClass: Record<string, string> = {
-        "Not Submitted": "bg-stone-100 text-stone-500 border-stone-200",
-        Submitted: "bg-blue-100 text-blue-700 border-blue-200",
-        Graded: "bg-green-100 text-green-700 border-green-200",
-        Late: "bg-orange-100 text-orange-600 border-orange-200",
-        Overdue: "bg-red-100 text-red-600 border-red-200",
+        Submitted: "bg-green-100 text-green-700 border-green-200",
     };
 
+    // Assignment: chỉ Graded mới xanh lá, còn lại default stone
     const assignmentStatusClass: Record<string, string> = {
-        Active: "bg-green-100 text-green-700 border-green-200",
-        Inactive: "bg-stone-100 text-stone-500 border-stone-200",
-        Upcoming: "bg-blue-100 text-blue-700 border-blue-200",
-        Closed: "bg-red-100 text-red-600 border-red-200",
+        Graded: "bg-green-100 text-green-700 border-green-200",
     };
 
     const typeClass: Record<string, string> = {
@@ -462,11 +457,6 @@
                                     <CalendarIcon class="w-3.5 h-3.5" /> Due Date
                                 </div>
                             </Table.Head>
-                            <Table.Head class="text-stone-600 font-semibold">
-                                <div class="flex items-center gap-1.5">
-                                    <TrophyIcon class="w-3.5 h-3.5" /> Score
-                                </div>
-                            </Table.Head>
                             <Table.Head
                                 class="text-stone-600 font-semibold text-center"
                                 >Assignment</Table.Head
@@ -475,17 +465,13 @@
                                 class="text-stone-600 font-semibold text-center"
                                 >Submission</Table.Head
                             >
-                            <Table.Head
-                                class="text-stone-600 font-semibold text-center"
-                                >Action</Table.Head
-                            >
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
                         {#if checkpoints.length === 0}
                             <Table.Row>
                                 <Table.Cell
-                                    colspan={8}
+                                    colspan={6}
                                     class="py-16 text-center"
                                 >
                                     <div
@@ -506,7 +492,7 @@
                                 </Table.Cell>
                             </Table.Row>
                         {:else}
-                            {#each checkpoints as cp (cp.id)}
+                            {#each checkpoints as cp, i (cp.id)}
                                 {@const StatusIcon = getSubmissionIcon(
                                     (cp as any).status,
                                 )}
@@ -516,13 +502,18 @@
                                     <Table.Cell
                                         class="text-center text-stone-400 text-sm font-mono"
                                     >
-                                        {(cp as any).sequenceNumber ?? "—"}
+                                        {i + 1}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        <span
-                                            class="text-sm font-semibold text-stone-900"
-                                            >{(cp as any).title}</span
+                                        <button
+                                            onclick={() =>
+                                                goto(
+                                                    `/app/mentor/groups/${g.groupId}/assignment/${(cp as any).id}`,
+                                                )}
+                                            class="text-sm font-semibold text-stone-900 hover:text-amber-600 hover:underline cursor-pointer text-left"
                                         >
+                                            {(cp as any).title}
+                                        </button>
                                     </Table.Cell>
                                     <Table.Cell>
                                         <Badge
@@ -548,25 +539,6 @@
                                                 >
                                             {/if}
                                         </div>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        {#if (cp as any).score !== null && (cp as any).score !== undefined}
-                                            <span
-                                                class="text-sm font-bold text-stone-800"
-                                            >
-                                                {(cp as any).score}
-                                                <span
-                                                    class="text-xs font-normal text-stone-400"
-                                                    >/ {(cp as any)
-                                                        .maxScore}</span
-                                                >
-                                            </span>
-                                        {:else}
-                                            <span class="text-sm text-stone-300"
-                                                >— / {(cp as any)
-                                                    .maxScore}</span
-                                            >
-                                        {/if}
                                     </Table.Cell>
                                     <Table.Cell class="text-center">
                                         <Badge
@@ -596,19 +568,6 @@
                                                 {(cp as any).status}
                                             </Badge>
                                         </div>
-                                    </Table.Cell>
-                                    <Table.Cell class="text-center">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onclick={() =>
-                                                goto(
-                                                    `/app/mentor/groups/${g.groupId}/assignment/${(cp as any).id}`,
-                                                )}
-                                            class="gap-1.5 text-stone-400 hover:text-amber-600 hover:bg-amber-50 cursor-pointer h-7 text-xs"
-                                        >
-                                            View
-                                        </Button>
                                     </Table.Cell>
                                 </Table.Row>
                             {/each}
@@ -667,11 +626,6 @@
                                     <CalendarIcon class="w-3.5 h-3.5" /> Due Date
                                 </div>
                             </Table.Head>
-                            <Table.Head class="text-stone-600 font-semibold">
-                                <div class="flex items-center gap-1.5">
-                                    <TrophyIcon class="w-3.5 h-3.5" /> Score
-                                </div>
-                            </Table.Head>
                             <Table.Head
                                 class="text-stone-600 font-semibold text-center"
                                 >Assignment</Table.Head
@@ -680,17 +634,13 @@
                                 class="text-stone-600 font-semibold text-center"
                                 >Submission</Table.Head
                             >
-                            <Table.Head
-                                class="text-stone-600 font-semibold text-center"
-                                >Action</Table.Head
-                            >
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
                         {#if otherAssignments.length === 0}
                             <Table.Row>
                                 <Table.Cell
-                                    colspan={8}
+                                    colspan={6}
                                     class="py-16 text-center"
                                 >
                                     <div
@@ -728,10 +678,15 @@
                                             1}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        <span
-                                            class="text-sm font-semibold text-stone-900"
-                                            >{(asgn as any).title}</span
+                                        <button
+                                            onclick={() =>
+                                                goto(
+                                                    `/app/mentor/groups/${g.groupId}/assignment/${(asgn as any).id}`,
+                                                )}
+                                            class="text-sm font-semibold text-stone-900 hover:text-sky-600 hover:underline cursor-pointer text-left"
                                         >
+                                            {(asgn as any).title}
+                                        </button>
                                     </Table.Cell>
                                     <Table.Cell>
                                         <Badge
@@ -757,25 +712,6 @@
                                                 >
                                             {/if}
                                         </div>
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        {#if (asgn as any).score !== null && (asgn as any).score !== undefined}
-                                            <span
-                                                class="text-sm font-bold text-stone-800"
-                                            >
-                                                {(asgn as any).score}
-                                                <span
-                                                    class="text-xs font-normal text-stone-400"
-                                                    >/ {(asgn as any)
-                                                        .maxScore}</span
-                                                >
-                                            </span>
-                                        {:else}
-                                            <span class="text-sm text-stone-300"
-                                                >— / {(asgn as any)
-                                                    .maxScore}</span
-                                            >
-                                        {/if}
                                     </Table.Cell>
                                     <Table.Cell class="text-center">
                                         <Badge
@@ -805,19 +741,6 @@
                                                 {(asgn as any).status}
                                             </Badge>
                                         </div>
-                                    </Table.Cell>
-                                    <Table.Cell class="text-center">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onclick={() =>
-                                                goto(
-                                                    `/app/mentor/groups/${g.groupId}/assignment/${(asgn as any).id}`,
-                                                )}
-                                            class="gap-1.5 text-stone-400 hover:text-sky-600 hover:bg-sky-50 cursor-pointer h-7 text-xs"
-                                        >
-                                            View
-                                        </Button>
                                     </Table.Cell>
                                 </Table.Row>
                             {/each}
