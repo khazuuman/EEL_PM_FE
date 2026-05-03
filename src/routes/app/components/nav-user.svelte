@@ -7,7 +7,7 @@
   import type { UserProfileDto } from "$lib/types/user";
   import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
   import LogOutIcon from "@lucide/svelte/icons/log-out";
-  import { CircleUserRoundIcon } from "lucide-svelte";
+  import { CircleUserRoundIcon, BookOpenTextIcon } from "lucide-svelte";
 
   let { user }: { user: UserProfileDto } = $props();
   let userRole = "";
@@ -24,6 +24,8 @@
     userRole = "mentor";
   }
 
+  const userGuidePath = "/user-guides/eelpm-fpt-guide.pdf";
+
   let dropdownMenu = $derived([
     ...(userRole !== "academic-staff"
       ? [
@@ -35,6 +37,12 @@
         ]
       : []),
     {
+      label: "User Guide",
+      path: userGuidePath,
+      icon: BookOpenTextIcon,
+      external: true,
+    },
+    {
       label: "Logout",
       path: "/auth/logout",
       icon: LogOutIcon,
@@ -44,7 +52,15 @@
 
 {#snippet dropdownItem(o: (typeof dropdownMenu)[number])}
   {@const Icon = o.icon}
-  <DropdownMenu.Item onclick={() => goto(o.path)}>
+  <DropdownMenu.Item
+    onclick={() => {
+      if ("external" in o && o.external) {
+        window.open(o.path, "_blank", "noopener,noreferrer");
+      } else {
+        goto(o.path);
+      }
+    }}
+  >
     <Icon />
     {o.label}
   </DropdownMenu.Item>
