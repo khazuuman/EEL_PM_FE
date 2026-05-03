@@ -321,13 +321,13 @@
                 <Select.Trigger class="h-8 w-fit text-sm">
                     {courses.find(
                         (c: any) => String(c.courseId) === dashboardCourseId,
-                    )?.courseName ?? "All Courses"}
+                    )?.courseCode ?? "All Courses"}
                 </Select.Trigger>
                 <Select.Content>
                     <Select.Item value="">All Courses</Select.Item>
                     {#each courses as course}
                         <Select.Item value={String(course.courseId)}>
-                            {course.courseName}
+                            {course.courseCode}
                         </Select.Item>
                     {/each}
                 </Select.Content>

@@ -168,11 +168,13 @@ export const actions: Actions = {
         const formData = await event.request.formData();
         const groupId = Number(formData.get("groupId"));
         const mentorIdRaw = formData.get("mentorId");
-        const mentorCode = formData.get("mentorCode");
+        const mentorCode = formData.get("mentorCode") as string;
         const mentorEmail = (formData.get("mentorEmail") as string) || null;
         const mentorFullName = (formData.get("mentorFullName") as string) || null;
 
         const mentorId = mentorIdRaw ? Number(mentorIdRaw) || null : null;
+
+        console.log('mentorCode: ', mentorCode);
 
         const assignMentorRes = await assignMentor(event, groupId, {
             ...(mentorId ? { mentorId } : {}),

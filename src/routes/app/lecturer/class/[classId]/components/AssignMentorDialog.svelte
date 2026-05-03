@@ -487,6 +487,23 @@
                             found in the system, they will be invited.
                         </p>
 
+                                                <div class="space-y-1.5">
+                            <Label
+                                for="manualCode"
+                                class="text-sm font-medium text-stone-700"
+                            >
+                                Mentor Code <span class="text-red-400">*</span>
+                            </Label>
+                            <Input
+                                id="manualCode"
+                                type="text"
+                                placeholder="e.g. MTR001"
+                                bind:value={manualCode}
+                                class="font-mono text-sm"
+                                required
+                            />
+                        </div>
+
                         <div class="space-y-1.5">
                             <Label
                                 for="manualEmail"
@@ -509,10 +526,7 @@
                                 for="manualFullName"
                                 class="text-sm font-medium text-stone-700"
                             >
-                                Full Name <span
-                                    class="text-stone-400 font-normal"
-                                    >(optional)</span
-                                >
+                                Full Name <span class="text-red-400">*</span>
                             </Label>
                             <Input
                                 id="manualFullName"
@@ -520,25 +534,7 @@
                                 placeholder="e.g. John Doe"
                                 bind:value={manualFullName}
                                 class="text-sm"
-                            />
-                        </div>
-
-                        <div class="space-y-1.5">
-                            <Label
-                                for="manualCode"
-                                class="text-sm font-medium text-stone-700"
-                            >
-                                Mentor Code <span
-                                    class="text-stone-400 font-normal"
-                                    >(optional)</span
-                                >
-                            </Label>
-                            <Input
-                                id="manualCode"
-                                type="text"
-                                placeholder="e.g. MTR001"
-                                bind:value={manualCode}
-                                class="font-mono text-sm"
+                                required
                             />
                         </div>
 
