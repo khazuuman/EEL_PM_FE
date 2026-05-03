@@ -18,23 +18,23 @@
         groupLabel: "Academic Data",
         items: [
             {
-                name: "Manage Student",
+                name: "View Student",
                 url: "/app/academic-staff/manage-academic-data",
             },
             {
-                name: "Manage Lecturer",
+                name: "View Lecturer",
                 url: "/app/academic-staff/manage-lecturers",
             },
             {
-                name: "Manage Mentor",
+                name: "View Mentor",
                 url: "/app/academic-staff/manage-mentors",
             },
             {
-                name: "Manage Topics",
+                name: "View Topics",
                 url: "/app/academic-staff/manage-topic",
             },
             {
-                name: "Manage Groups",
+                name: "View Groups",
                 url: "/app/academic-staff/manage-groups",
             },
             {
